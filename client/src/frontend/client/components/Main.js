@@ -261,13 +261,24 @@ const uploadReviewPhotos = (e) => {
     <div className='MainContainer'>
       <div className='live_msg_and_salse'>
         <div className='live_message_main'>
-          <div className='gruopNameAndLogo'>
-            <img src={groupIcon} alt="group logo"/>
-            <h3>Nothun Group</h3>
-            </div>
-          <div className='groupNotificatin_view'>Group Notification</div>
+          <GroupChats/>
         </div>
         <div className='live_salse_main'>
+          <div className='live_salse_header'>Today’s Overview</div>
+          <div className='live_sales_innerContainer'>
+            <div className='live_salesContainerGroup' style={{border:'none',color:'#0af'}}>
+              <h2>400</h2>
+              <h6>Units Sold</h6>
+            </div>
+            <div className='live_salesContainerGroup' style={{color:'#cd9300'}}>
+              <h2>40000</h2>
+              <h6>Revenue</h6>
+            </div>
+            <div className='live_salesContainerGroup' style={{color:'#00cbc0'}}>
+              <h2>4000</h2>
+              <h6>Estimated Profit</h6>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -414,7 +425,6 @@ const uploadReviewPhotos = (e) => {
                     </div>
         </div>
       </div>
-      <GroupChats/>
     </div>
   );
 };

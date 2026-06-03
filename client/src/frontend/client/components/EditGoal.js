@@ -4,9 +4,11 @@ import './view.css';
 import numWords from 'num-words';
 import { Link, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useAuth } from "../../../context/AuthContext";
 
 function EditGoal() {
     const { goalId } = useParams();
+    const {user} = useAuth();
     const [myTarget,setMyTarget] = useState({
         targetStartDate:"",
         targetEndDate:"",
@@ -144,7 +146,7 @@ function formatLargeNumber(number) {
   return (
     <div className='setTargetMain'>
         <div className='setTargetInner'>
-            <Link to="/" className="backToPrevious"><ArrowBackIcon/></Link>
+            <Link to={`/company/${user?.companyName}`} className="backToPrevious"><ArrowBackIcon/></Link>
             <h1>Update Your Target Goal</h1>
             <div className='setCurrentTarget'>
                 <div className='setCurrentTargetInner'>

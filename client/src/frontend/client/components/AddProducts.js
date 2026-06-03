@@ -3,6 +3,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import {Altaxios} from '../../Altaxios';
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useAuth } from "../../../context/AuthContext";
 
 function AddProduct() {
   const [productImg,setProductImg] = useState("");
@@ -18,6 +19,7 @@ function AddProduct() {
         ProductPrice:"",
         InStockQuentity:"",
   });
+    const {user} = useAuth();
   
     useEffect(() => {
       Altaxios.get('/setgole/getGoleData').then((res) => {
@@ -72,7 +74,7 @@ function AddProduct() {
   if(files){
     setProductImgFile(files);
   function readAndPreview(file) {
-    if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+    if (/\.(jpe?g|png|webp)$/i.test(file.name)) {
       const reader = new FileReader();
       reader.addEventListener(
         "load",
@@ -89,6 +91,21 @@ function AddProduct() {
 }
 //preview photos  end
  
+  const AddProductData = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setProductInfo({
+      ...porductInfo,
+      [name] : value
+    });
+  };
+
+const handleCheck = (id, checked) => {
+    setCheckedGoals((prev) =>
+      checked ? [...prev, id] : prev.filter((x) => x !== id)
+    );
+  };
+
   const AddProductDataNew = async() => {
     try{
     setIsEnableBtn(true);
@@ -96,15 +113,11 @@ function AddProduct() {
     ProductData.append("ProductName",porductInfo.ProductName);
     ProductData.append("ProductPrice",porductInfo.ProductPrice);
     ProductData.append("InStockQuentity",porductInfo.InStockQuentity);
-    ProductData.append("GoalIdentifire",checkedGoals);
-    ProductData.append("file",productImgFile);
-    const addProduct = await Altaxios.post('/newproduct/addNewProduct',ProductData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
+    checkedGoals.forEach(id => {
+        ProductData.append("GoalIdentifire[]", id);
+    });
+    ProductData.append("files",productImgFile);
+    const addProduct = await Altaxios.post('/newproduct/addNewProduct',ProductData);
       if(addProduct.status === 200){
         setResMessage(addProduct.data.message);
         setCurrentProducts([...currentProducs,addProduct.data.data]);
@@ -137,26 +150,12 @@ function AddProduct() {
     }
   };
 
-  const AddProductData = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setProductInfo({
-      ...porductInfo,
-      [name] : value
-    });
-  };
-
-const handleCheck = (id, checked) => {
-    setCheckedGoals((prev) =>
-      checked ? [...prev, id] : prev.filter((x) => x !== id)
-    );
-  };
 
   return (
     <div className="clientAddproductMain">
 
       <div className="clientAddProductInner">
-        <Link to="/" style={{left:'5px',top:'5px'}}><ArrowBackIcon/></Link>
+        <Link to={`/company/${user.companyName}`} style={{left:'5px',top:'5px'}}><ArrowBackIcon/></Link>
         <div className="clientAddProductLeft">
             <h2>Add Product</h2>
             <div className="addProductClientFrom">

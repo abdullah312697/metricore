@@ -38,7 +38,7 @@ function ViewProduct() {
 
       
       const findGola = currentProducs?.GoalIdentifire !== null && currentProducs?.GoalIdentifire !== undefined ? 
-        currentProducs?.GoalIdentifire[0].split(",") : [];
+        currentProducs?.GoalIdentifire : [];
       const finalGolaData = allGoalsData.filter((goal) => (
         findGola.includes(goal._id)
       ));

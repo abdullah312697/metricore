@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import SmsOutlinedIcon from '@mui/icons-material/SmsOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
-import Draggable from 'react-draggable';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Altaxios } from '../../Altaxios';
 import { useAuth } from "../../../context/AuthContext";
 import {socket} from '../../../socket';
@@ -24,20 +20,27 @@ import pptIcon from '../../../images/icons/ppt.png';
 import fileIcon from '../../../images/icons/open-folder.png';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import DescriptionIcon from '@mui/icons-material/Description';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import GroupsIcon from '@mui/icons-material/Groups';
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
+import EmojiEmotionsRoundedIcon from '@mui/icons-material/EmojiEmotionsRounded';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import smstone from '../../../audio/sms.mp3';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 
 function GroupChats() {
-  const [open, setOpen] = useState(false);
   const [isPopup, setIsPopup] = useState(false);
-  const [minimized, setMinimized] = useState(false);
+  const [minimized, setMinimized] = useState(true);
   const [inputMessage, setInputMessage] = useState('');
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   // const [isPhone, setIsPhone] = useState(false);
   const [previewFiles,setPreviewFiles] = useState([]);
   const fileInputRef = useRef();
-  const [lastMessage, setLastMessage] = useState('');
-  const endRef = useRef(null);
-  const nodeRef = useRef(null);
+  const [lastMessage, setLastMessage] = useState([]);
   const innerRef = useRef(null);
   const [isTypingStart,setIsTypingStart] = useState(false);
   const popupTimerRef = useRef(null);
@@ -49,8 +52,23 @@ function GroupChats() {
   const [previewFilesMsg, setPreviewFilesMsg] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadProgress, setUploadProgress] = useState(null);
-
-  useEffect(()=>{
+  const containerRef = useRef(null);
+const [tickerIndex, setTickerIndex] = useState(0);
+const intervalRef = useRef(null);
+const [isPaused, setIsPaused] = useState(false);
+const [isGroupInfoOpen,setIsGroupInfoOpen] = useState(false);
+const [groupImage,setGroupImage] = useState(null);
+const [groupImagePreview,setGroupImagePreview] = useState("");
+const [groupTitleName,setGroupTitleName] = useState('');
+const [isChangeGropuInfo,setIsChangeGroupInfo] = useState(false);
+const [isAdmin,setIsAdmin] = useState(null);
+const [responseMsg,setResponseMsg] = useState('');
+const [responseMsgStyle,setResponseMsgStyle] = useState({});
+const [showEmoji, setShowEmoji] = useState(false);
+const pickerRef = useRef(null);
+const audioRef = useRef(null);
+const [isMutedState,setIsMutedState] = useState(false);
+useEffect(()=>{
         const getAllEmployee = async () => {
         try{
           const Emplyee = await Altaxios.get("/newemplyee/getallEmployeeforMessage/");
@@ -78,29 +96,29 @@ function GroupChats() {
     },[user?.companyName,user?.companyLogo]);
 
     // ✅ Adjust input area for mobile keyboard
-  useEffect(() => {
-    const initialVH = window.innerHeight;
-    function adjust() {
-      const vv = window.visualViewport;
-      const vh = vv ? vv.height : window.innerHeight;
-      const off = vv ? vv.offsetTop : 0;
-      const keyboardHeight = Math.max(0, initialVH - vh - off);
-      if (innerRef.current) innerRef.current.style.bottom = keyboardHeight + 'px';
-    }
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', adjust);
-      window.visualViewport.addEventListener('scroll', adjust);
-    }
-    window.addEventListener('resize', adjust);
-    adjust();
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', adjust);
-        window.visualViewport.removeEventListener('scroll', adjust);
-      }
-      window.removeEventListener('resize', adjust);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const initialVH = window.innerHeight;
+  //   function adjust() {
+  //     const vv = window.visualViewport;
+  //     const vh = vv ? vv.height : window.innerHeight;
+  //     const off = vv ? vv.offsetTop : 0;
+  //     const keyboardHeight = Math.max(0, initialVH - vh - off);
+  //     if (innerRef.current) innerRef.current.style.bottom = keyboardHeight + 'px';
+  //   }
+  //   if (window.visualViewport) {
+  //     window.visualViewport.addEventListener('resize', adjust);
+  //     window.visualViewport.addEventListener('scroll', adjust);
+  //   }
+  //   window.addEventListener('resize', adjust);
+  //   adjust();
+  //   return () => {
+  //     if (window.visualViewport) {
+  //       window.visualViewport.removeEventListener('resize', adjust);
+  //       window.visualViewport.removeEventListener('scroll', adjust);
+  //     }
+  //     window.removeEventListener('resize', adjust);
+  //   };
+  // }, []);
 
 
   useEffect(() => {
@@ -119,6 +137,14 @@ function GroupChats() {
 
   return () => socket.off("uploadProgress");
 }, [user?.employeeId]);
+
+useEffect(() => {
+  if((conversation?.title !== groupTitleName || groupImage !== null) &&  groupTitleName !== ""){
+    setIsChangeGroupInfo(true);
+  }else{
+    setIsChangeGroupInfo(false);
+  }
+},[conversation?.title, groupTitleName, groupImage]);
 
   // ✅ Detect mobile
   // useEffect(() => {
@@ -140,7 +166,8 @@ useEffect(() => {
       if(convInfo?.participants?.length !== 0){
       const { data } = await Altaxios.post('/conversation/newConverSation', convInfo);
       setConversation(data?.conversation);
-      console.log(data?.conversation);
+      setGroupTitleName(data?.conversation?.title);
+      setGroupImagePreview(data?.conversation?.avatar);
       setMessages(data.messages || []);
       socket.emit("joinConversation", {
         conversationId: data?.conversation?._id
@@ -165,89 +192,119 @@ useEffect(() => {
 },[]);
 
 useEffect(() => {
-if (!user?.employeeId) return;
-socket.on("newMessage", (msg) => {
-    setMessages((prev) => [...prev, msg]);
-    setConversation((prevData) => {
-      return{
-        ...prevData,
-        lastMessage: msg
-      }
-    });
+  if (!user?.employeeId) return;
 
-    if (msg?.senderId !== user?.employeeId) {
-      setLastMessage(msg?.content || "New message");
+  socket.on("newMessage", (msg) => {
+    setMessages((prev) => [...prev, msg]);
+
+    setConversation((prev) => ({
+      ...prev,
+      lastMessage: msg
+    }));
+
+    // 🎯 ONLY for receiver
+    if (msg.senderId !== user.employeeId) {
+    audioRef.current && isMutedState && audioRef.current.play();
+
+      // ✅ emit delivered (single pointer)
+      socket.emit("message:delivered", {
+        conversationId: conversation?._id,
+        employeeId: user.employeeId,
+        lastDeliveredMessageId: msg._id
+      });
+
+      // popup logic (your existing)
+      setLastMessage((prev) => [...prev, msg?.content]);
       setIsPopup(true);
       clearTimeout(popupTimerRef.current);
       popupTimerRef.current = setTimeout(() => setIsPopup(false), 5000);
     }
-
-  if (msg?.senderId !== user?.employeeId) {
-    socket.emit("message:delivered", {
-      messageIds: [msg._id],
-      employeeId: user?.employeeId,
-      conversationId: conversation?._id
-    });
-  }
   });
   return () => {
     socket.off("newMessage");
   };
-},[user?.employeeId, conversation?._id]);
+}, [user?.employeeId, conversation?._id, isMutedState]);
 
 useEffect(() => {
-  if(open && !minimized){
-  const unseenMessageIds = messages
-    .filter(m => !m.seenBy?.includes(user?.employeeId) && m.senderId !== user?.employeeId)
-    .map(m => m._id);
-  if (unseenMessageIds.length) {
-    socket.emit("message:seen", { messageIds: unseenMessageIds, employeeId: user?.employeeId, conversationId: conversation?._id });
+  if (!minimized && messages.length > 0) {
+    const lastMessage = messages[messages.length - 1];
+
+    if (lastMessage.senderId !== user?.employeeId) {
+      socket.emit("message:seen", {
+        conversationId: conversation?._id,
+        employeeId: user?.employeeId,
+        lastSeenMessageId: lastMessage._id
+      });
+    }
   }
-}
-}, [messages, user?.employeeId, open, minimized, conversation?._id]);
+}, [
+  messages.length,
+  minimized,
+  conversation?._id,
+  messages,
+  user?.employeeId
+]);
 
   // ✅ Scroll to bottom on new message
-  const scrollToBottom = useCallback(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+const scrollToBottom = useCallback((smooth = true) => {
+  const el = containerRef.current;
+  if (!el) return;
+  el.scrollTo({
+    top: el.scrollHeight,
+    behavior: smooth ? 'smooth' : 'auto'
+  });
+},[]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, open, minimized, scrollToBottom]);
+  }, [messages, minimized, scrollToBottom]);
 
-  useEffect(() => {
-socket.on("messageDelivered", ({ messageIds, employeeId }) => {
-  setMessages(prev =>
-    prev.map(msg =>
-      messageIds.includes(msg._id)
-        ? { 
-            ...msg, 
-            deliveredTo: [...new Set([...(msg.deliveredTo || []), employeeId])]
-          }
-        : msg
-    )
-  );
-});
+useEffect(() => {
 
-socket.on("messageSeen", ({ messageIds, employeeId }) => {
-  setMessages(prev =>
-    prev.map(msg =>
-      messageIds.includes(msg._id)
-        ? { 
-            ...msg, 
-            seenBy: [...new Set([...(msg.seenBy || []), employeeId])]
-          }
-        : msg
-    )
-  );
-});
+  // ✅ Delivered update
+  socket.on("messageDelivered", ({ employeeId, lastDeliveredMessageId }) => {
+
+    setConversation((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        participants: prev.participants.map((p) =>
+          p.employeeId === employeeId
+            ? { ...p, lastDeliveredMessageId }
+            : p
+        )
+      };
+    });
+
+  });
+
+  // ✅ Seen update
+  socket.on("messageSeen", ({ employeeId, lastSeenMessageId }) => {
+
+    setConversation((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        participants: prev.participants.map((p) =>
+          p.employeeId === employeeId
+            ? { ...p, lastReadMessageId: lastSeenMessageId }
+            : p
+        )
+      };
+    });
+
+  });
+
   return () => {
     socket.off("messageDelivered");
     socket.off("messageSeen");
   };
+
 }, []);
 
-const sendMessage = async (blob) => {
+const sendMessage = async (blob, thumbUp) => {
   if (!conversation?._id || !user?.employeeId) return;
   setInputMessage("");
   setPreviewFiles([]);
@@ -261,17 +318,27 @@ const sendMessage = async (blob) => {
 
   formData.append("conversationId", conversation?._id);
   formData.append("senderId", user?.employeeId);
-  formData.append("content", inputMessage);
+  if(thumbUp){
+    formData.append("content", thumbUp);
+  }else{
+    formData.append("content", inputMessage);
+  }
 
   try {
-    const msgRes = await Altaxios.post("messages/newMessage", formData);
-    console.log(msgRes);
+     await Altaxios.post("messages/newMessage", formData);
     // Progress is handled entirely via socket events from backend
   } catch (error) {
     console.error(error);
     setUploadProgress(null); // clear on error
   }
 };
+
+const handleGroupLogo = (e) => {
+    const selectedFiles = e.target.files[0];
+    setGroupImage(selectedFiles);
+    setGroupImagePreview(URL.createObjectURL(selectedFiles))
+    e.target.value = null
+  };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -319,12 +386,6 @@ const formatMessageTime = (dateString) => {
     minute: "2-digit",
   });
 };
-
-  const toggleChat = () => {
-    setOpen((o) => !o);
-    setMinimized(false);
-    setIsPopup(false);
-  };
 
   const typeingMessage = (e) => {
     setInputMessage(e.target.value);
@@ -429,42 +490,251 @@ const truncateFileName = (name = "") => {
   return `${base.slice(0, 5)}...${base.slice(-3)}${ext}`;
 };
 
+// singel message <>
+const getOtherParticipants = () => {
+  return conversation?.participants.filter(
+    p => p.employeeId !== user.employeeId
+  );
+};
+
+useEffect(() => {
+const isAdmin = conversation?.participants.some(
+  (pr) => pr.employeeId === user.employeeId && pr.role === "admin"
+);
+const isMute = conversation?.participants.some(
+  (pr) => pr.employeeId === user.employeeId && pr.isMuted === true
+);
+setIsAdmin(isAdmin);
+setIsMutedState(isMute);
+},[conversation, user.employeeId]);
+// singel message </>
+const getDeliveredCount = (msg) => {
+  const others = getOtherParticipants();
+  return others.filter(p =>
+    p.lastDeliveredMessageId &&
+    String(p.lastDeliveredMessageId) >= String(msg._id)
+  ).length;
+};
+
+const getSeenCount = (msg) => {
+  const others = getOtherParticipants();
+  return others.filter(p =>
+    p.lastReadMessageId &&
+    String(p.lastReadMessageId) >= String(msg._id)
+  ).length;
+};
+
+
+const getUnreadMessages = () => {
+  const me = conversation?.participants.find(
+    p => p.employeeId === user.employeeId
+  );
+
+  return messages.filter(msg => {
+    if (msg.senderId === user.employeeId) return false;
+
+    if (!me?.lastReadMessageId) return true;
+
+    return String(msg._id) > String(me.lastReadMessageId);
+  });
+};
+const unreadMessages = getUnreadMessages().slice(0, 20);
+const unreadMessagesCount = unreadMessages.length;
+const loopMessages = [...unreadMessages, ...unreadMessages];
+const formatMessagePreview = (msg) => {
+  if (msg.messageType === "text") return msg.content;
+
+  if (msg.messageType === "image") return "📷 sent a photo";
+  if (msg.messageType === "video") return "🎥 sent a video";
+  if (msg.messageType === "audio") return "🎧 sent an audio";
+  if (msg.messageType === "file") return "📁 sent a file";
+
+  return "sent a message";
+};
+
+const startTicker = useCallback(() => {
+  stopTicker(); // prevent duplicate intervals
+  setIsPaused(false);
+  intervalRef.current = setInterval(() => {
+    setTickerIndex((prev) => (prev + 1) % unreadMessages.length);
+  }, 3000);
+},[unreadMessages.length]);
+
+const stopTicker = () => {
+  setIsPaused(true);
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  }
+};
+
+useEffect(() => {
+  if (unreadMessages.length === 0) return;
+
+  startTicker();
+
+  return () => stopTicker();
+}, [unreadMessages.length, startTicker]);
+
+useEffect(() => {
+  if (tickerIndex >= unreadMessages.length) {
+    setTickerIndex(0);
+  }
+}, [unreadMessages.length,tickerIndex]);
+
+const toggleGroupInfo = () => {
+  setIsGroupInfoOpen(!isGroupInfoOpen);
+}
+
+const GroupDataUpdate = async () => {
+  setIsChangeGroupInfo(false);
+  const formData = new FormData();
+  if (groupImage) {
+    formData.append("files", groupImage);
+  }
+  if (groupTitleName) {
+    formData.append("title", groupTitleName);
+  }
+  formData.append("actorEmployeeId", user.employeeId);
+  try {
+    const res = await Altaxios.put(
+      `conversation/updateGroupInfo/${conversation?._id}`, // ✅ dynamic id
+      formData
+    );
+    setResponseMsg(res.data.message);
+    setResponseMsgStyle({opacity:1});
+
+    setTimeout(() => {
+          setResponseMsg('');
+          setResponseMsgStyle({opacity:0})
+    }, 3000);
+  } catch (err) {
+    console.log(err.response?.data);
+  }
+};
+
+const pertiCipentIsmuteUpdate = async (muted) => {
+  try {
+    const isMutedValue = await Altaxios.put(
+      `conversation/updatePerticipent/${conversation?._id}`,
+      { isMuted: muted, actorEmployeeId: user.employeeId }
+    );
+    const resValue = isMutedValue?.data?.participant?.isMuted;
+    setIsMutedState(resValue);
+    setConversation((prev) => {
+      const updatedParticipants = prev.participants.map((pr) => {
+        if (pr.employeeId?.toString() === user?.employeeId?.toString()) {
+          return { ...pr, isMuted: resValue };
+        }
+        return pr;
+      });
+      return {
+        ...prev,
+        participants: updatedParticipants,
+      };
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setShowEmoji(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+
+  const isOnlyEmoji = (text) => {
+  return text.trim() === "👍";
+};
+
+//return jsx<>
   return (
-    <div className="liveChatsMain">
-      {!open && (
-        <Draggable bounds="parent" nodeRef={nodeRef} enableUserSelectHack={false}>
-          <div className="liveChatsLogo" ref={nodeRef} onClick={toggleChat}>
-            <SmsOutlinedIcon className="liveChatsLogoIcon" />
-            <div className="liveChatAciveSigne"></div>
-            <div className={`liveChatFirstPopup ${isPopup ? 'visible' : ''}`}>
-              {isPopup && <span>{lastMessage}</span>}
-            </div>
-          </div>
-        </Draggable>
-      )}
+        <div className='GroupChatMainContainer'>
+                  <div className='live_message_mainHeader'>
+                    <div className='messangerHeadrFunction'>
+                      {
+                        isMutedState ? (<VolumeUpIcon onClick={() => {pertiCipentIsmuteUpdate(false)}} className='isMutedIcon'/>) :
+                        (<VolumeOffIcon onClick={() => {pertiCipentIsmuteUpdate(true)}} className='isMutedIcon'/>)
+                      }
+                      {isAdmin && <InfoOutlinedIcon onClick={toggleGroupInfo} className='adminOnlybtnInfo'/>}
+                    </div>
+                    {isGroupInfoOpen && (
+                      <div className='groupInformatinAndUpdate'>
+                        <div className='changeGroupImage'>
+                          <label>
+                            <AddAPhotoIcon className='changeGroupImagesvgone'/>
+                            <input type='file' onChange={handleGroupLogo}/>
+                          </label>
+                          {groupImagePreview !== "" ? (<img src={groupImagePreview} alt="group logo"/>) :
+                          (<GroupsIcon className='changeGroupImagesvgone changeGroupImagesvgtwo'/>) }
+                        </div>
+                        <div className='changeGroupName'>
+                          <input type='text' value={groupTitleName} name="title" onChange={(e) => {setGroupTitleName(e.target.value)}}/>
+                        </div>
+                        <div className='responseMessage' style={responseMsgStyle}>{responseMsg}</div>
+                        <button disabled={!isChangeGropuInfo} onClick={GroupDataUpdate}>Change</button>
+                      </div>
+                    )}
+                    <div className='gruopNameAndLogo'>
+                        {conversation?.avatar !== "" ? (
+                          <img src={conversation?.avatar} alt="groupIcon"/>
+                        ) : (
+                          <GroupsIcon className="liveConversationAvater" />
+                        )}
+                      <h3>{conversation?.title ?? "Company"}</h3>
+                      </div>
+                    <div className='groupNotificatin_view'>
+                      {minimized && unreadMessagesCount > 0 && (<div className='unreadMessagesCount'>{unreadMessagesCount}</div>)}
+                      <div
+  className="tickerContainer"
+  onMouseEnter={stopTicker}
+  onMouseLeave={startTicker}
+>
+      {loopMessages.length === 0 && (        
+      <div className="tickerItem">
+        New message will appear here!
+      </div>
+    )}
 
-      {open && (
-        <div className={`liveChatsInnerPart ${minimized ? 'minimized' : ''}`} ref={innerRef}>
-          <div className="liveConverstaionHeder">
-            {conversation?.avatar !== "" ? (
-              <img src={conversation?.avatar} alt="avater" style={{width:'28px',height:'27px',borderRadius:'50%'}}/>
-            ) : (
-              <SupportAgentIcon className="liveConversationAvater" />
-            )}
-            <div className="liveChatHeaderLive"></div>
-            <span className="supportagettext">{conversation?.avatar ?? "Company"}</span>
-            {minimized ? (
-              <KeyboardArrowUpOutlinedIcon onClick={() => setMinimized((m) => !m)} className="toggleMinimizebtn" />
-            ) : (
-              <KeyboardArrowDownOutlinedIcon onClick={() => setMinimized((m) => !m)} className="toggleMinimizebtn" />
-            )}
-            <CloseOutlinedIcon onClick={() => setOpen(false)} className="liveChatclosebtn" />
-          </div>
+  {minimized && (<div className={`tickerWrapper ${isPaused ? "paused" : ""}`}>
+    {loopMessages.length > 0 && loopMessages.map((msg, index) => {
+          const sender = senderMap[msg.senderId];
 
+      return (
+        <div className="tickerItem" key={index}>
+          <img
+            src={sender.EmplyeeProfile}
+            alt={sender.YemplyeeName}
+          />
+          {formatMessagePreview(msg)}
+        </div>
+      );
+    })}
+  </div>)}
+</div>
+                      <div className='group_Notifican_toggleBtns'>
+                          {minimized ? (
+                            <KeyboardArrowUpOutlinedIcon onClick={() => setMinimized((m) => !m)} className="toggleMinimizebtn" />
+                          ) : (
+                            <KeyboardArrowDownOutlinedIcon onClick={() => setMinimized((m) => !m)} className="toggleMinimizebtn" />
+                          )}
+                      </div>
+                    </div>
+                  </div>
 
+        <div className={`liveChatsInnerPart_group ${minimized ? 'minimized' : ''}`} ref={innerRef}>
           {!minimized && (
             <>
-              <div className="liveCustomerMessages">
+              <div className="liveCustomerMessages" ref={containerRef}>
                 {messages.map((msg, index) => {
                 const currentDate = formatMessageDate(msg.createdAt);
                 const prevMessage = messages[index - 1];
@@ -480,16 +750,6 @@ const truncateFileName = (name = "") => {
                 const showName =
                   !isMine &&
                   (!prevMessage || prevMessage.senderId !== msg.senderId);
-
-                const totalParticipants = conversation.participants
-                  .filter(p => p.employeeId !== user.employeeId)
-                  .length;
-                const deliveredCount = msg.deliveredTo?.length || 0;
-                const seenCount = msg.seenBy?.length || 0;
-                let messageStatus = "sent";
-                if (deliveredCount > 0) messageStatus = "delivered";
-                if (seenCount === totalParticipants) messageStatus = "seen";
-
                 const lastMessage = String(conversation?.lastMessage?.messageId) === String(msg?._id);
                 const isNotmyMsg = String(conversation?.lastMessage?.senderId) !== String(user?.employeeId);
 
@@ -502,6 +762,10 @@ const truncateFileName = (name = "") => {
                 ) || [];
                 const mediaLength = otherMedia.length;
 
+                 const deliveredCount = getDeliveredCount(msg);
+                  const seenCount = getSeenCount(msg);
+                  const total = conversation.participants.length - 1;
+                  
                 return (
                   <React.Fragment key={msg?._id}>
                     {showDate && (
@@ -637,7 +901,11 @@ const truncateFileName = (name = "") => {
                           <div
                             className={`liveCustomerMessagesText ${isMine ? 'liveAgentMessage' : ''}`}
                           >
-                            {msg?.content}
+                            {
+                              isOnlyEmoji(msg?.content) ?
+                               (<ThumbUpIcon style={{color:'#0af'}}/>) : 
+                                msg?.content
+                            }
                           </div>
                         )}
 
@@ -647,9 +915,10 @@ const truncateFileName = (name = "") => {
                           </div>
                           {isMine && (
                             <div className="liveCustomerMessagesStatus">
-                              {messageStatus === "sent" && <SentIcon />}
-                              {messageStatus === "delivered" && <DeliveredIcon />}
-                              {messageStatus === "seen" && <SeenIcon />}
+                              {seenCount === total ? (<SeenIcon />) : 
+                              deliveredCount === total ? (<DeliveredIcon />) : 
+                              (<SentIcon />)
+                              }
                             </div>
                           )}
                         </div>
@@ -760,17 +1029,16 @@ const truncateFileName = (name = "") => {
                     </div>
                   </div>
                 )}
-
-                <div ref={endRef} />
               </div>
 
               {isTypingStart && <TypingIndicator />}
-
               <div className="liveConverstaionFooter">
                 <label className="liveChatfileInput">
                   <input type="file" multiple onChange={handleFileChange} ref={fileInputRef} />
                   <PermMediaOutlinedIcon className={`footerliveMedia ${previewFiles.length > 10 ? 'inActiveLiveChantsendbtn' : ''}`} />
                 </label>
+                <div className='messagnesEmojiINputContainer'>
+                  <EmojiEmotionsRoundedIcon onClick={() => setShowEmoji(prev => !prev)}/>
                 <input
                   type="text"
                   className="liveConverstaionInput"
@@ -785,7 +1053,33 @@ const truncateFileName = (name = "") => {
                     }
                   }}
                 />
-                {(previewFiles.length === 0 && inputMessage === "") ? (
+
+              {showEmoji && (
+                <div style={{
+                  position: "absolute",
+                  bottom: "40px",
+                  right: "130px",
+                  zIndex: 1000,
+                  height:'280px',
+                  width:'245px',
+                  overflow:'hidden'
+                }} ref={pickerRef}>
+        <Picker
+            data={data}
+            onEmojiSelect={(emoji) => {
+              setInputMessage((prev) => prev + emoji.native);
+            }}
+            theme="dark"
+            emojiSize={20}
+            perLine={6}
+            previewPosition="none"
+            navPosition="top"
+          />
+          </div>
+      )}
+                  <div className='thumbUpandVoiceSection'>
+
+                      {(previewFiles.length === 0 && inputMessage === "") ? (
                   <VoiceRecorder
                     onSend={(blob) => sendMessage(blob)}
                     onCancel={() => console.log("Cancelled")}
@@ -798,11 +1092,15 @@ const truncateFileName = (name = "") => {
                   />
                 )}
               </div>
+            </div>
+                <ThumbUpIcon onClick={() => {sendMessage(null,"👍")}} className='thumbUpbigEmoji'/>
+              </div>
             </>
           )}
 </div>
-      )}
-    </div>
+              {<audio src={smstone} style={{opacity:'0', position:'absolute'}} ref={audioRef}/>}
+
+        </div>
   );
 }
 

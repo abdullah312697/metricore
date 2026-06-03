@@ -8,6 +8,7 @@ import { getIO } from "../socket/socket.js";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegPath from "ffmpeg-static";
 import fs from "fs";
+import {generatePublicId} from '../reuseableFn.js';
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 const router = express.Router();
@@ -28,6 +29,7 @@ const getFileType = (mime) => {
   if (mime.includes("zip") || mime.includes("rar") || mime.includes("7z")) return "archive";
   return "file";
 };
+const getBaseName = (name = "") => name.replace(/\.[^/.]+$/, "");
 
 const convertToMp3 = (inputPath) => {
   return new Promise((resolve, reject) => {
@@ -44,16 +46,6 @@ const convertToMp3 = (inputPath) => {
   });
 };
 
-const getBaseName = (name = "") => name.replace(/\.[^/.]+$/, "");
-const cleanFileName = (name = "") => name.replace(/[^\w.-]/g, "_");
-const getExt = (name = "") => name.includes(".") ? name.split(".").pop() : "";
-
-const generatePublicId = (originalName) => {
-  const ext = getExt(originalName);
-  const base = cleanFileName(getBaseName(originalName));
-  const unique = `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-  return ext ? `${base}_${unique}.${ext}` : `${base}_${unique}`;
-};
 
 /* ─────────────────────────────────────────
    POST /newMessage
@@ -272,39 +264,105 @@ router.get("/:conversationId", async (req, res) => {
 /* ─────────────────────────────────────────
    PUT /delivered
 ───────────────────────────────────────── */
+// router.put("/delivered", async (req, res) => {
+//   try {
+//     const { messageIds, employeeId } = req.body;
+//     if (!Array.isArray(messageIds) || !employeeId)
+//       return res.status(400).json({ message: "messageIds[] and employeeId required" });
+
+//     await Message.updateMany(
+//       { _id: { $in: messageIds }, deliveredTo: { $ne: employeeId } },
+//       { $push: { deliveredTo: employeeId }, $set: { status: "delivered" } }
+//     );
+
+//     return res.status(200).json({ message: "Messages marked delivered" });
+//   } catch (err) {
+//     console.error("deliver update error:", err);
+//     return res.status(500).json({ message: "Something went wrong" });
+//   }
+// });
+// PUT /delivered
 router.put("/delivered", async (req, res) => {
   try {
-    const { messageIds, employeeId } = req.body;
-    if (!Array.isArray(messageIds) || !employeeId)
-      return res.status(400).json({ message: "messageIds[] and employeeId required" });
+    const { conversationId, employeeId, lastDeliveredMessageId } = req.body;
 
-    await Message.updateMany(
-      { _id: { $in: messageIds }, deliveredTo: { $ne: employeeId } },
-      { $push: { deliveredTo: employeeId }, $set: { status: "delivered" } }
+    if (!conversationId || !employeeId || !lastDeliveredMessageId) {
+      return res.status(400).json({
+        message: "conversationId, employeeId, lastDeliveredMessageId required"
+      });
+    }
+
+    const updated = await Conversation.updateOne(
+      {
+        _id: conversationId,
+        "participants.employeeId": employeeId
+      },
+      {
+        $set: {
+          "participants.$.lastDeliveredMessageId": lastDeliveredMessageId
+        }
+      }
     );
 
-    return res.status(200).json({ message: "Messages marked delivered" });
+    return res.status(200).json({
+      message: "Delivered updated",
+      updated
+    });
+
   } catch (err) {
-    console.error("deliver update error:", err);
+    console.error("delivered update error:", err);
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
-
 /* ─────────────────────────────────────────
    PUT /seen
 ───────────────────────────────────────── */
+// router.put("/seen", async (req, res) => {
+//   try {
+//     const { messageIds, employeeId } = req.body;
+//     if (!Array.isArray(messageIds) || !employeeId)
+//       return res.status(400).json({ message: "messageIds[] and employeeId required" });
+
+//     await Message.updateMany(
+//       { _id: { $in: messageIds }, seenBy: { $ne: employeeId } },
+//       { $push: { seenBy: employeeId }, $set: { status: "seen" } }
+//     );
+
+//     return res.status(200).json({ message: "Messages marked seen" });
+//   } catch (err) {
+//     console.error("seen update error:", err);
+//     return res.status(500).json({ message: "Something went wrong" });
+//   }
+// });
+// PUT /seen
 router.put("/seen", async (req, res) => {
   try {
-    const { messageIds, employeeId } = req.body;
-    if (!Array.isArray(messageIds) || !employeeId)
-      return res.status(400).json({ message: "messageIds[] and employeeId required" });
+    const { conversationId, employeeId, lastSeenMessageId } = req.body;
 
-    await Message.updateMany(
-      { _id: { $in: messageIds }, seenBy: { $ne: employeeId } },
-      { $push: { seenBy: employeeId }, $set: { status: "seen" } }
+    if (!conversationId || !employeeId || !lastSeenMessageId) {
+      return res.status(400).json({
+        message: "conversationId, employeeId, lastSeenMessageId required"
+      });
+    }
+
+    const updated = await Conversation.updateOne(
+      {
+        _id: conversationId,
+        "participants.employeeId": employeeId
+      },
+      {
+        $set: {
+          "participants.$.lastReadMessageId": lastSeenMessageId,
+          "participants.$.lastReadAt": new Date()
+        }
+      }
     );
 
-    return res.status(200).json({ message: "Messages marked seen" });
+    return res.status(200).json({
+      message: "Seen updated",
+      updated
+    });
+
   } catch (err) {
     console.error("seen update error:", err);
     return res.status(500).json({ message: "Something went wrong" });

@@ -1,4 +1,5 @@
 import Message from "../models/Message.js";
+import Conversation from "../models/Conversation.js";
 
 const registerMessageEvents = (io, socket) => {
 
@@ -35,38 +36,92 @@ const registerMessageEvents = (io, socket) => {
   });
 
   // Delivered
-  socket.on("message:delivered", async ({ messageIds = [], employeeId, conversationId }) => {
-    try {
-      if (!Array.isArray(messageIds) || !employeeId) return;
-      await Message.updateMany(
-        { _id: { $in: messageIds }, deliveredTo: { $ne: employeeId } },
-        {
-          $addToSet: { deliveredTo: employeeId }
+  // socket.on("message:delivered", async ({ messageIds = [], employeeId, conversationId }) => {
+  //   try {
+  //     if (!Array.isArray(messageIds) || !employeeId) return;
+  //     await Message.updateMany(
+  //       { _id: { $in: messageIds }, deliveredTo: { $ne: employeeId } },
+  //       {
+  //         $addToSet: { deliveredTo: employeeId }
+  //       }
+  //     );
+  //     // notify sender(s)
+  //     io.to(`conversation_${conversationId}`).emit("messageDelivered", { messageIds, employeeId });
+
+  //   } catch (err) {
+  //     console.error("message:delivered error:", err);
+  //   }
+  // });
+socket.on("message:delivered", async ({
+  conversationId,
+  employeeId,
+  lastDeliveredMessageId
+}) => {
+  try {
+    if (!conversationId || !employeeId || !lastDeliveredMessageId) return;
+
+    await Conversation.updateOne(
+      {
+        _id: conversationId,
+        "participants.employeeId": employeeId
+      },
+      {
+        $set: {
+          "participants.$.lastDeliveredMessageId": lastDeliveredMessageId
         }
-      );
-      // notify sender(s)
-      io.to(`conversation_${conversationId}`).emit("messageDelivered", { messageIds, employeeId });
+      }
+    );
 
-    } catch (err) {
-      console.error("message:delivered error:", err);
-    }
-  });
+    // 🔔 notify everyone in that conversation
+    io.to(`conversation_${conversationId}`).emit("messageDelivered", {
+      employeeId,
+      lastDeliveredMessageId
+    });
 
+  } catch (err) {
+    console.error("message:delivered error:", err);
+  }
+});
   // Seen
-  socket.on("message:seen", async ({ messageIds = [], employeeId, conversationId }) => {
-    try {
-      if (!Array.isArray(messageIds) || !employeeId) return;
-      await Message.updateMany(
-        { _id: { $in: messageIds }, seenBy: { $ne: employeeId } },
-        {
-          $addToSet: { seenBy: employeeId }
+  // socket.on("message:seen", async ({ messageIds = [], employeeId, conversationId }) => {
+  //   try {
+  //     if (!Array.isArray(messageIds) || !employeeId) return;
+  //     await Message.updateMany(
+  //       { _id: { $in: messageIds }, seenBy: { $ne: employeeId } },
+  //       {
+  //         $addToSet: { seenBy: employeeId }
+  //       }
+  //     );
+  //     io.to(`conversation_${conversationId}`).emit("messageSeen", { messageIds, employeeId });
+  //   } catch (err) {
+  //     console.error("message:seen error:", err);
+  //   }
+  // });
+socket.on("message:seen", async ({ conversationId, employeeId, lastSeenMessageId }) => {
+  try {
+    if (!employeeId || !conversationId || !lastSeenMessageId) return;
+
+    await Conversation.updateOne(
+      {
+        _id: conversationId,
+        "participants.employeeId": employeeId
+      },
+      {
+        $set: {
+          "participants.$.lastReadMessageId": lastSeenMessageId
         }
-      );
-      io.to(`conversation_${conversationId}`).emit("messageSeen", { messageIds, employeeId });
-    } catch (err) {
-      console.error("message:seen error:", err);
-    }
-  });
+      }
+    );
+
+    io.to(`conversation_${conversationId}`).emit("messageSeen", {
+      employeeId,
+      lastSeenMessageId
+    });
+
+  } catch (err) {
+    console.error("message:seen error:", err);
+  }
+});
 
 }
 

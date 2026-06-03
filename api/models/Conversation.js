@@ -8,6 +8,8 @@ export const participantSchema = new Schema({
   role: { type: String, enum: ["admin", "member"], default: "member" },
   joinedAt: { type: Date, default: Date.now },
   lastReadMessageId: { type: Schema.Types.ObjectId, ref: "Message", default: null },
+  lastDeliveredMessageId: { type: Schema.Types.ObjectId, ref: "Message", default: null },
+  lastReadAt: {type: Date, default: null},
   isMuted: { type: Boolean, default: false }
 }, { _id: false }); // participants are subdocs; keep single object _id out (optional)
 

@@ -1,0 +1,250 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  font-family: 'DM Mono', 'Courier New', monospace;
+}
+
+.modal {
+  background: #011626;
+  border: 1px solid #ccc3;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.headerLabel {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgb(167 164 164);
+  margin-bottom: 4px;
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.closeBtn {
+    background: none;
+    border: 1px solid #ccc3;
+    color: #ffbc00;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgb(167 164 164);
+}
+
+.input {
+  background: transparent;
+  border: 1px solid #ccc3;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.formulaBox {
+  background: #111;
+  border: 1px solid #ccc3;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.formulaLabel {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.formula {
+  font-size: 13px;
+  color: #93c5fd;
+  font-family: 'DM Mono', monospace;
+  word-break: break-all;
+}
+
+.addRowBtn {
+  background: transparent;
+  border: 1px solid #ccc3;
+  color: #b17f00;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.emptyRows {
+  font-size: 12px;
+  color: rgb(197 197 197);
+  text-align: center;
+  padding: 16px;
+  border: 1px dashed #ccc3;
+  border-radius: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ccc3;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.stepNum {
+  font-size: 11px;
+  color: #444;
+  min-width: 16px;
+  text-align: center;
+}
+
+.calcTypeGroup {
+  display: flex;
+  gap: 4px;
+}
+
+.calcTypeBtn {
+border: 1px solid #ccc3;
+    border-radius: 5px;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 700;
+    background: transparent;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.select {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #ccc3;
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: #ccc;
+  font-size: 12px;
+  outline: none;
+  font-weight: 700;
+}
+.moveGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.moveBtn {
+  background: transparent;
+  border: 1px solid #ccc3;
+  color: rgb(167 164 164);
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.removeBtn {
+  background: transparent;
+  border: 1px solid #ccc3;
+  color: rgb(167 164 164);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.orderNote {
+  font-size: 11px;
+  color: rgb(167 164 164);
+  border: 1px solid #ccc3;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.error {
+  font-size: 12px;
+  color: #ef4444;
+  border: 1px solid #ccc3;
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid #ccc3;
+  color: #666;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.submitBtn {
+  background: #b17f00;
+  border: none;
+  color: #000;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.submitBtn:disabled{
+    user-select: none;
+    background: #3b382f;
+    color:#999;
+    cursor: no-drop;
+}

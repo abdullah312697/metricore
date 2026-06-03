@@ -2,7 +2,7 @@
   position: absolute;
   bottom: 45px;
   right: 0;
-  width: 320px;
+  width: 310px;
   background: #1a2f3f;
   border-radius: 12px;
   padding: 10px;
@@ -23,6 +23,7 @@
 }
 .canvasAndAudioTimerInner{
   padding: 5px 0px;
+  margin: 0 auto;
 }
 .whileRecordingCanvas{
     display: flex;

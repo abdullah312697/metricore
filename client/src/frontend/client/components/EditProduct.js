@@ -33,7 +33,8 @@ useEffect(()=>{
                 InStockQuentity:proData?.InStockQuentity,
             });
             setProductImg(proData?.productImgFile);
-            setCheckedGoals(proData?.GoalIdentifire[0].split(",") ?? []);
+            // setCheckedGoals(proData?.GoalIdentifire[0].split(",") ?? []);
+            setCheckedGoals(proData?.GoalIdentifire ?? []);
           }
         }catch(error){
           if(error.response){
@@ -70,9 +71,12 @@ useEffect(() => {
 
   const existingGoals = currentProducsEX?.GoalIdentifire !== undefined ? String(currentProducsEX?.GoalIdentifire[0]).split(",").map(s => s.trim()).filter(Boolean) : [];
 
-  const goalsChanged = (checkedGoals.length === 0) ? true : (checkedGoals.length > 0 &&
-    existingGoals.every(val => checkedGoals?.length > 0 ? checkedGoals?.includes(val) : false));
-
+const goalsChanged =
+  checkedGoals.length === 0 ||
+  (
+    checkedGoals.length === existingGoals.length &&
+    existingGoals.every(val => checkedGoals.includes(val))
+  );
   const imageChanged = productImgFile === null;
     
   const isChanged = nameChanged && priceChanged && stockChanged && goalsChanged && imageChanged;
@@ -120,8 +124,10 @@ useEffect(() => {
     ProductData.append("ProductName",porductInfo.ProductName);
     ProductData.append("ProductPrice",porductInfo.ProductPrice);
     ProductData.append("InStockQuentity",porductInfo.InStockQuentity);
-    ProductData.append("GoalIdentifire",checkedGoals);
-    ProductData.append("file",productImgFile);
+     checkedGoals.forEach(id => {
+        ProductData.append("GoalIdentifire[]", id);
+    });
+    ProductData.append("files",productImgFile);
     const addProduct = await Altaxios.put(`/newproduct/updateProduct/${productId}`,ProductData,
       {
         headers: {
@@ -139,7 +145,8 @@ useEffect(() => {
                 InStockQuentity:proData?.InStockQuentity,
             });
             setProductImg(proData?.productImgFile);
-            setCheckedGoals(proData?.GoalIdentifire[0].split(",") ?? []);
+            // setCheckedGoals(proData?.GoalIdentifire[0].split(",") ?? []);
+            setCheckedGoals(proData?.GoalIdentifire ?? []);
 
         setResMsgStyle({color:"green",opacity:1});
         setProductImgFile(null);
@@ -172,11 +179,20 @@ useEffect(() => {
     });
   };
 
+// const handleCheck = (id, checked) => {
+//     setCheckedGoals((prev) =>
+//       checked ? [...prev, id] : prev.filter((x) => x !== id)
+//     );
+//   };
 const handleCheck = (id, checked) => {
-    setCheckedGoals((prev) =>
-      checked ? [...prev, id] : prev.filter((x) => x !== id)
-    );
-  };
+  setCheckedGoals((prev) =>
+    checked
+      ? prev.includes(id)
+        ? prev
+        : [...prev, id]
+      : prev.filter((x) => x !== id)
+  );
+};
 
   return (
     <div className="clientAddproductMain">

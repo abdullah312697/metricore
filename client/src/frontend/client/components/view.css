@@ -379,8 +379,8 @@
       background: transparent;
       border: 1px solid #ccc3;
       border-radius: 5px;
-      padding: 5px;
-      font-size: 15px;
+      padding: 9px;
+      font-size: 13px;
       font-weight: bold;
       cursor: pointer;
       color: #0cf3e7;
@@ -401,8 +401,12 @@
     }
   .cashFlow__dateTwo{
     width: 400px;
-    text-align: left;
-  }
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+    position: relative;
+    }
   .cashFlow__dateThree{
     width: 210px;
     text-align: right;
@@ -414,6 +418,16 @@
     color: #ffd400;
     font-size: 13px;
     margin-bottom: 15px;
+  }
+  .cashFlow__dateTwo>span{
+    position: absolute;
+    top: 17px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #00ff35;
+    transform: translateX(-50%);
+    text-align: left;
+    width: 44px;
   }
   .cashFlowDateSection{
     background: transparent;
@@ -453,7 +467,6 @@
     overflow: hidden;
   }
   .cashFlowProgressbarInner{
-    width: 60%;
     height: 100%;
     background: #16d53e;
     border-radius: 5px;
@@ -465,7 +478,38 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
   }
+  .userSelect_Calender{
+    position: absolute;
+    top: 46px;
+    left: -19px;
+    z-index: 10000;
+    }
+    .select_rangeStartEnd{
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+    .select_rangeStartEnd>button{
+        background: #011626;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc8;
+        color: #ffb700;
+        font-size: 13px;
+        font-weight: bold;
+        width: 120px;
+        height: auto;
+        text-align: center;
+        cursor: pointer;
+    }
+    .userSelect_Calender_inner{
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
   .targetFinterOptions>svg{
     margin-left: -26px;
     font-size: 17px;
@@ -651,6 +695,30 @@
     position: relative;
     padding: 25px;
 }
+.viewGoalsMiancontainer{
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+.viewGoalHeaderPart{
+  width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
+.productMetricLength{
+  position: absolute;
+    top: 8px;
+    left: 13px;
+    font-weight: bold;
+    font-size: 20px;
+    color: #ffd400;
+    z-index: 2;
+}
 .viewGoalsInner{
     width: 100%;
     height: 434px;
@@ -668,12 +736,15 @@
   box-sizing: border-box;
   position: relative;
   padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 .viewGolasInnerTaskResult{
     position: sticky;
     bottom: 0px;
     background: #011626;
-    z-index: 1;
+    z-index: 10;
 }
 
 .viewGolasInnerTask>svg{
@@ -701,8 +772,105 @@
     border: 1px solid #ccc3;
     padding: 10px 10px 15px;
     border-radius: 10px;
+    z-index: 2;
+}
+.viewGoalAddExtraMain{
+    position: absolute;
+    top: 33px;
+    right: -3px;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transition: 0.8s all;
+  }
+.viewGaoldAddButtonTitle{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.viewGaoldAddButtonTitle>svg{
+    font-size: 30px;
+    color: #0091ffa1;
+    cursor: pointer;
+}
+.viewGaoldAddButtonTitle>span{
+  position: absolute;
+    top: -13px;
+    left: 3px;
+    font-size: 12px;
+    color: #ccc;
+    width: 100px;
+    transition: 0.8s all;
+    opacity: 0;
+    user-select: none;
+}
+.viewGaoldAddButtonTitle>svg:hover+span{
+  opacity: 1;
 }
 
+.addExtarFieldViewBox{
+  position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 300px;
+    background: #011626;
+    height: 258px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc3;
+    border-radius: 7px;
+}
+.addExtarFieldViewBox>svg{
+    position: absolute;
+    top: 1px;
+    right: 0px;
+    color: #ff007f;
+    font-size: 28px;
+    cursor: pointer;
+}
+.addExtarFieldViewBox_inner{
+    display: flex;
+    flex-direction: column;
+}
+.addExtarFieldViewBox_inner>input{
+  width: 224px;
+    height: 30px;
+    border-radius: 5px;
+    padding: 5px;
+    background: transparent;
+    border: 1px solid #0078d4b0;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+.addExtarFieldViewBox_inner>select{
+    background: transparent;
+    border: 1px solid rgb(0 120 212 / 66%);
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #ccc;
+    width: 224px;
+    margin-bottom: 10px;
+}
+.addExtarFieldViewBox_inner>select>option{
+    color: #ccc;
+    background: #011626;
+    cursor: pointer;
+}
+.addExtarFieldViewBox_inner>button{
+    margin-top: 10px;
+    width: 224px;
+    height: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #ababab;
+    background: transparent;
+    border: 1px solid #b17f00;
+    border-radius: 5px;
+}
 .viewGoalsInner::-webkit-scrollbar{
   height: 8px;
   width: 8px;
@@ -722,19 +890,26 @@
 }
 
 .taskGoalInner,.taskGoalInnerResult{
-  margin: 0px 5px;
-  position: relative;
+    margin: 0px 5px;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;  
 }
 .taskGoalInner>label{
-  font-size: 10px;
+    font-size: 10px;
     color: #00ffd0;
+    margin: 0px 0px 2px 2px;
 }
 .taskGoalInnerResult>label{
   font-size: 10px;
   color: rgb(93 185 255);
+  margin: 0px 0px 2px 2px;
 }
 .taskGoalInner>input,
-.taskGoalInnerResult>input{
+.taskGoalInnerResult>input,
+.tg-input{
   background: transparent;
   border: 1px solid #ccc3;
   padding: 5px;
@@ -744,16 +919,23 @@
   font-weight: bold;
   width: 200px;
   -moz-appearance: textfield; /* Firefox */
+  appearance: textfield;
+
 }
-.taskGoalInnerResult>input{
-  color: #fc0;
-}
-.taskGoalInner>input::-webkit-inner-spin-button,
+
 .taskGoalInner>input::-webkit-outer-spin-button,
+.taskGoalInner>input::-webkit-inner-spin-button,
+.taskGoalInnerResult>input::-webkit-outer-spin-button,
 .taskGoalInnerResult>input::-webkit-inner-spin-button,
-.taskGoalInnerResult>input::-webkit-outer-spin-button{
-  -webkit-appearance: none; /* Chrome, Safari */
-  margin: 0; /* Remove margins */
+.tg-input::-webkit-outer-spin-button,
+.tg-input::-webkit-inner-spin-button{
+  appearance: none;
+  margin: 0;
+  -webkit-appearance: none;
+}
+.taskGoalInnerResult>input,
+.tginputResult{
+  color: #fc0;
 }
 
 .taskGoalInner>input:focus-within,
@@ -761,12 +943,18 @@
   outline: none;
   border: 1px solid #cccccc;
 }
+.tg-input:focus-within{
+  outline: none;
+  border: 1px solid #ccc3;
+}
 .taskGoalInner>input[readonly]:focus,
-.taskGoalInnerResult>input[readonly]:focus{
+.taskGoalInnerResult>input[readonly]:focus,
+.tg-input[readonly]:focus{
   border: 1px solid #ccc3;
 }
 .taskGoalInner>input[readonly]:hover,
-.taskGoalInnerResult>input[readonly]:hover{
+.taskGoalInnerResult>input[readonly]:hover,
+.tg-input[readonly]:hover{
   cursor: default;
 }
 .addLadderNoData{
@@ -824,8 +1012,32 @@
 }
 .targetLockUnlock{
     position: absolute;
-    top: 24px;
+    top: 19px;
     right: 24px;
+}
+.extraFieldEditAndDelete{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 30px;
+      height: auto;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      opacity: 0;
+      transition: 0.8s all;
+}
+.extraFieldEditIcon,
+.extraFieldDeleteIcon{
+    font-size: 14px !important;
+    color: #00aaffbd;
+    cursor: pointer;
+}
+.extraFieldDeleteIcon{
+      color: #ff005c;
+}
+.taskGoalInner:hover .extraFieldEditAndDelete{
+  opacity: 1;
 }
 .lockUnlockInner{}
 .targetUnlock,.targetLock{
@@ -855,4 +1067,102 @@
 .targetLock:hover ~ .lockunlocktitle,
 .targetUnlock:hover ~ .lockunlocktitle{
   opacity: 1;
+}
+
+.tg-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tg-has-suffix {
+  padding-right: 28px; /* make room for suffix */
+}
+.tg-suffix {
+    position: absolute;
+    right: 8px;
+    font-size: 18px;
+    font-weight: bolder;
+    color: #ff008d;
+    font-family: var(--font-mono);
+    pointer-events: none;
+    letter-spacing: 0.5px;
+  }
+
+.deleteConfirmOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.deleteConfirmBox {
+  width: 350px;
+  background: #011626;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid #ccc3;
+}
+
+.deleteConfirmTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffb700;
+}
+
+.deleteConfirmText {
+  margin-top: 14px;
+  font-size: 15px;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.deleteConfirmButtons {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.deleteConfirmBtn {
+  border: none;
+  outline: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.deleteConfirmYes {
+  background: #e53935;
+  color: white;
+}
+.deleteConfirmYes:hover {
+  background: #c62828;
+}
+
+.deleteConfirmNo {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.deleteConfirmNo:hover {
+  background: #cfcfcf;
+}
+.deleteConfirmYes:disabled{
+  cursor: not-allowed;
+  user-select: none;
+  pointer-events: none;
+  color: #ccc9;
+  background: #301717;
 }

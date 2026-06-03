@@ -15,6 +15,7 @@ const allowedMimeTypes = [
   "image/gif",
   "image/svg+xml",
   "image/tiff",
+  "image/jpg",
 
   // ── Videos ──────────────────────────────────────────────
   "video/mp4",

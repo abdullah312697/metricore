@@ -3,18 +3,18 @@ import { PassThrough } from "stream";
 
 cloudinary.config({ secure: true });
 
-export const uploadImage = async (fileStream, fileName, fname, onProgress) => {
-  return await uploadStream(fileStream, fileName, fname, onProgress);
+export const uploadImage = async (fileStream, public_id, fname, onProgress) => {
+  return await uploadStream(fileStream, public_id, fname, onProgress);
 };
 
-const uploadStream = (fileStream, name, fname, onProgress) => {
+const uploadStream = (fileStream, publicId, fname, onProgress) => {
   const folderName = `flucash/${fname}`;
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: folderName,
-        public_id: name,
+        public_id: publicId,
         resource_type: "auto",
         use_filename: false,
         unique_filename: false,

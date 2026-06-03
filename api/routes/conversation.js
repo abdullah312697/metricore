@@ -6,28 +6,12 @@ import Conversation from "../models/Conversation.js";
 import{decryptUserData} from '../verifyuser.js';
 // import authMiddleware if you have one that sets req.companyId
 import mongoose from "mongoose";
+import multerProcess from '../multerMiddleware.js';
 
 import Message from "../models/Message.js";
+import { uploadImage } from '../cloudinary.js';
 
 const router = express.Router();
-
-/**
- * Helper: get current employeeId and companyIdDecripted from cookie
- * Assumes decryptUserData(userIdCookie) returns an object id (company or employee)
- */
-function getSessionIdsFromReq(req) {
-  const { companyId } = req.cookies || {};
-  if (!companyId) return null;
-  const id = decryptUserData(companyId);
-  return id; // we expect this to be companyIdDecripted or employeeId depending on your decryptUserData
-}
-
-/**
- * Create a conversation (private or group)
- * - For private: send type=private and participants: [employeeAId, employeeBId]
- *   The route will check if a private conversation between those two within the same company exists and return it instead of creating a duplicate.
- * - For group: send type=group, title, participants: [employeeId1,...] (first participant will be admin)
- */
 
 router.post("/newConverSation", async (req, res) => {
   try {
@@ -226,43 +210,121 @@ router.get("/:conversationId", async (req, res) => {
   }
 });
 
-/**
- * Update conversation (e.g. group title/avatar) -- only admins should do this
- */
-router.put("/:conversationId", async (req, res) => {
-  try {
-    const { companyId } = req.cookies;
-    if (!companyId) return res.status(401).json({ message: "Unauthorized" });
-    const companyIdDecripted = decryptUserData(companyId);
+router.put("/updateGroupInfo/:conversationId", (req, res) => {
+  multerProcess(req, res, async (err) => {
+    if (err) return res.status(400).json({ message: err.message });
 
-    const { conversationId } = req.params;
-    const { title, avatar } = req.body;
+    try {
+      const { companyId } = req.cookies;
+      if (!companyId) return res.status(401).json({ message: "Unauthorized" });
 
-    // simple admin check: ensure req contains employeeId as actor (improve via auth middleware)
-    const actorEmployeeId = req.body.actorEmployeeId;
-    if (!actorEmployeeId) return res.status(400).json({ message: "actorEmployeeId required to verify admin role" });
+      const companyIdDecripted = decryptUserData(companyId);
 
-    const convo = await Conversation.findOne({ _id: conversationId, companyId: companyIdDecripted });
-    if (!convo) return res.status(404).json({ message: "Conversation not found" });
+      const { conversationId } = req.params;
+      const { title, actorEmployeeId } = req.body;
+      const files = req.files;
 
-    const actor = convo.participants.find(p => String(p.employeeId) === String(actorEmployeeId));
-    if (!actor || actor.role !== "admin") return res.status(403).json({ message: "Forbidden: admin only" });
+      // 🔴 admin check
+      if (!actorEmployeeId) {
+        return res.status(400).json({
+          message: "actorEmployeeId required to verify admin role",
+        });
+      }
 
-    if (title !== undefined) convo.title = title;
-    if (avatar !== undefined) convo.avatar = avatar;
+      const convo = await Conversation.findOne({
+        _id: conversationId,
+        companyId: companyIdDecripted,
+      });
 
-    await convo.save();
-    return res.status(200).json({ message: "Conversation updated", data: convo });
-  } catch (err) {
-    console.error("update convo error:", err);
-    return res.status(500).json({ message: "Something went wrong" });
-  }
+      if (!convo) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      const actor = convo.participants.find(
+        (p) => String(p.employeeId) === String(actorEmployeeId)
+      );
+
+      if (!actor || actor.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden: admin only" });
+      }
+
+      // ============================
+      // ✅ HANDLE FILE UPLOAD
+      // ============================
+      if (files && files.length > 0) {
+        const file = files[0];
+
+        const result = await uploadImage(
+          file.buffer,
+          `group_${conversationId}`, // file name
+          "groupAvatar"              // folder name
+        );
+
+        convo.avatar = result.secure_url; // ✅ save Cloudinary URL
+      }
+
+      // ============================
+      // ✅ HANDLE TITLE UPDATE
+      // ============================
+      if (title !== undefined && title.trim() !== "") {
+        convo.title = title;
+      }
+
+      await convo.save();
+
+      return res.status(200).json({message: "updated"});
+
+    } catch (err) {
+      console.error("update convo error:", err);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  });
 });
 
-/**
- * Add participant to a group conversation (admin only)
- * body: { employeeId: "<id>", actorEmployeeId: "<admin id>" }
- */
+
+router.put("/updatePerticipent/:conversationId", async(req, res) => {
+
+    try {
+      const { companyId } = req.cookies;
+      if (!companyId) return res.status(401).json({ message: "Unauthorized" });
+
+      const companyIdDecripted = decryptUserData(companyId);
+
+      const { conversationId } = req.params;
+      const {isMuted, actorEmployeeId } = req.body;
+
+      const updated = await Conversation.findOneAndUpdate(
+      {
+        _id: conversationId,
+        companyId: companyIdDecripted,
+        "participants.employeeId": actorEmployeeId,
+      },
+      {
+        $set: { "participants.$.isMuted": isMuted },
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Conversation or participant not found." });
+    }
+    // Return only the updated participant for a leaner response
+    const updatedParticipant = updated.participants.find(
+      (p) => p.employeeId.toString() === actorEmployeeId
+    );
+
+    res.status(200).json({
+      message: "Mute status updated successfully.",
+      participant: updatedParticipant,
+    });
+
+    } catch (err) {
+      console.error("update convo error:", err);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  });
+
+
 router.post("/:conversationId/participants", async (req, res) => {
   try {
     const { companyId } = req.cookies;
@@ -327,5 +389,6 @@ router.delete("/:conversationId/participants/:employeeId", async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
+
 
 export default router;

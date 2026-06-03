@@ -677,17 +677,254 @@ body{
     height: 130px;
     border: 1px solid #ccc3;
     border-radius: 10px;
+    position: relative;
+}
+.GroupChatMainContainer{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+.live_message_mainHeader{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+.messangerHeadrFunction{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+.isMutedIcon{
+    color: #00aeff;
+    cursor: pointer;
+    transition: 0.7s all;
+}
+.isMutedIcon:hover{
+    color: #00aeff96;
+}
+.adminOnlybtnInfo{
+    color: #b17f00;
+    cursor: pointer;
+    transition: 0.7s all;
+}
+.adminOnlybtnInfo:hover{
+        color: #ffb700;
+}
+.groupInformatinAndUpdate{
+    position: absolute;
+    background: #011626;
+    border: 1px solid #ccc3;
+    padding: 10px;
+    border-radius: 10px;
+    width: 98%;
+    height: 250px;
+    z-index: 999999;
+    box-sizing: border-box;
+    top: 28px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.groupInformatinAndUpdate>button{
+    margin-top: 30px;
+    width: 170px;
+    background: transparent;
+    border: 1px solid #ccc3;
+    padding: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fc0;
+    border-radius: 5px;
+    transition: 0.8s all;
+}
+.groupInformatinAndUpdate>button:disabled{
+    cursor: not-allowed;
+    user-select: none;
+    color: rgb(114, 91, 0);
+}
+.changeGroupImage{
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #ccc3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.changeGroupImage>label{
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    cursor: pointer;
+}
+.changeGroupImage>label>input{
+    opacity: 0;
+    width: 22px;
+    cursor: pointer;
+}
+.changeGroupImagesvgone{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-size: 21px !important;
+    color: #00fff2cf;
+    cursor: pointer;
+    z-index: 1;
+}
+.changeGroupImagesvgtwo{
+    position: unset;
+    cursor: default;
+    font-size: 51px !important;
+    color: #b17f00;
+}
+.changeGroupImage>img{
+    width: 99%;
+    height: 99%;
+    border-radius: 50%;
+}
+.changeGroupName{
+    margin-top: 20px;
+}
+.changeGroupName>input{
+    background: transparent;
+    border: 1px solid #ccc3;
+    padding: 5px;
+    border-radius: 5px;
+    color: #ccc;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 10px;
 }
 .live_salse_main{
     width: 600px;
     height: 130px;
     border: 1px solid #ccc3;
     border-radius: 10px;
+    position: relative;
 }
-.gruopNameAndLogo{}
-.gruopNameAndLogo>img{}
-.gruopNameAndLogo>h3{}
-.groupNotificatin_view{}
+.live_salse_header{
+padding: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #b17f00;
+    text-align: center;
+    border-bottom: 1px solid #ccc3;
+    background: #6985833d;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.live_sales_innerContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    position: relative;
+    background: #cccccc0d;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.live_salesContainerGroup{
+    width: 200px;
+    border-left: 1px solid #ccc3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100px;
+}
+.live_salesContainerGroup>h2{
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+.live_salesContainerGroup>h6{
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.gruopNameAndLogo{
+    width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.gruopNameAndLogo>img{
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+}
+.responseMessage{
+    font-size: 12px;
+    position: absolute;
+    top: 176px;
+    transition: 0.7s all;
+    opacity: 0;
+    color: #00fff2;
+}
+.gruopNameAndLogo>h3{
+    margin-left: 10px;
+    color: #fff;
+}
+.messagnesEmojiINputContainer{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.messagnesEmojiINputContainer>svg{
+    font-size: 25px;
+    color: #00fff2a3;
+    cursor: pointer;
+    margin-right: 5px;
+}
+.thumbUpandVoiceSection{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 5px;
+}
+.thumbUpbigEmoji{
+    color: #0af;
+    cursor: pointer;
+    margin-top: -5px;
+}
+
+.groupNotificatin_view{
+    width: 250px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ccc3;
+    padding: 5px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    position: relative;
+}
+.group_Notifican_toggleBtns{
+    margin-left: 10px;
+}
+.group_Notifican_toggleBtns>svg{
+    color:#00cbc0;
+    font-size: 38px !important;
+    cursor: pointer;
+}
 .AddEmployeeMainPage{
     display: flex;
     width: 100%;
@@ -1009,17 +1246,6 @@ border-color: #85858563;
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
-}
-.custom-tooltip {
-    width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #011626;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
 }
 
 .productpagehr {
@@ -4696,8 +4922,25 @@ border-color: #85858563;
     border: 1px solid rgb(50, 49, 48);
     transition: bottom 150ms ease;
 }
-.liveChatsInnerPart.minimized{
+.liveChatsInnerPart_group{
+    width: 100%;
+    height: 351px;
+    background: #011626;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: all;
+    border: 1px solid rgb(50, 49, 48);
+    transition: bottom 150ms ease;
+    z-index: 99999;
+    position: absolute;
+    top: 128px;
+}
+.liveChatsInnerPart.minimized,
+.liveChatsInnerPart_group.minimized{
     height: auto;
+    border: none;
 }
 .liveConverstaionHeder{
     padding: 10px;
@@ -4752,7 +4995,7 @@ border-color: #85858563;
     overflow-y: scroll;
     overflow-x: hidden;
     width: 100%;
-    height: auto;
+    height: 100%;
     box-sizing: border-box;
     position: relative;
     background: #011626;
@@ -4762,7 +5005,90 @@ border-color: #85858563;
 .liveCustomerMessages::-webkit-scrollbar{
     display: none;
 }
+/* animation start */
+.tickerContainer {
+    width: 200px;
+    height: 40px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0px 3px;
+    background: rgb(96 94 92 / 9%);
+}
 
+.tickerWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: scrollUp linear infinite;
+    animation-duration: 20s;
+}
+
+.tickerWrapper.paused {
+  animation-play-state: paused;
+}
+
+.tickerItem {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #00fff2f2;
+}
+.tickerItem>img{
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 5px;
+    object-fit: cover;
+    object-position: center;
+}
+.tickerContainer::before,
+.tickerContainer::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 10px;
+  z-index: 2;
+}
+.unreadMessagesCount{
+    position: absolute;
+    top: -19px;
+    left: -13px;
+    color: #b17f00;
+    font-size: 12px;
+    border: 1px solid #ababab94;
+    border-radius: 50%;
+    padding: 5px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tickerContainer::before {
+  top: 0;
+  background: linear-gradient(to bottom, #b17f00ab, transparent);
+}
+
+.tickerContainer::after {
+  bottom: 0;
+  background: linear-gradient(to top, #b17f00ab, transparent);
+}
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+/* animation start */
 
 .liveCustomerMessagesCustomer,
 .liveCustomerMessagesAgent{
@@ -5153,7 +5479,7 @@ border-color: #85858563;
 
 .uploadProgressTrack {
     position: relative;
-    width: 80%;
+    width: 60%;
     font-size: 13px;
     color: #ccc;
 }
@@ -5161,14 +5487,14 @@ border-color: #85858563;
 .uploadProgressFill {
     width: 100%;
     transition: width 0.2s ease, background 0.3s ease;
-    height: 50px;
+    height: 30px;
     border-radius: 5px;
     background-color: #cccccc36;
     position: relative;
     text-align: center;
 }
 .uloadPrgressFillinner{
-    height: 50px;
+    height: 30px;
     border-radius: 5px;
     background-color: #00fff291;
     transition: width 0.2s ease, background 0.3s ease;
@@ -5253,10 +5579,134 @@ border-color: #85858563;
 }
 
 .liveChatsInnerPart.minimized .liveCustomerMessages,
-.liveChatsInnerPart.minimized .liveConverstaionFooter {
+.liveChatsInnerPart.minimized .liveConverstaionFooter,
+.liveChatsInnerPart_group.minimized .liveCustomerMessages,
+.liveChatsInnerPart_group.minimized .liveConverstaionFooter
+ {
   display: none;
 }
 /* Live Chats page Styles</> */
+
+/* RevieueChart.js */
+.rc-root{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.rc-header{
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.rc-header__left{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.rc-eyebrow{
+    margin-right: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #ffbc00;
+}
+.rc-title{
+    color: #00fff2;
+    margin-right: 20px;
+    font-size: 13px;
+    font-weight: 400;
+}
+.rc-period{
+    font-size: 16px;
+    color: #00cbc0;
+    font-weight: bold;
+}
+.rc-metrics{
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 7px;
+    flex-direction: column;
+}
+.rc-period-section,
+.rc-metrics-section{
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 5px;
+}
+.rc-metric-btn,
+.rc-period-btn {
+    width: 70px;
+    background: transparent;
+    border: 1px solid #ccc3;
+    padding: 2px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #bb8600;
+    cursor: pointer;
+    transition: 0.7s all;
+}
+.rc-metric-btn:hover,
+.rc-period-btn:hover {
+    border-color: #ccc9;
+}
+.rc-stats{
+    margin-top: -10px;
+    position: relative;
+}
+.rc-stat{
+    width: 200px;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-start;
+}
+.rc-stat__label{
+    font-size: 10px;
+    font-weight: bold;
+    color: #00cbc0;
+    width: 32px;
+}
+.rc-stat__val{
+    font-size: 10px;
+    font-weight: bold;
+}
+.rc-custom{
+    position: absolute;
+    top: 66px;
+    right: 9px;
+    z-index: 100;
+}
+.rc-chart-wrap{
+    width: 100%;
+    height: 190px;
+}
+.rc-tooltip {
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    background: #011626;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+}
+.rc_Calender_inner{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    top: 7px;
+    left: 22px;
+}
+/* RevieueChart.js  */
 
     /* //media query star (max-width: 768px) <> */
     @media only screen and (max-width: 768px) {

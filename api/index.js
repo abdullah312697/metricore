@@ -1,9 +1,6 @@
-// import { config } from "dotenv";
-// config();
 import express, { json } from "express";
 import fs from "fs";
 import https from "https";
-// import { set, connect } from "mongoose";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -28,6 +25,10 @@ import ClientAddProduct from "./routes/ClientAddProduct.js";
 import conversationRoutes from "./routes/conversation.js";
 import messageRoutes from "./routes/message.js";
 import callsRoutes from "./routes/calls.js";
+import produstData from "./routes/ProductData.js";
+import ExtraFieldAdd from "./routes/ExtraFieldAdd.js";
+import TargetAmountRoute from "./routes/TargetAmountRoute.js";
+import ChartData from "./routes/ChartData.js";
 // =========================
 // ✅ App Initialization
 // =========================
@@ -81,6 +82,10 @@ app.use("/api/newproduct", ClientAddProduct);
 app.use("/api/conversation", conversationRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/calls", callsRoutes);
+app.use("/api/productdata", produstData);
+app.use("/api/extrafield", ExtraFieldAdd);
+app.use("/api/goalTarget", TargetAmountRoute);
+app.use("/api/chart", ChartData);
 // =========================
 // ✅ HTTP & Socket.IO Setup
 // =========================
@@ -103,29 +108,10 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY
 );
 
-// // =========================
-// // ✅ MongoDB Connection
-// // =========================
-// const mongoDB = process.env.MONGO_URL;
-// set("strictQuery", false);
-
-// connect(mongoDB)
-//   .then(() => console.log("✅ Database connection successful"))
-//   .catch((err) => console.error("❌ Database connection error:", err));
-
-// // =========================
-// // ✅ Start Server
-// // =========================
-// const PORT = process.env.PORT || 5000;
-
-// server.listen(PORT, "0.0.0.0", () => {
-//   console.log(`🚀 Server is running at https://192.168.8.103:${PORT}`);
-// });
-
 const startServer = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL, {
-      family: 4, // force IPv4 (important for your previous ETIMEDOUT issue)
+      family: 4,
       serverSelectionTimeoutMS: 5000
     });
 
