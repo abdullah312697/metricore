@@ -79,6 +79,8 @@ const apiV1Limiter = rateLimit({
 // ✅ CORS Configuration
 // =========================
 const allowedOrigins = [
+  "https://motricore.netlify.app/",
+  "https://www.motricore.netlify.app/",
   "https://metricore.app",
   "https://www.metricore.app",
   "https://192.168.8.103:3000",
