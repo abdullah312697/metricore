@@ -3,7 +3,7 @@ const router = express.Router();
 import Companies from "../models/Companies.js";
 import Employee from "../models/Employee.js";
 import MyTarget from "../models/MyTarget.js";
-import{encryptUserData,decryptUserData,encryptCompanyPassword,decryptCompanyPassword} from '../verifyuser.js';
+import{encryptUserData,hashPassword,decryptUserData,encryptCompanyPassword,decryptCompanyPassword} from '../verifyuser.js';
 import multerProcess from '../multerMiddleware.js';
 import { uploadImage } from '../cloudinary.js';
 import mongoose from 'mongoose';
