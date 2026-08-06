@@ -1,14 +1,16 @@
 {
-  "name": "nothunapi",
+  "name": "MotreiCore",
   "version": "1.0.0",
-  "description": "E-commerce website",
+  "description": "Business Management",
   "main": "index.js",
-  "scripts": {
+"scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon -r dotenv/config index.js",
+    "start": "node index.js",
+    "dev": "nodemon -r dotenv/config index.js",
     "build": "webpack"
   },
-  "author": "kingStar",
+
+  "author": "kamil",
   "license": "ISC",
   "type": "module",
   "dependencies": {
