@@ -1,120 +1,109 @@
 // api/mailer.js — ONE email system for the whole backend
 //
 // Every email MetriCore sends goes through this file. Routes never
-// touch nodemailer, transporters, or HTML again — they call one
-// function and get a result object back.
+// touch HTTP, providers, or HTML again — they call one function and
+// get a result object back.
 //
 //   import { sendMail, sendVerificationCode, sendPasswordReset } from "../mailer.js";
 //
 //   const mail = await sendVerificationCode("owner@shop.com", 482913);
 //   if (!mail.ok) console.error(mail.error);
 //
-// ── PROVIDER SWITCHING = .env ONLY ───────────────────────────────
-// Configure with generic SMTP variables. Every transactional
-// provider speaks SMTP, so changing provider never touches code:
+// ── WHY THE HTTP API, NOT SMTP ───────────────────────────────────
+// Cloud hosts (Railway, Render, etc.) block or throttle outbound
+// SMTP ports to prevent spam — so nodemailer/SMTP "Connection
+// timeout"s in production even with correct credentials. Brevo's
+// transactional API is plain HTTPS (port 443), which is NEVER
+// blocked, so it works reliably in the cloud. Same Brevo account,
+// same emails — just a different transport underneath.
 //
-//   SMTP_HOST=smtp-relay.brevo.com
-//   SMTP_PORT=587
-//   SMTP_USER=your_brevo_login
-//   SMTP_PASS=your_brevo_smtp_key
-//   MAIL_FROM=no-reply@yourdomain.com
+// ── .env ─────────────────────────────────────────────────────────
+//   BREVO_API_KEY=xkeysib-...          (Brevo dashboard → SMTP & API → API Keys)
+//   MAIL_FROM=no-reply@yourdomain.com  (must be a VERIFIED sender in Brevo)
 //   MAIL_FROM_NAME=MetriCore
 //
-// Quick reference:
-//   Brevo    → host smtp-relay.brevo.com : 587
-//   Resend   → host smtp.resend.com      : 587   (user: "resend", pass: API key)
-//   Postmark → host smtp.postmarkapp.com : 587
-//   Gmail    → host smtp.gmail.com       : 587   (app password)
-//
-// TRANSITION SAFETY: if no SMTP_HOST is set but the old
-// EMAIL_USER/EMAIL_PASS exist, this falls back to Gmail so nothing
-// breaks mid-migration (a warning is logged).
+// TRANSITION SAFETY: the exported functions (sendMail,
+// renderBrandEmail, sendVerificationCode, sendPasswordReset) keep the
+// EXACT same signatures and return shapes as the SMTP version, so no
+// route that calls them changes at all.
 
-import nodemailer from "nodemailer";
+const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
 
-/* ═══════════════════════════════════════════════════════════════
-   TRANSPORTER — lazy singleton (same lesson as cloudinary.js:
-   configure on first send, never at import time)
-═══════════════════════════════════════════════════════════════ */
-let transporter = null;
-
-const ensureTransporter = () => {
-  if (transporter) return transporter;
-
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_USER, EMAIL_PASS } = process.env;
-
-  if (SMTP_HOST) {
-    // ── Modern path: generic SMTP, provider-agnostic ────────────
-    const missing = [];
-    if (!SMTP_USER) missing.push("SMTP_USER");
-    if (!SMTP_PASS) missing.push("SMTP_PASS");
-    if (missing.length) {
-      throw new Error(`Mailer is not configured — missing ${missing.join(", ")} in api/.env`);
-    }
-
-    const port = Number(SMTP_PORT) || 587;
-    transporter = nodemailer.createTransport({
-      host:   SMTP_HOST,
-      port,
-      secure: port === 465,           // 465 = TLS from the start, 587 = STARTTLS
-      auth:   { user: SMTP_USER, pass: SMTP_PASS },
-    });
-    return transporter;
-  }
-
-  if (EMAIL_USER && EMAIL_PASS) {
-    // ── Legacy fallback: old Gmail vars — keeps email alive
-    //    during the provider transition ─────────────────────────
-    console.warn("⚠️  mailer: SMTP_* vars not set — falling back to legacy Gmail (EMAIL_USER/EMAIL_PASS)");
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      port:    587,
-      secure:  false,
-      auth:    { user: EMAIL_USER, pass: EMAIL_PASS },
-    });
-    return transporter;
-  }
-
-  throw new Error(
-    "Mailer is not configured — set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS in api/.env"
-  );
-};
-
-const fromAddress = () => {
-  const name = process.env.MAIL_FROM_NAME || "MetriCore";
-  const addr = process.env.MAIL_FROM || process.env.SMTP_USER || process.env.EMAIL_USER;
-  return `"${name}" <${addr}>`;
-};
+/* ── sender identity ─────────────────────────────────────────── */
+const fromIdentity = () => ({
+  name:  process.env.MAIL_FROM_NAME || "MetriCore",
+  email: process.env.MAIL_FROM || process.env.SMTP_USER || process.env.EMAIL_USER,
+});
 
 /* ═══════════════════════════════════════════════════════════════
-   CORE SENDER
+   CORE SENDER — Brevo transactional API over HTTPS
    to      : string OR array of strings
+   bcc     : string OR array of strings (optional)
    subject : string
    html    : string (use renderBrandEmail for the standard shell)
    text    : optional plain-text alternative
-   replyTo : optional
+   replyTo : optional (string email)
    Returns { ok, messageId } or { ok: false, error } — NEVER throws,
    so each route decides whether a mail failure is fatal.
+   Signature is IDENTICAL to the old SMTP version.
 ═══════════════════════════════════════════════════════════════ */
-export async function sendMail({  to, bcc, subject, html, text, replyTo }) {
+export async function sendMail({ to, bcc, subject, html, text, replyTo }) {
   try {
     const list = Array.isArray(to) ? to.filter(Boolean) : [to].filter(Boolean);
-    if (!list.length)      return { ok: false, error: "sendMail: no recipient" };
-    if (!subject)          return { ok: false, error: "sendMail: subject is required" };
-    if (!html && !text)    return { ok: false, error: "sendMail: html or text body is required" };
+    if (!list.length)   return { ok: false, error: "sendMail: no recipient" };
+    if (!subject)       return { ok: false, error: "sendMail: subject is required" };
+    if (!html && !text) return { ok: false, error: "sendMail: html or text body is required" };
 
-    const t = ensureTransporter();
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
+      return { ok: false, error: "Mailer not configured — set BREVO_API_KEY in api/.env" };
+    }
 
-  const info = await t.sendMail({
-    from: fromAddress(),
-    to:   list.join(", "),
-    ...(bcc ? { bcc: (Array.isArray(bcc) ? bcc : [bcc]).join(", ") } : {}),
-    subject, html, text,
-    ...(replyTo ? { replyTo } : {}),
-  });
-  
-    console.log(`📧 sent "${subject}" → ${list.join(", ")} (${info.messageId})`);
-    return { ok: true, messageId: info.messageId };
+    const sender = fromIdentity();
+    if (!sender.email) {
+      return { ok: false, error: "Mailer not configured — set MAIL_FROM (a verified Brevo sender)" };
+    }
+
+    // Build the Brevo payload
+    const payload = {
+      sender,
+      to: list.map((email) => ({ email })),
+      subject,
+      ...(html ? { htmlContent: html } : {}),
+      ...(text ? { textContent: text } : {}),
+      ...(bcc
+        ? { bcc: (Array.isArray(bcc) ? bcc : [bcc]).filter(Boolean).map((email) => ({ email })) }
+        : {}),
+      ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+    };
+
+    const res = await fetch(BREVO_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "api-key":      apiKey,
+        "Content-Type": "application/json",
+        "accept":       "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      // Brevo returns a JSON error body — surface it for debugging
+      let detail = "";
+      try {
+        const body = await res.json();
+        detail = body?.message || JSON.stringify(body);
+      } catch {
+        detail = `HTTP ${res.status}`;
+      }
+      console.error(`❌ mail failed "${subject}" → ${list.join(", ")}: ${detail}`);
+      return { ok: false, error: detail };
+    }
+
+    const data = await res.json().catch(() => ({}));
+    const messageId = data?.messageId || "sent";
+    console.log(`📧 sent "${subject}" → ${list.join(", ")} (${messageId})`);
+    return { ok: true, messageId };
 
   } catch (err) {
     console.error(`❌ mail failed "${subject}" → ${to}:`, err.message);
@@ -122,23 +111,22 @@ export async function sendMail({  to, bcc, subject, html, text, replyTo }) {
   }
 }
 
-/* Optional: call once at server start (dev) to catch bad SMTP
-   credentials immediately instead of at the first real signup:
-     verifySmtpConnection().then(r => !r.ok && console.error(r.error));   */
+/* ═══════════════════════════════════════════════════════════════
+   CONNECTION CHECK — kept for compatibility with any startup call.
+   The API has no persistent connection to "verify", so this does a
+   lightweight config check instead of an SMTP handshake. Returns the
+   same { ok } / { ok:false, error } shape as before.
+═══════════════════════════════════════════════════════════════ */
 export async function verifySmtpConnection() {
-  try {
-    await ensureTransporter().verify();
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, error: `SMTP verify failed: ${err.message}` };
-  }
+  const apiKey = process.env.BREVO_API_KEY;
+  const sender = fromIdentity();
+  if (!apiKey)        return { ok: false, error: "BREVO_API_KEY is not set" };
+  if (!sender.email)  return { ok: false, error: "MAIL_FROM is not set" };
+  return { ok: true };
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BRAND SHELL — one look for every email
-   Templates only supply the middle; header/footer stay identical.
-   Exported so ANY future email (welcome, invoice, alert) reuses it:
-     sendMail({ to, subject, html: renderBrandEmail({ bodyHtml: "..." }) })
+   BRAND SHELL — one look for every email  (UNCHANGED)
 ═══════════════════════════════════════════════════════════════ */
 const esc = (s) =>
   String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -160,7 +148,7 @@ export function renderBrandEmail({ bodyHtml, footerNote = "" }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TEMPLATE 1 — email verification code
+   TEMPLATE 1 — email verification code  (UNCHANGED)
 ═══════════════════════════════════════════════════════════════ */
 export async function sendVerificationCode(to, code) {
   const bodyHtml = `
@@ -181,7 +169,7 @@ export async function sendVerificationCode(to, code) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TEMPLATE 2 — password reset link
+   TEMPLATE 2 — password reset link  (UNCHANGED)
 ═══════════════════════════════════════════════════════════════ */
 export async function sendPasswordReset(to, resetUrl, ttlMinutes = 30) {
   const bodyHtml = `
