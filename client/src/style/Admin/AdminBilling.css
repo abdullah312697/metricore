@@ -1,0 +1,282 @@
+/* AdminBilling.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Prefix : adb- (admin billing)
+   Revenue cards + status strip + per-plan bars + recent activity.
+   Page title/sub + ghosts come from AdminLayout.css.                  */
+
+:root {
+  --adb-card:       #071e30;
+  --adb-deep:       #040f1a;
+  --adb-amber:      #ffb100;
+  --adb-amber-dim:  rgba(255, 177, 0, 0.10);
+  --adb-amber-line: rgba(255, 177, 0, 0.28);
+  --adb-white:      #ffffff;
+  --adb-off-white:  #dde6ee;
+  --adb-slate:      #8899aa;
+  --adb-slate-dim:  #4d6070;
+  --adb-border:     rgba(255, 255, 255, 0.08);
+  --adb-border-s:   rgba(255, 255, 255, 0.04);
+  --adb-green:      #22c55e;
+  --adb-blue:       #38bdf8;
+  --adb-red:        #ef4444;
+
+  --adb-display: 'Space Grotesk', sans-serif;
+  --adb-body:    'Inter', sans-serif;
+  --adb-mono:    'IBM Plex Mono', monospace;
+
+  --adb-ease: 0.16s ease;
+
+  /* logo | company | plan | renew | status */
+  --adb-cols: 38px 1.4fr 1.1fr 108px 92px;
+}
+
+.adb-mono { font-family: var(--adb-mono); }
+
+/* ══ HEADLINE CARDS ════════════════════════════════════════════ */
+.adb-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap:                   14px;
+  max-width:             920px;
+  margin-bottom:         14px;
+}
+
+.adb-card {
+  background:     var(--adb-card);
+  border:         1px solid var(--adb-border);
+  border-radius:  13px;
+  padding:        18px;
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+  transition:     border-color var(--adb-ease);
+}
+.adb-card:hover { border-color: rgba(255, 255, 255, 0.14); }
+
+.adb-card__icon {
+  width:           34px;
+  height:          34px;
+  border-radius:   9px;
+  background:      rgba(255, 255, 255, 0.05);
+  color:           var(--adb-slate);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  margin-bottom:   8px;
+}
+.adb-card__icon svg { font-size: 19px !important; }
+.adb-card__icon--accent { background: var(--adb-amber-dim); color: var(--adb-amber); }
+
+.adb-card__value {
+  font-family:    var(--adb-display);
+  font-size:      27px;
+  font-weight:    700;
+  letter-spacing: -0.6px;
+  line-height:    1.1;
+  color:          var(--adb-white);
+}
+
+.adb-card__label {
+  font-size:      9px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color:          var(--adb-slate-dim);
+}
+.adb-card__sub { font-family: var(--adb-body); font-size: 11px; color: var(--adb-slate-dim); margin-top: 2px; }
+
+/* ══ STATUS STRIP ══════════════════════════════════════════════ */
+.adb-strip {
+  display:       flex;
+  align-items:   center;
+  gap:           18px;
+  flex-wrap:     wrap;
+  max-width:     920px;
+  padding:       12px 16px;
+  background:    var(--adb-card);
+  border:        1px solid var(--adb-border);
+  border-radius: 11px;
+  margin-bottom: 30px;
+}
+.adb-strip__item {
+  display:     flex;
+  align-items: center;
+  gap:         7px;
+  font-size:   12.5px;
+  color:       var(--adb-slate);
+}
+.adb-strip__item.adb-mono { margin-left: auto; color: var(--adb-slate-dim); font-size: 11px; }
+
+.adb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.adb-dot--pastdue  { background: var(--adb-red); }
+.adb-dot--canceled { background: var(--adb-slate-dim); }
+
+/* ══ SECTIONS ══════════════════════════════════════════════════ */
+.adb-section { max-width: 920px; margin-bottom: 30px; }
+
+.adb-section__title {
+  font-family: var(--adb-display);
+  font-size:   15px;
+  font-weight: 600;
+  color:       var(--adb-off-white);
+  margin:      0 0 14px;
+}
+
+/* per-plan bars */
+.adb-plans {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:                   14px;
+}
+
+.adb-plan {
+  background:     var(--adb-card);
+  border:         1px solid var(--adb-border);
+  border-radius:  12px;
+  padding:        16px;
+  display:        flex;
+  flex-direction: column;
+  gap:            9px;
+}
+
+.adb-plan__head {
+  display:         flex;
+  align-items:     baseline;
+  justify-content: space-between;
+  gap:             10px;
+}
+.adb-plan__name {
+  font-family: var(--adb-display);
+  font-size:   14px;
+  font-weight: 600;
+  color:       var(--adb-white);
+}
+.adb-plan__mrr { font-size: 13px; color: var(--adb-amber); }
+
+.adb-bar {
+  height:        7px;
+  border-radius: 4px;
+  background:    var(--adb-deep);
+  overflow:      hidden;
+}
+.adb-bar__fill {
+  height:        100%;
+  border-radius: 4px;
+  background:    linear-gradient(90deg, var(--adb-amber), #ffc933);
+  transition:    width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width:     2px;
+}
+
+.adb-plan__count { font-size: 11.5px; color: var(--adb-slate-dim); }
+
+/* recent activity table */
+.adb-table {
+  background:    var(--adb-card);
+  border:        1px solid var(--adb-border);
+  border-radius: 13px;
+  overflow:      hidden;
+}
+
+.adb-row {
+  display:               grid;
+  grid-template-columns: var(--adb-cols);
+  align-items:           center;
+  gap:                   12px;
+  padding:               11px 16px;
+  border-bottom:         1px solid var(--adb-border-s);
+  box-sizing:            border-box;
+}
+.adb-row:last-child { border-bottom: none; }
+
+.adb-logo {
+  width:         34px;
+  height:        34px;
+  border-radius: 8px;
+  object-fit:    cover;
+  border:        1px solid var(--adb-border);
+  background:    var(--adb-deep);
+  flex-shrink:   0;
+}
+.adb-logo--fallback {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--adb-display);
+  font-weight:     700;
+  font-size:       13px;
+  color:           var(--adb-amber);
+  background:      var(--adb-amber-dim);
+  border-color:    var(--adb-amber-line);
+}
+
+.adb-row__name {
+  font-family:   var(--adb-display);
+  font-size:     13.5px;
+  font-weight:   600;
+  color:         var(--adb-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.adb-row__plan {
+  font-size:     12.5px;
+  color:         var(--adb-off-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+.adb-row__interval { color: var(--adb-slate-dim); }
+
+.adb-row__renew { font-size: 11.5px; color: var(--adb-slate); white-space: nowrap; }
+
+.adb-status {
+  font-family:   var(--adb-display);
+  font-size:     10.5px;
+  font-weight:   600;
+  border-radius: 20px;
+  padding:       3px 11px;
+  white-space:   nowrap;
+  width:         fit-content;
+  justify-self:  end;
+}
+.adb-status--active   { color: var(--adb-green); background: rgba(34,197,94,0.10);  border: 1px solid rgba(34,197,94,0.30); }
+.adb-status--past_due { color: var(--adb-red);   background: rgba(239,68,68,0.10);  border: 1px solid rgba(239,68,68,0.30); }
+.adb-status--canceled { color: var(--adb-slate); background: rgba(136,153,170,0.08); border: 1px solid var(--adb-border); }
+
+/* empty / error */
+.adb-empty {
+  padding:       36px 20px;
+  text-align:    center;
+  font-size:     13.5px;
+  color:         var(--adb-slate-dim);
+  background:    var(--adb-card);
+  border:        1px dashed var(--adb-border);
+  border-radius: 13px;
+}
+
+.adb-error {
+  max-width:     420px;
+  background:    rgba(239, 68, 68, 0.08);
+  border:        1px solid rgba(239, 68, 68, 0.28);
+  border-radius: 12px;
+  padding:       18px;
+}
+.adb-error p { font-size: 13.5px; color: var(--adb-off-white); margin: 0 0 12px; }
+.adb-retry {
+  font-family: var(--adb-display); font-size: 13px; font-weight: 600;
+  color: var(--adb-deep); background: var(--adb-amber);
+  border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer;
+}
+.adb-retry:hover { background: #ffc933; }
+
+/* ── responsive ───────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  :root { --adb-cols: 34px 1.4fr 92px; }
+  .adb-row__plan, .adb-row__renew { display: none; }
+}
+
+/* ── reduced motion / focus ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .adb-card, .adb-bar__fill, .adb-retry { transition: none; }
+}
+.adb-retry:focus-visible { outline: 2px solid var(--adb-amber); outline-offset: 3px; }

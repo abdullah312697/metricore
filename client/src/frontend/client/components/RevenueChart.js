@@ -46,6 +46,32 @@ const formatVal = (v, unit) => {
   return v >= 1000 ? `${(v/1000).toFixed(1)}k` : v;
 };
 
+
+// In RevenueChart.js — calculate which ticks to show
+const getTickValues = (points, period) => {
+  if (!points.length) return undefined;
+
+  const len = points.length;
+
+  // How many ticks to show per period
+  const maxTicks = {
+    today:  12,  // every 2 hours
+    week:   7,   // every day
+    month:  6,   // every 5 days
+    year:   12,  // every month
+    full:   12,
+    custom: 7,
+  }[period] || 6;
+
+  if (len <= maxTicks) return undefined; // show all if few points
+
+  // Pick evenly spaced ticks
+  const step  = Math.ceil(len / maxTicks);
+  return points
+    .filter((_, i) => i % step === 0 || i === len - 1) // always show last
+    .map(p => p.x);
+};
+
 export default function RevenueChart() {
   const [period,       setPeriod]      = useState("month");
   const [activeMetric, setActiveMetric]= useState("SoldAmount");
@@ -90,7 +116,6 @@ function ddmmyyyyToISOString(dateStr) {
   // ── Fetch whenever period or metric changes ───────────────────
   useEffect(() => {
     if (period === "custom" && (!startDateView || !endDateView)) return;
-
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -148,6 +173,10 @@ const chartData = useMemo(() => {
     return () =>
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Dynamic margin based on rotation need
+const needsRotation = chartPoints.length > 10;
+
 
   return (
     <div className="rc-root">
@@ -312,16 +341,21 @@ const chartData = useMemo(() => {
         ) : (
           <ResponsiveLine
             data={chartData}
-            margin={{ top: 16, right: 24, bottom: 52, left: 62 }}
+            margin={{ top: 16, right: 24, bottom: needsRotation ? 64 : 48, left: 62 }}
             xScale={{ type: "point" }}
             yScale={{ type: "linear", min: 0, max: "auto" }}
             curve="monotoneX"
             axisBottom={{
-              tickSize: 0, tickPadding: 7,
-              tickRotation: chartPoints.length > 20 ? -45 : 0,
-              legend: period === "today" ? "Hour" : period === "year" ? "Month" : "Day",
-              legendOffset: 44, legendPosition: "middle",
-            }}
+                tickSize:     0,
+                tickPadding:  7,
+                tickRotation: chartPoints.length > 20 ? -45 : 0, // 👈 slight rotation only when needed
+                legend:       period === "today" ? "Hour"
+                            : period === "year" || period === "full" ? "Month"
+                            : "Date",
+                legendOffset:    chartPoints.length > 10 ? 50 : 42, // 👈 more space when rotated
+                legendPosition: "middle",
+                tickValues:    getTickValues(chartPoints, period), // 👈 skip dense ticks
+              }}
             axisLeft={{
               tickSize: 0, tickPadding: 10,
               legend: metric.label, legendOffset: -52, legendPosition: "middle",

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useMemo } from 'react'
 import { useParams } from 'react-router-dom';
 import ChangeDate from './ChangeDate';
 import {Altaxios} from '../../Altaxios';
-import './view.css';
+import '../../../style/view.css';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
@@ -22,11 +22,7 @@ function ViewGoal() {
   const [viewGoal,setViewGoal] = useState({targetAmount:0,targetEndDate:0,targetName:"",targetStartDate:0,goalLadder:[]});
   const [goalLadder,setGoalLadder] = useState([]);
   const [deffirent,setDeffirent] = useState({year: 0, month: 0, week: 0, day: 0});
-  // const [loading, setLoading] = useState(false);
-  // const [addingTask, setAddingTask] = useState(false);
   const inputRefs = useRef({});
-  // const [errorMsg,setErrorMsg] = useState("");
-  // const [errStyle,setErrStyle] = useState({});
   const [currentProductsData,setCurrentProductsData] = useState([]);
   const productMetrics = useProductMetrics(currentProductsData, deffirent);
   const totalMetrics = useTotalMetrics(productMetrics);
@@ -55,8 +51,8 @@ function ViewGoal() {
   const [isClickedDel,setIsClickedDel] = useState(false);
 
   useEffect(() => {
-    try{
       const getProduct = async() => {
+      try{
         const params = dateRange.start && dateRange.end
         ? { start: dateRange.start.toISOString(), end: dateRange.end.toISOString() }
         : {};
@@ -80,11 +76,13 @@ function ViewGoal() {
           setEachProductAmount(goalTarget.data.data)
         }
       }
+    }catch(error){
+      if(error.response){
+        console.log(error.response.data.message);
+      }
     }
-      getProduct();
-    }catch(err){
-      console.log(err);
     }
+  getProduct();
   },[goalId,dateRange?.end,dateRange?.start]);
 
   useEffect(() => {
@@ -533,7 +531,6 @@ const handleDeleteExtraField = async () => {
         />
       )}
       <div className='viewGoalsInner'>
-        {/* <div className='shwoCalculateErrorMsg' style={errStyle}>{errorMsg}</div> */}
         {productMetrics.length > 0 ? productMetrics.map((metrics, index) => (
         <div className='viewGolasInnerTask' key={`${metrics._id}_${index}`}>
         <div className='viewGoalsTaskContainer'>

@@ -1,0 +1,623 @@
+/* Employee.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body) · IBM Plex Mono (labels)
+   Prefix : ep- (employee profile) — zero collision with other stylesheets
+
+   Signature: the avatar STATUS RING — the border and glow around the
+   employee photo wear the current profile status color (green Active,
+   amber Suspended, red Blocked…). Status isn't a row in a table; it's
+   worn by the person. Peers see a neutral ring — status is private.  */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --ep-navy:       #011626;
+  --ep-card:       #071e30;
+  --ep-deep:       #040f1a;
+  --ep-amber:      #ffb100;
+  --ep-amber-dim:  rgba(255, 177, 0, 0.10);
+  --ep-amber-line: rgba(255, 177, 0, 0.28);
+  --ep-white:      #ffffff;
+  --ep-off-white:  #dde6ee;
+  --ep-slate:      #8899aa;
+  --ep-slate-dim:  #4d6070;
+  --ep-border:     rgba(255, 255, 255, 0.08);
+  --ep-border-s:   rgba(255, 255, 255, 0.04);
+  --ep-green:      #22c55e;
+  --ep-red:        #ef4444;
+  --ep-red-dim:    rgba(239, 68, 68, 0.08);
+  --ep-red-line:   rgba(239, 68, 68, 0.28);
+
+  --ep-display: 'Space Grotesk', sans-serif;
+  --ep-body:    'Inter', sans-serif;
+  --ep-mono:    'IBM Plex Mono', monospace;
+
+  --ep-r:    10px;
+  --ep-r-lg: 14px;
+  --ep-ease: 0.18s ease;
+}
+
+/* ── root ─────────────────────────────────────────────────────── */
+.ep-root {
+  min-height:  100%;
+  background:  var(--ep-navy);
+  color:       var(--ep-white);
+  font-family: var(--ep-body);
+  font-size:   16px;
+  line-height: 1.6;
+  padding:     24px 0 64px;
+}
+
+.ep-container {
+  max-width: 980px;
+  margin:    0 auto;
+  padding:   0 24px;
+}
+
+.ep-mono { font-family: var(--ep-mono); }
+
+/* ════════════════════════════════════════════════════════════════
+   TOP BAR — back + viewer mode chip
+════════════════════════════════════════════════════════════════ */
+.ep-topbar {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             16px;
+  margin-bottom:   24px;
+}
+
+.ep-back {
+  width:           40px;
+  height:          40px;
+  border-radius:   var(--ep-r);
+  border:          1px solid var(--ep-border);
+  color:           var(--ep-amber);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  text-decoration: none;
+  transition:      border-color var(--ep-ease), background var(--ep-ease);
+}
+.ep-back:hover {
+  border-color: var(--ep-amber-line);
+  background:   var(--ep-amber-dim);
+}
+
+/* which lens am I looking through? */
+.ep-mode-chip {
+  font-size:      10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding:        5px 12px;
+  border-radius:  20px;
+  border:         1px solid;
+}
+.ep-mode-chip--manager { color: var(--ep-amber); border-color: var(--ep-amber-line); background: var(--ep-amber-dim); }
+.ep-mode-chip--self    { color: var(--ep-green); border-color: rgba(34,197,94,0.3);  background: rgba(34,197,94,0.08); }
+.ep-mode-chip--peer    { color: var(--ep-slate); border-color: var(--ep-border);     background: transparent; }
+
+/* ════════════════════════════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════════════════════════════ */
+.ep-grid {
+  display:               grid;
+  grid-template-columns: 280px 1fr;
+  gap:                   24px;
+  align-items:           start;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   IDENTITY CARD (left)
+════════════════════════════════════════════════════════════════ */
+.ep-identity {
+  background:     var(--ep-card);
+  border:         1px solid var(--ep-border);
+  border-radius:  var(--ep-r-lg);
+  padding:        28px 22px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            12px;
+  text-align:     center;
+  position:       sticky;
+  top:            84px;
+}
+
+/* ── Avatar with status ring — THE SIGNATURE ─────────────────── */
+.ep-avatar-wrap { position: relative; }
+
+.ep-avatar {
+  position:      relative;
+  width:         116px;
+  height:        116px;
+  border-radius: 50%;
+  border:        3px solid var(--ep-border);   /* neutral (peer view) — JS injects status color */
+  overflow:      hidden;
+  background:    var(--ep-deep);
+  transition:    border-color var(--ep-ease), box-shadow var(--ep-ease);
+}
+
+.ep-avatar img {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  display:    block;
+}
+
+/* change-photo button — bottom right of avatar */
+.ep-avatar__change {
+  position:        absolute;
+  bottom:          4px;
+  right:           4px;
+  width:           32px;
+  height:          32px;
+  border-radius:   50%;
+  background:      var(--ep-amber);
+  color:           var(--ep-deep);
+  border:          2px solid var(--ep-card);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  transition:      background var(--ep-ease), transform var(--ep-ease);
+}
+.ep-avatar__change:hover { background: #ffc933; transform: scale(1.06); }
+
+.ep-avatar__busy {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(1, 10, 18, 0.7);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+
+.ep-file-hidden { display: none; }
+
+.ep-photo-pending {
+  display: flex;
+  gap:     8px;
+}
+
+/* ── Name / position / status ────────────────────────────────── */
+.ep-name {
+  font-family:    var(--ep-display);
+  font-size:      20px;
+  font-weight:    700;
+  letter-spacing: -0.3px;
+  line-height:    1.25;
+  word-break:     break-word;
+}
+
+.ep-name-input {
+  text-align:  center;
+  font-family: var(--ep-display);
+  font-weight: 600;
+  font-size:   16px;
+}
+
+.ep-position {
+  font-size:  14px;
+  color:      var(--ep-slate);
+  margin-top: -6px;
+}
+
+.ep-status-badge {
+  font-size:      10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding:        4px 12px;
+  border-radius:  20px;
+  border:         1px solid;
+}
+
+/* ── Contact icons (peer + manager viewing others) ───────────── */
+.ep-contact {
+  display:    flex;
+  gap:        10px;
+  margin-top: 8px;
+}
+
+.ep-contact__btn {
+  width:           42px;
+  height:          42px;
+  border-radius:   var(--ep-r);
+  border:          1px solid var(--ep-border);
+  background:      var(--ep-deep);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  text-decoration: none;
+  transition:      border-color var(--ep-ease), background var(--ep-ease), transform var(--ep-ease);
+}
+.ep-contact__btn:hover {
+  border-color: var(--ep-amber-line);
+  background:   var(--ep-amber-dim);
+  transform:    translateY(-2px);
+}
+
+.ep-contact__btn--disabled {
+  opacity:        0.4;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MAIN COLUMN
+════════════════════════════════════════════════════════════════ */
+.ep-main {
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+  min-width:      0;
+}
+
+/* edit controls row */
+.ep-edit-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             12px;
+  min-height:      36px;
+  flex-wrap:       wrap;
+}
+
+.ep-edit-actions { display: flex; gap: 8px; }
+
+/* ── Card ────────────────────────────────────────────────────── */
+.ep-card {
+  background:     var(--ep-card);
+  border:         1px solid var(--ep-border);
+  border-radius:  var(--ep-r-lg);
+  padding:        22px 24px;
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+}
+
+.ep-card__heading {
+  font-family:    var(--ep-display);
+  font-size:      14px;
+  font-weight:    600;
+  color:          var(--ep-white);
+  padding-bottom: 12px;
+  border-bottom:  1px solid var(--ep-border-s);
+}
+
+/* ── Field rows — label left, value/input right ──────────────── */
+.ep-fields {
+  display:        flex;
+  flex-direction: column;
+}
+
+.ep-field {
+  display:               grid;
+  grid-template-columns: 130px 1fr;
+  align-items:           center;
+  gap:                   16px;
+  padding:               11px 0;
+  border-bottom:         1px solid var(--ep-border-s);
+}
+.ep-field:last-child { border-bottom: none; }
+
+.ep-field__label {
+  font-size:      9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color:          var(--ep-slate-dim);
+}
+
+.ep-field__value {
+  font-size:  14px;
+  color:      var(--ep-off-white);
+  word-break: break-word;
+}
+
+.ep-empty { color: var(--ep-slate-dim); }
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+.ep-input {
+  background:    var(--ep-deep);
+  border:        1.5px solid var(--ep-border);
+  border-radius: var(--ep-r);
+  padding:       9px 12px;
+  font-family:   var(--ep-body);
+  font-size:     14px;
+  color:         var(--ep-white);
+  width:         100%;
+  outline:       none;
+  transition:    border-color var(--ep-ease), box-shadow var(--ep-ease);
+  -webkit-appearance: none;
+}
+
+.ep-input::placeholder { color: var(--ep-slate-dim); }
+.ep-input:hover        { border-color: rgba(255, 255, 255, 0.16); }
+.ep-input:focus {
+  border-color: var(--ep-amber);
+  box-shadow:   0 0 0 3px var(--ep-amber-dim);
+}
+
+.ep-input[type="date"] { color-scheme: dark; }
+
+/* ════════════════════════════════════════════════════════════════
+   BUTTONS / SPINNER / FLASH
+════════════════════════════════════════════════════════════════ */
+.ep-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             7px;
+  font-family:     var(--ep-display);
+  font-weight:     600;
+  font-size:       14px;
+  border-radius:   var(--ep-r);
+  padding:         10px 18px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  white-space:     nowrap;
+  text-decoration: none;
+  transition:      background var(--ep-ease), color var(--ep-ease),
+                   border-color var(--ep-ease), box-shadow var(--ep-ease);
+}
+.ep-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.ep-btn--sm { padding: 8px 14px; font-size: 13px; }
+
+.ep-btn--primary { background: var(--ep-amber); color: var(--ep-deep); }
+.ep-btn--primary:hover:not(:disabled) {
+  background: #ffc933;
+  box-shadow: 0 4px 18px rgba(255, 177, 0, 0.2);
+}
+
+.ep-btn--ghost {
+  background:   transparent;
+  border-color: var(--ep-border);
+  color:        var(--ep-slate);
+}
+.ep-btn--ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  color:        var(--ep-white);
+}
+
+.ep-spinner {
+  width:            13px;
+  height:           13px;
+  border:           2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius:    50%;
+  animation:        ep-spin 0.7s linear infinite;
+  flex-shrink:      0;
+}
+.ep-spinner--dark {
+  border-color:     rgba(4, 15, 26, 0.3);
+  border-top-color: var(--ep-deep);
+}
+@keyframes ep-spin { to { transform: rotate(360deg); } }
+
+/* inline result messages */
+.ep-flash {
+  font-size:   12px;
+  line-height: 1.4;
+}
+.ep-flash--ok  { color: var(--ep-green); }
+.ep-flash--err { color: var(--ep-red);   }
+
+/* ════════════════════════════════════════════════════════════════
+   MANAGER ACTIONS
+════════════════════════════════════════════════════════════════ */
+.ep-card--actions { gap: 18px; }
+
+.ep-action-block {
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+}
+
+.ep-action-label {
+  font-size:      9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color:          var(--ep-slate-dim);
+}
+
+/* status pills — replaces the scroll wheel */
+.ep-status-pills {
+  display:   flex;
+  gap:       6px;
+  flex-wrap: wrap;
+}
+
+.ep-status-pill {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           7px;
+  font-family:   var(--ep-display);
+  font-size:     13px;
+  font-weight:   500;
+  color:         var(--ep-slate);
+  background:    transparent;
+  border:        1px solid var(--ep-border);
+  border-radius: 20px;
+  padding:       6px 13px;
+  cursor:        pointer;
+  transition:    all var(--ep-ease);
+}
+.ep-status-pill:hover {
+  color:        var(--ep-white);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ep-status-pill__dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  flex-shrink:   0;
+  opacity:       0.75;
+}
+.ep-status-pill--active .ep-status-pill__dot { opacity: 1; }
+
+.ep-action-foot {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             12px;
+  flex-wrap:       wrap;
+}
+
+.ep-divider {
+  height:     1px;
+  background: var(--ep-border-s);
+}
+
+/* password form */
+.ep-pass-form {
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+  max-width:      340px;
+}
+
+.ep-pass-input-wrap { position: relative; }
+
+.ep-pass-input-wrap .ep-input { padding-right: 40px; }
+
+.ep-pass-toggle {
+  position:   absolute;
+  right:      8px;
+  top:        50%;
+  transform:  translateY(-50%);
+  background: none;
+  border:     none;
+  color:      var(--ep-slate-dim);
+  cursor:     pointer;
+  padding:    4px;
+  display:    flex;
+  transition: color var(--ep-ease);
+}
+.ep-pass-toggle:hover { color: var(--ep-slate); }
+
+.ep-pass-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             8px;
+}
+
+/* danger zone */
+.ep-danger {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             16px;
+  flex-wrap:       wrap;
+  padding:         14px 16px;
+  background:      var(--ep-red-dim);
+  border:          1px solid var(--ep-red-line);
+  border-radius:   var(--ep-r);
+}
+
+.ep-danger__title {
+  font-family: var(--ep-display);
+  font-size:   13px;
+  font-weight: 600;
+  color:       var(--ep-white);
+  margin:      0 0 3px;
+}
+
+.ep-danger__desc {
+  font-size:   12px;
+  color:       var(--ep-slate);
+  margin:      0;
+  line-height: 1.5;
+}
+
+.ep-danger__btn {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           7px;
+  background:    transparent;
+  border:        1.5px solid var(--ep-red-line);
+  border-radius: var(--ep-r);
+  color:         var(--ep-red);
+  font-family:   var(--ep-display);
+  font-size:     13px;
+  font-weight:   600;
+  padding:       8px 15px;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    background var(--ep-ease), color var(--ep-ease);
+}
+.ep-danger__btn:hover {
+  background: var(--ep-red);
+  color:      #ffffff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LOADING / ERROR
+════════════════════════════════════════════════════════════════ */
+.ep-loading {
+  padding:        90px 24px;
+  text-align:     center;
+  color:          var(--ep-slate-dim);
+  font-size:      12px;
+  letter-spacing: 3px;
+}
+
+.ep-load-error {
+  padding:        90px 24px;
+  text-align:     center;
+  color:          var(--ep-slate);
+  font-size:      15px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            18px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 820px) {
+  .ep-grid     { grid-template-columns: 1fr; }
+  .ep-identity { position: static; }
+}
+
+@media (max-width: 520px) {
+  .ep-field {
+    grid-template-columns: 1fr;
+    gap:                   4px;
+    padding:               10px 0;
+  }
+
+  .ep-edit-row      { justify-content: stretch; }
+  .ep-edit-actions  { width: 100%; }
+  .ep-edit-actions .ep-btn { flex: 1; }
+
+  .ep-action-foot   { justify-content: stretch; }
+  .ep-action-foot .ep-btn { flex: 1; }
+
+  .ep-danger        { flex-direction: column; align-items: stretch; }
+  .ep-danger__btn   { justify-content: center; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ep-btn, .ep-input, .ep-avatar, .ep-avatar__change,
+  .ep-contact__btn, .ep-status-pill, .ep-back { transition: none; }
+
+  .ep-avatar__change:hover { transform: none; }
+  .ep-contact__btn:hover   { transform: none; }
+  .ep-spinner              { animation: none; }
+}
+
+/* ── focus visible ────────────────────────────────────────────── */
+.ep-btn:focus-visible,
+.ep-back:focus-visible,
+.ep-input:focus-visible,
+.ep-avatar__change:focus-visible,
+.ep-contact__btn:focus-visible,
+.ep-status-pill:focus-visible,
+.ep-pass-toggle:focus-visible,
+.ep-danger__btn:focus-visible {
+  outline:        2px solid var(--ep-amber);
+  outline-offset: 3px;
+}

@@ -68,6 +68,7 @@ const [showEmoji, setShowEmoji] = useState(false);
 const pickerRef = useRef(null);
 const audioRef = useRef(null);
 const [isMutedState,setIsMutedState] = useState(false);
+
 useEffect(()=>{
         const getAllEmployee = async () => {
         try{
@@ -202,11 +203,8 @@ useEffect(() => {
       lastMessage: msg
     }));
 
-    // 🎯 ONLY for receiver
     if (msg.senderId !== user.employeeId) {
     audioRef.current && isMutedState && audioRef.current.play();
-
-      // ✅ emit delivered (single pointer)
       socket.emit("message:delivered", {
         conversationId: conversation?._id,
         employeeId: user.employeeId,
@@ -930,30 +928,6 @@ useEffect(() => {
                 })}
 
 
-                {/* ── File Previews (before sending) ── */}
-                {previewFiles.length > 0 &&
-                  <div className="preview-container">
-                    {previewFiles.map((item, index) => (
-                      <div key={index} className="preview-item">
-                        <button className="remove-btn" onClick={() => removeFile(index)}>✕</button>
-                        {item.type.startsWith("image") ? (
-                          <img src={item.preview} alt="" className="preview-image" />
-                        ) : (
-                          <div className="file-box">FILE</div>
-                        )}
-                      </div>
-                    ))}
-                    <div
-                      className="add-btn"
-                      onClick={() => fileInputRef.current.click()}
-                      style={{ display: `${previewFiles.length > 9 ? 'none' : ''}` }}
-                    >
-                      {previewFiles.length} +
-                    </div>
-                  </div>
-                }
-
-
                 {/* ── Media Preview Modal ── */}
                 {previewOpen && (
                   <div className="mediaModal" onClick={() => setPreviewOpen(false)}>
@@ -1030,9 +1004,32 @@ useEffect(() => {
                   </div>
                 )}
               </div>
+                {/* ── File Previews (before sending) ── */}
+                {previewFiles.length > 0 &&
+                  <div className="preview-container">
+                    {previewFiles.map((item, index) => (
+                      <div key={index} className="preview-item">
+                        <button className="remove-btn" onClick={() => removeFile(index)}>✕</button>
+                        {item.type.startsWith("image") ? (
+                          <img src={item.preview} alt="" className="preview-image" />
+                        ) : (
+                          <div className="file-box">FILE</div>
+                        )}
+                      </div>
+                    ))}
+                    <div
+                      className="add-btn"
+                      onClick={() => fileInputRef.current.click()}
+                      style={{ display: `${previewFiles.length > 9 ? 'none' : ''}` }}
+                    >
+                      {previewFiles.length} +
+                    </div>
+                  </div>
+                }
 
               {isTypingStart && <TypingIndicator />}
               <div className="liveConverstaionFooter">
+
                 <label className="liveChatfileInput">
                   <input type="file" multiple onChange={handleFileChange} ref={fileInputRef} />
                   <PermMediaOutlinedIcon className={`footerliveMedia ${previewFiles.length > 10 ? 'inActiveLiveChantsendbtn' : ''}`} />
@@ -1064,19 +1061,19 @@ useEffect(() => {
                   width:'245px',
                   overflow:'hidden'
                 }} ref={pickerRef}>
-        <Picker
-            data={data}
-            onEmojiSelect={(emoji) => {
-              setInputMessage((prev) => prev + emoji.native);
-            }}
-            theme="dark"
-            emojiSize={20}
-            perLine={6}
-            previewPosition="none"
-            navPosition="top"
-          />
-          </div>
-      )}
+                  <Picker
+                      data={data}
+                      onEmojiSelect={(emoji) => {
+                        setInputMessage((prev) => prev + emoji.native);
+                      }}
+                      theme="dark"
+                      emojiSize={20}
+                      perLine={6}
+                      previewPosition="none"
+                      navPosition="top"
+                    />
+                    </div>
+                )}
                   <div className='thumbUpandVoiceSection'>
 
                       {(previewFiles.length === 0 && inputMessage === "") ? (

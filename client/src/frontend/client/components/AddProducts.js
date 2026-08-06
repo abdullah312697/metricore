@@ -1,245 +1,324 @@
-import { useEffect, useState } from "react"
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import {Altaxios} from '../../Altaxios';
-import { Link } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useAuth } from "../../../context/AuthContext";
+import { useState, useEffect, useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
+import ArrowBackIcon        from "@mui/icons-material/ArrowBack";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { Altaxios } from "../../Altaxios";
+import "../../../style/AddProduct.css";
+import { useAuth }  from "../../../context/AuthContext";
 
-function AddProduct() {
-  const [productImg,setProductImg] = useState("");
-  const [productImgFile,setProductImgFile] = useState(null);
-  const [resMessage,setResMessage] = useState("");
-  const [resMsgStyle,setResMsgStyle] = useState({});
-  const [allGoalsData,setAllGoalsData] = useState([]);
- const [checkedGoals, setCheckedGoals] = useState([]);
- const [isEnableBtn,setIsEnableBtn] = useState(true);
- const [currentProducs,setCurrentProducts] = useState([]);
-   const [porductInfo,setProductInfo] = useState({
-        ProductName:"",
-        ProductPrice:"",
-        InStockQuentity:"",
+export default function AddProduct() {
+  const { companyName } = useParams();
+  const { user } = useAuth();
+
+  const [form, setForm] = useState({
+    ProductName:     "",
+    sku:             "",
+    ProductPrice:    "",
+    InStockQuentity: "",
   });
-    const {user} = useAuth();
-  
-    useEffect(() => {
-      Altaxios.get('/setgole/getGoleData').then((res) => {
-        if(res.status === 200){
-          setAllGoalsData(res.data);
-        }
-        })
-    },[]);
 
-      useEffect(()=>{
-          const getAllProducts = async () => {
-          try{
-            const product = await Altaxios.get("/newproduct/getallProducts/");
-          if(product.status === 200){
-            setCurrentProducts(product.data.data || [])
-          }
-        }catch(error){
-          if(error.response){
-            console.log(error.response.data.message);
-          }else{
-            console.log(error);
-          }
-        }
-        };
-        getAllProducts();
-    
-      },[]);
+  const [imgFile,    setImgFile]    = useState(null);
+  const [imgPreview, setImgPreview] = useState("");
+
+  const [goals,        setGoals]        = useState([]);
+  const [checkedGoals, setCheckedGoals] = useState([]);
+  const [products,     setProducts]     = useState([]);
+
+  const [errors,      setErrors]      = useState({});
+  const [serverError, setServerError] = useState("");
+  const [saving,      setSaving]      = useState(false);
+  const [savedFlash,  setSavedFlash]  = useState(false);
+
+  // ── Load goals + existing products ──────────────────────────────
   useEffect(() => {
-    if(
-      porductInfo.ProductName !== "" && 
-      porductInfo.ProductPrice !== "" && 
-      porductInfo.InStockQuentity !== "" && 
-      checkedGoals.length > 0 && 
-      productImgFile !== null
-    ){
-      setIsEnableBtn(false);
-    }else{
-      setIsEnableBtn(true);
-    }
-  },[
-    porductInfo.ProductName,
-    porductInfo.ProductPrice,
-    porductInfo.InStockQuentity,
-    checkedGoals,
-    productImgFile
-  ]);
+    Altaxios.get("/setgole/getGoleData")
+      .then((res) => setGoals(res.data || []))
+      .catch(() => {});
+  }, []);
 
-  const uploadReviewPhotos = (e) => {
-  setProductImg("");
-  setProductImgFile(null);
-  let files = e.currentTarget.files[0];
-  if(files){
-    setProductImgFile(files);
-  function readAndPreview(file) {
-    if (/\.(jpe?g|png|webp)$/i.test(file.name)) {
-      const reader = new FileReader();
-      reader.addEventListener(
-        "load",
-        () => {
-          setProductImg(reader.result);
-        },
-        false,
-      );
-      reader.readAsDataURL(file);
-    }
-  }
-  readAndPreview(files);
-  }
-}
-//preview photos  end
- 
-  const AddProductData = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setProductInfo({
-      ...porductInfo,
-      [name] : value
-    });
+  useEffect(() => {
+    Altaxios.get("/newproduct/getallProducts/")
+      .then((res) => setProducts(res.data.data || []))
+      .catch(() => {});
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((p) => ({ ...p, [name]: value }));
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
+    if (serverError)  setServerError("");
   };
 
-const handleCheck = (id, checked) => {
+  // ── Image pick + preview ────────────────────────────────────────
+  const pickImage = (e) => {
+    const f = e.currentTarget.files[0];
+    if (!f) return;
+    if (!/\.(jpe?g|png|webp)$/i.test(f.name)) {
+      setErrors((p) => ({ ...p, image: "Use a JPG, PNG or WEBP image." }));
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      setErrors((p) => ({ ...p, image: "Image must be under 5MB." }));
+      return;
+    }
+    setErrors((p) => ({ ...p, image: "" }));
+    setImgFile(f);
+    setImgPreview(URL.createObjectURL(f));
+  };
+
+  const clearImage = () => {
+    setImgFile(null);
+    setImgPreview("");
+  };
+
+  const toggleGoal = (id) =>
     setCheckedGoals((prev) =>
-      checked ? [...prev, id] : prev.filter((x) => x !== id)
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+
+  // ── Validation ──────────────────────────────────────────────────
+  const validate = () => {
+    const e = {};
+    if (!form.ProductName.trim())     e.ProductName     = "Product name is required.";
+    if (form.ProductPrice === "" || Number(form.ProductPrice) < 0)
+      e.ProductPrice = "Enter a valid price.";
+    if (form.InStockQuentity === "" || Number(form.InStockQuentity) < 0)
+      e.InStockQuentity = "Enter available quantity.";
+    if (!checkedGoals.length)         e.goals           = "Attach the product to at least one goal.";
+    if (!imgFile)                     e.image           = "A product image is required.";
+    return e;
   };
 
-  const AddProductDataNew = async() => {
-    try{
-    setIsEnableBtn(true);
-    const ProductData = new FormData();
-    ProductData.append("ProductName",porductInfo.ProductName);
-    ProductData.append("ProductPrice",porductInfo.ProductPrice);
-    ProductData.append("InStockQuentity",porductInfo.InStockQuentity);
-    checkedGoals.forEach(id => {
-        ProductData.append("GoalIdentifire[]", id);
-    });
-    ProductData.append("files",productImgFile);
-    const addProduct = await Altaxios.post('/newproduct/addNewProduct',ProductData);
-      if(addProduct.status === 200){
-        setResMessage(addProduct.data.message);
-        setCurrentProducts([...currentProducs,addProduct.data.data]);
-        setResMsgStyle({color:"green",opacity:1});
-        setProductImgFile(null);
-        setProductImg("");
-        setCheckedGoals([]);
-        setProductInfo({
-                  ProductName:"",
-                  ProductPrice:"",
-                  InStockQuentity:"",
-        })
-      setTimeout(() => {
-          setResMsgStyle({opacity:0});
-      },3000);
-     }
-    }catch(error){
-      if(error.response){
-      setResMessage(error.response.data.message);
-      setResMsgStyle({color:"red",opacity:1})
-      setTimeout(() => {
-          setResMsgStyle({opacity:0})
-      },3000);
-      }else{
-        setResMessage("Something went wrong!");
-        console.log(error);
-      }
-    }finally{
-      setIsEnableBtn(false);
+  const canSubmit = useMemo(
+    () =>
+      form.ProductName.trim() &&
+      form.ProductPrice !== "" &&
+      form.InStockQuentity !== "" &&
+      checkedGoals.length > 0 &&
+      imgFile,
+    [form, checkedGoals, imgFile]
+  );
+
+  // ── Submit ──────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+
+    setSaving(true);
+    setServerError("");
+    try {
+      const fd = new FormData();
+      fd.append("ProductName",     form.ProductName.trim());
+      fd.append("sku",             form.sku.trim());          // 👈 optional SKU
+      fd.append("ProductPrice",    form.ProductPrice);
+      fd.append("InStockQuentity", form.InStockQuentity);
+      checkedGoals.forEach((id) => fd.append("GoalIdentifire[]", id));
+      fd.append("files", imgFile);
+
+      const res = await Altaxios.post("/newproduct/addNewProduct", fd);
+
+      setProducts((prev) => [...prev, res.data.data]);
+      setForm({ ProductName: "", sku: "", ProductPrice: "", InStockQuentity: "" });
+      setCheckedGoals([]);
+      clearImage();
+
+      setSavedFlash(true);
+      setTimeout(() => setSavedFlash(false), 2500);
+    } catch (err) {
+      setServerError(err.response?.data?.message || "Failed to add product. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
-
 
   return (
-    <div className="clientAddproductMain">
+    <div className="ap-root">
+      <div className="ap-container">
 
-      <div className="clientAddProductInner">
-        <Link to={`/company/${user.companyName}`} style={{left:'5px',top:'5px'}}><ArrowBackIcon/></Link>
-        <div className="clientAddProductLeft">
-            <h2>Add Product</h2>
-            <div className="addProductClientFrom">
-              <div className="addProductInputClientMain">
-                <label htmlFor="ProductName">Product/Service Name</label>
-                <input type="text" id="ProductName" name="ProductName" placeholder="product/service name..." value={porductInfo.ProductName} onChange={AddProductData}/>
-              </div>
-              <div className="addProductInputClientMain">
-                <label htmlFor="ProductPrice">Product/Service Price</label>
-                <input type="number" id="ProductPrice" name="ProductPrice" placeholder="product/service price..." value={porductInfo.ProductPrice} onChange={AddProductData}/>
-              </div>
-              <div className="addProductInputClientMain">
-                <span>Product/Service Image</span>
-                <div className="productImageClient">
-                  <label htmlFor="ProductImage" className="clientAddProductSelectBtn">
-                        <AddPhotoAlternateIcon style={{color:`${productImgFile !== null ? '#0078d4' : '#ffb100'}`}}/>
-                        <input type="file" id="ProductImage" accept=".jpg,.png,.webp" onChange={uploadReviewPhotos}/>
-                  </label>
-                  <span style={{width:'162px',marginLeft:'-20px',fontSize:`${productImgFile !== null ? "7px" : '16px'}`,marginRight:'15px'}}>{productImgFile !== null ? productImgFile.name : "Select Image"}</span>
-                  {productImgFile !== null ? (
-                    <img src={productImg} alt="productImage" width={"70px"} height={"70px"}/>
-                    ) : (<></>) }
-                </div>
-              </div>
-              <div className="addProductInputClientMain">
-                <label htmlFor="InStockQuentity">Total Quantity</label>
-                <input type="number" placeholder="total saleable units..." id="InStockQuentity" name="InStockQuentity" value={porductInfo.InStockQuentity} onChange={AddProductData}/>
-              </div>
-              <div className="addProductInputClientMain">
-                <span>Select Goal</span>
-                <div className="clientAddProductGoalSelection">
-                  {
-                    allGoalsData.length > 0 ? allGoalsData.map((data) => (
-                    <div className="GoalSelectionInner" key={data._id} onClick={(e) => {
-            if (e.target.tagName !== "INPUT") {
-              e.currentTarget.lastElementChild.click();
-            }
-          }}>
-                      <span>{data.targetName}</span> <input type="checkbox" value={data._id} checked={checkedGoals.includes(data._id)} name={data.targetName} onChange={(e) => handleCheck(data._id, e.target.checked)}/>
-                    </div>
-                    )) : (
-                          <div className="GoalSelectionInner">
-                            <span>You don't have any goal</span>
-                          </div>
-                        )
-                  }
-                </div>
-              </div>
-              <button className="addClientProdutbtn" onClick={AddProductDataNew} disabled={isEnableBtn}>Add Product</button>
-              <div className='showErrorOrSuccess' style={resMsgStyle}>{resMessage}</div>
-            </div>
+        {/* ── Top bar ─────────────────────────────────────────── */}
+        <div className="ap-topbar">
+          <Link to={`/company/${companyName}`} className="ap-back" aria-label="Back to dashboard">
+            <ArrowBackIcon style={{ fontSize: 22 }} />
+          </Link>
+          <span className="ap-eyebrow ap-mono">Products</span>
+          <span className={`ap-saved-flash ${savedFlash ? "ap-saved-flash--show" : ""}`}>
+            ✓ Product added
+          </span>
         </div>
-        <div className="clientAddProductRight">
-          <h2>Product List</h2>
-          <div className="ClientProductContainer">
-            <div className="clientProductInnerHeader">
-              <div className="ProductInnerMainHeadr">
-                <div className="clientHeadr__productName">Name</div>
-                <div className="clientHeadr__productPrice">Price</div>
-                <div className="clientHeadr__productUnite">Units</div>
-                <div className="clientHeadr__productImg">Image</div>
-                <div className="clientHeadr__productAction">Action</div>
+
+        <div className="ap-grid">
+
+          {/* ══ LEFT — form ════════════════════════════════════ */}
+          <div className="ap-form-card">
+            <h1 className="ap-title">Add a product</h1>
+            <p className="ap-sub">
+              Products carry the costs you track. Attach each one to a goal
+              so its sales count toward that target.
+            </p>
+
+            <div className="ap-field">
+              <label className="ap-label" htmlFor="ap-name">Product / service name</label>
+              <input
+                id="ap-name"
+                name="ProductName"
+                type="text"
+                className={`ap-input ${errors.ProductName ? "ap-input--error" : ""}`}
+                placeholder="e.g. Classic Tote Bag"
+                value={form.ProductName}
+                onChange={handleChange}
+                maxLength={100}
+              />
+              {errors.ProductName && <span className="ap-error">{errors.ProductName}</span>}
+            </div>
+
+            <div className="ap-field">
+              <label className="ap-label" htmlFor="ap-sku">
+                SKU
+                <span className="ap-label__hint">Optional — a stable code your systems use to push data (e.g. TOTE-01)</span>
+              </label>
+              <input
+                id="ap-sku"
+                name="sku"
+                type="text"
+                className="ap-input ap-mono"
+                placeholder="TOTE-01"
+                value={form.sku}
+                onChange={handleChange}
+                maxLength={40}
+              />
+            </div>
+
+            <div className="ap-row">
+              <div className="ap-field">
+                <label className="ap-label" htmlFor="ap-price">Price</label>
+                <div className="ap-prefix-wrap">
+                  <span className="ap-prefix ap-mono">$</span>
+                  <input
+                    id="ap-price"
+                    name="ProductPrice"
+                    type="number"
+                    min="0"
+                    className={`ap-input ap-input--prefixed ${errors.ProductPrice ? "ap-input--error" : ""}`}
+                    placeholder="0.00"
+                    value={form.ProductPrice}
+                    onChange={handleChange}
+                  />
+                </div>
+                {errors.ProductPrice && <span className="ap-error">{errors.ProductPrice}</span>}
+              </div>
+
+              <div className="ap-field">
+                <label className="ap-label" htmlFor="ap-stock">Available quantity</label>
+                <input
+                  id="ap-stock"
+                  name="InStockQuentity"
+                  type="number"
+                  min="0"
+                  className={`ap-input ${errors.InStockQuentity ? "ap-input--error" : ""}`}
+                  placeholder="Saleable units"
+                  value={form.InStockQuentity}
+                  onChange={handleChange}
+                />
+                {errors.InStockQuentity && <span className="ap-error">{errors.InStockQuentity}</span>}
               </div>
             </div>
-            <div className="clientProductInnerMain">
-              {
-                currentProducs.length > 0 ? currentProducs.map((pro, index) => (
-                <div  className="clientProductInnerCont" key={pro._id}>
-                  <div className="client__productName">{pro.ProductName}</div>
-                  <div className="client__productPrice">{pro.ProductPrice}</div>
-                  <div className="client__productInStock">{pro.InStockQuentity}</div>
-                  <div className="client__productImg"><img src={pro.productImgFile} alt="ProductImg" style={{width:'36px',height:'40px'}}/></div>
-                  <Link className="client__productAction" to={`/viewproduct/${pro._id}`}>View</Link>
-                </div> 
-                ))
-                : (<div style={{textAlign:'center',paddingTop:'20px',color:'#ccc'}}>You Don't have any product yet!</div>)
-              }
 
+            {/* Image */}
+            <div className="ap-field">
+              <label className="ap-label">Product image</label>
+              {!imgPreview ? (
+                <label className={`ap-drop ${errors.image ? "ap-drop--error" : ""}`}>
+                  <AddPhotoAlternateIcon style={{ fontSize: 24, color: "#ffb100" }} />
+                  <span className="ap-drop__text">Click to upload an image</span>
+                  <input type="file" accept=".jpg,.jpeg,.png,.webp" className="ap-file-hidden" onChange={pickImage} />
+                </label>
+              ) : (
+                <div className="ap-img-preview">
+                  <img src={imgPreview} alt="Product preview" />
+                  <div className="ap-img-preview__meta">
+                    <span className="ap-img-preview__name ap-mono">{imgFile?.name}</span>
+                    <button type="button" className="ap-img-remove" onClick={clearImage}>Remove</button>
+                  </div>
+                </div>
+              )}
+              {errors.image && <span className="ap-error">{errors.image}</span>}
             </div>
+
+            {/* Goals */}
+            <div className="ap-field">
+              <label className="ap-label">Attach to goal(s)</label>
+              {goals.length > 0 ? (
+                <div className="ap-goals">
+                  {goals.map((g) => {
+                    const on = checkedGoals.includes(g._id);
+                    return (
+                      <button
+                        type="button"
+                        key={g._id}
+                        className={`ap-goal ${on ? "ap-goal--on" : ""}`}
+                        onClick={() => toggleGoal(g._id)}
+                      >
+                        <span className={`ap-goal__check ${on ? "ap-goal__check--on" : ""}`}>
+                          {on ? "✓" : ""}
+                        </span>
+                        {g.targetName}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="ap-no-goals">
+                  <span>You don't have any goals yet.</span>
+                  <Link to={`/company/${companyName}/creategoal`} className="ap-link">Create your first goal →</Link>
+                </div>
+              )}
+              {errors.goals && <span className="ap-error">{errors.goals}</span>}
+            </div>
+
+            {serverError && <div className="ap-server-error" role="alert">{serverError}</div>}
+
+            <button className="ap-btn ap-btn--primary" onClick={handleSubmit} disabled={!canSubmit || saving}>
+              {saving && <span className="ap-spinner" />}
+              Add product
+            </button>
           </div>
+
+          {/* ══ RIGHT — product list ═══════════════════════════ */}
+          <aside className="ap-list-card">
+            <div className="ap-list-head">
+              <h2 className="ap-list-title">Your products</h2>
+              <span className="ap-count ap-mono">{products.length}</span>
+            </div>
+
+            {products.length > 0 ? (
+              <div className="ap-list">
+                {products.map((p) => (
+                  <div className="ap-prod" key={p._id}>
+                    <img
+                      className="ap-prod__img"
+                      src={p.productImgFile}
+                      alt={p.ProductName}
+                    />
+                    <div className="ap-prod__info">
+                      <span className="ap-prod__name">{p.ProductName}</span>
+                      <span className="ap-prod__meta ap-mono">
+                        {p.sku ? `${p.sku} · ` : ""}${p.ProductPrice} · {p.InStockQuentity} units
+                      </span>
+                    </div>
+                    <Link className="ap-prod__view" to={`/company/${user?.companyName || companyName}/viewproduct/${p._id}`}>View</Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="ap-empty">
+                <span className="ap-empty__icon">📦</span>
+                <p>No products yet. Add your first one on the left.</p>
+              </div>
+            )}
+          </aside>
+
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default AddProduct

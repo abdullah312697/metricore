@@ -1,0 +1,813 @@
+/* OnboardingPage.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (titles/buttons) · Inter (body/inputs) · IBM Plex Mono (numbers/labels)
+   Layout : Split panel — narrow left context column + wider right form column.
+   Prefix : ob- (onboarding) — zero collision with other stylesheets
+
+   Signature element: the giant ghost step number ("01"–"04", then "✓")
+   rendered in huge low-opacity amber mono BEHIND the left context text.
+   It tells the user where they are without a single extra UI element.   */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --ob-navy:        #011626;
+  --ob-card:        #071e30;
+  --ob-deep:        #040f1a;
+  --ob-amber:       #ffb100;
+  --ob-amber-dim:   rgba(255, 177, 0, 0.09);
+  --ob-amber-mid:   rgba(255, 177, 0, 0.15);
+  --ob-amber-line:  rgba(255, 177, 0, 0.28);
+  --ob-amber-glow:  rgba(255, 177, 0, 0.20);
+  --ob-white:       #ffffff;
+  --ob-off-white:   #dde6ee;
+  --ob-slate:       #8899aa;
+  --ob-slate-dim:   #4d6070;
+  --ob-border:      rgba(255, 255, 255, 0.08);
+  --ob-border-s:    rgba(255, 255, 255, 0.04);
+  --ob-green:       #22c55e;
+  --ob-red:         #ef4444;
+  --ob-red-dim:     rgba(239, 68, 68, 0.10);
+
+  --ob-display: 'Space Grotesk', sans-serif;
+  --ob-body:    'Inter', sans-serif;
+  --ob-mono:    'IBM Plex Mono', monospace;
+
+  --ob-r:       10px;
+  --ob-r-lg:    14px;
+  --ob-r-xl:    20px;
+  --ob-ease:    0.2s ease;
+  --ob-ease-lg: 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── root ─────────────────────────────────────────────────────── */
+.ob-root {
+  min-height:     100vh;
+  background:     var(--ob-navy);
+  color:          var(--ob-white);
+  font-family:    var(--ob-body);
+  font-size:      16px;
+  line-height:    1.6;
+  display:        flex;
+  flex-direction: column;
+  overflow-x:     hidden;
+}
+
+/* ── utility ──────────────────────────────────────────────────── */
+.ob-mono  { font-family: var(--ob-mono); }
+.ob-amber { color: var(--ob-amber); }
+
+/* ════════════════════════════════════════════════════════════════
+   TOP BAR
+════════════════════════════════════════════════════════════════ */
+.ob-topbar {
+  height:          64px;
+  border-bottom:   1px solid var(--ob-border);
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         0 32px;
+  flex-shrink:     0;
+}
+
+.ob-topbar__logo {
+  display:     flex;
+  align-items: center;
+  gap:         9px;
+  user-select: none;
+}
+
+.ob-logo__mark {
+  width:           32px;
+  height:          32px;
+  background:      var(--ob-amber);
+  color:           var(--ob-deep);
+  border-radius:   8px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--ob-display);
+  font-weight:     700;
+  font-size:       16px;
+}
+
+.ob-logo__name {
+  font-family: var(--ob-display);
+  font-weight: 700;
+  font-size:   17px;
+  color:       var(--ob-white);
+}
+
+.ob-topbar__step {
+  font-size:      11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color:          var(--ob-slate-dim);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PROGRESS BAR
+════════════════════════════════════════════════════════════════ */
+.ob-progress-wrap {
+  max-width:  760px;
+  width:      100%;
+  margin:     0 auto;
+  padding:    36px 24px 8px;
+  flex-shrink: 0;
+}
+
+.ob-progress {
+  display: flex;
+}
+
+.ob-progress__item {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            8px;
+  position:       relative;
+}
+
+/* connecting line — from right of this node to left of next node */
+.ob-progress__line {
+  position:   absolute;
+  top:        17px;                         /* half of 34px node */
+  left:       calc(50% + 25px);
+  width:      calc(100% - 50px);
+  height:     2px;
+  background: var(--ob-border);
+  transition: background var(--ob-ease);
+}
+
+.ob-progress__line--done {
+  background: var(--ob-amber);
+}
+
+/* node circle */
+.ob-node {
+  width:           34px;
+  height:          34px;
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--ob-mono);
+  font-size:       13px;
+  font-weight:     600;
+  flex-shrink:     0;
+  position:        relative;
+  z-index:         1;
+  transition:
+    background   var(--ob-ease),
+    border-color var(--ob-ease),
+    color        var(--ob-ease),
+    box-shadow   var(--ob-ease);
+}
+
+.ob-node--done {
+  background: var(--ob-amber);
+  border:     2px solid var(--ob-amber);
+  color:      var(--ob-deep);
+}
+
+.ob-node--active {
+  background: var(--ob-navy);
+  border:     2px solid var(--ob-amber);
+  color:      var(--ob-amber);
+  box-shadow: 0 0 0 5px var(--ob-amber-dim);
+}
+
+.ob-node--future {
+  background: var(--ob-navy);
+  border:     2px solid var(--ob-border);
+  color:      var(--ob-slate-dim);
+}
+
+/* step labels under nodes */
+.ob-progress__label {
+  font-family:    var(--ob-mono);
+  font-size:      10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color:          var(--ob-slate-dim);
+  transition:     color var(--ob-ease);
+  white-space:    nowrap;
+}
+
+.ob-progress__label--active {
+  color: var(--ob-amber);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PANEL — animated step container
+════════════════════════════════════════════════════════════════ */
+.ob-panel {
+  flex:      1;
+  max-width: 1080px;
+  width:     100%;
+  margin:    0 auto;
+  padding:   48px 32px 80px;
+}
+
+/* direction-aware slide (React remounts on key={step}) */
+.ob-panel--forward { animation: ob-slide-fwd var(--ob-ease-lg); }
+.ob-panel--back    { animation: ob-slide-back var(--ob-ease-lg); }
+
+@keyframes ob-slide-fwd {
+  from { opacity: 0; transform: translateX(44px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes ob-slide-back {
+  from { opacity: 0; transform: translateX(-44px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   STEP — split panel layout
+════════════════════════════════════════════════════════════════ */
+.ob-step {
+  display:               grid;
+  grid-template-columns: 380px 1fr;
+  gap:                   72px;
+  align-items:           start;
+}
+
+/* ── Left column: context ─────────────────────────────────────── */
+.ob-step__left {
+  position:    relative;
+  padding-top: 32px;
+}
+
+/* THE SIGNATURE — giant ghost step number behind the text */
+.ob-ghost-num {
+  position:       absolute;
+  top:            -28px;
+  left:           -18px;
+  font-family:    var(--ob-mono);
+  font-size:      190px;
+  font-weight:    600;
+  line-height:    1;
+  color:          var(--ob-amber);
+  opacity:        0.055;
+  pointer-events: none;
+  user-select:    none;
+  letter-spacing: -8px;
+}
+
+.ob-step__context {
+  position: relative;
+  z-index:  1;
+  display:  flex;
+  flex-direction: column;
+  gap:      16px;
+}
+
+.ob-step__eyebrow {
+  font-family:    var(--ob-mono);
+  font-size:      10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color:          var(--ob-amber);
+}
+
+.ob-step__title {
+  font-family:    var(--ob-display);
+  font-size:      clamp(26px, 3vw, 36px);
+  font-weight:    700;
+  line-height:    1.15;
+  letter-spacing: -0.5px;
+  color:          var(--ob-white);
+}
+
+.ob-step__sub {
+  font-size:   15px;
+  color:       var(--ob-slate);
+  line-height: 1.75;
+}
+
+/* tip box */
+.ob-tip {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           12px;
+  background:    var(--ob-amber-dim);
+  border:        1px solid var(--ob-amber-line);
+  border-left:   3px solid var(--ob-amber);
+  border-radius: var(--ob-r);
+  padding:       14px 16px;
+  margin-top:    8px;
+}
+
+.ob-tip__icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+.ob-tip p {
+  font-size:   13px;
+  color:       var(--ob-off-white);
+  line-height: 1.65;
+}
+
+/* ── Right column: forms ──────────────────────────────────────── */
+.ob-step__right {
+  padding-top: 32px;
+  min-width:   0;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   WELCOME STEP (step 1 right side)
+════════════════════════════════════════════════════════════════ */
+.ob-welcome-steps {
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+}
+
+.ob-welcome-step {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           18px;
+  background:    var(--ob-card);
+  border:        1px solid var(--ob-border);
+  border-radius: var(--ob-r-lg);
+  padding:       22px 24px;
+  transition:    border-color var(--ob-ease);
+}
+.ob-welcome-step:hover { border-color: var(--ob-amber-line); }
+
+.ob-welcome-step__n {
+  font-size:   20px;
+  font-weight: 600;
+  color:       var(--ob-amber);
+  line-height: 1.2;
+  flex-shrink: 0;
+  opacity:     0.85;
+}
+
+.ob-welcome-step__label {
+  font-family:   var(--ob-display);
+  font-size:     16px;
+  font-weight:   600;
+  color:         var(--ob-white);
+  margin-bottom: 3px;
+}
+
+.ob-welcome-step__desc {
+  font-size:   13px;
+  color:       var(--ob-slate);
+  line-height: 1.55;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FORM
+════════════════════════════════════════════════════════════════ */
+.ob-form {
+  display:        flex;
+  flex-direction: column;
+  gap:            22px;
+}
+
+.ob-form__row {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   16px;
+}
+
+/* cost fields 2-col grid (step 4) */
+.ob-form__grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   20px 16px;
+}
+
+/* ── Field ───────────────────────────────────────────────────── */
+.ob-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            7px;
+  min-width:      0;
+}
+
+.ob-label {
+  font-family:    var(--ob-display);
+  font-size:      13px;
+  font-weight:    500;
+  color:          var(--ob-off-white);
+  letter-spacing: 0.2px;
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+}
+
+.ob-label__hint {
+  font-family:    var(--ob-body);
+  font-size:      11px;
+  font-weight:    400;
+  color:          var(--ob-slate-dim);
+  letter-spacing: 0;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+.ob-input {
+  background:    var(--ob-card);
+  border:        1.5px solid var(--ob-border);
+  border-radius: var(--ob-r);
+  padding:       12px 14px;
+  font-family:   var(--ob-body);
+  font-size:     15px;
+  color:         var(--ob-white);
+  width:         100%;
+  outline:       none;
+  transition:
+    border-color var(--ob-ease),
+    box-shadow   var(--ob-ease),
+    background   var(--ob-ease);
+  -webkit-appearance: none;
+}
+
+.ob-input::placeholder { color: var(--ob-slate-dim); }
+
+.ob-input:hover { border-color: rgba(255, 255, 255, 0.15); }
+
+.ob-input:focus {
+  border-color: var(--ob-amber);
+  background:   rgba(255, 177, 0, 0.04);
+  box-shadow:   0 0 0 3px var(--ob-amber-dim);
+}
+
+.ob-input--error {
+  border-color: var(--ob-red) !important;
+  background:   var(--ob-red-dim) !important;
+  box-shadow:   none !important;
+}
+
+/* native date picker readable on dark */
+.ob-input[type="date"] { color-scheme: dark; }
+
+/* hide number spinners for cleaner cost inputs */
+.ob-input[type="number"]::-webkit-outer-spin-button,
+.ob-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ob-input[type="number"] { -moz-appearance: textfield; }
+
+/* ── Currency prefix ─────────────────────────────────────────── */
+.ob-input-prefix { position: relative; }
+
+.ob-input-prefix__sym {
+  position:       absolute;
+  left:           14px;
+  top:            50%;
+  transform:      translateY(-50%);
+  font-family:    var(--ob-mono);
+  font-size:      14px;
+  font-weight:    600;
+  color:          var(--ob-amber);
+  pointer-events: none;
+}
+
+.ob-input--prefixed { padding-left: 32px; }
+
+/* ── Error text ──────────────────────────────────────────────── */
+.ob-error {
+  font-size:   12px;
+  color:       var(--ob-red);
+  line-height: 1.4;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   IMAGE UPLOAD (step 3)
+════════════════════════════════════════════════════════════════ */
+.ob-img-drop {
+  border:        1.5px dashed var(--ob-border);
+  border-radius: var(--ob-r-lg);
+  min-height:    140px;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  cursor:        pointer;
+  overflow:      hidden;
+  background:    var(--ob-card);
+  transition:    border-color var(--ob-ease), background var(--ob-ease);
+}
+
+.ob-img-drop:hover {
+  border-color: var(--ob-amber-line);
+  background:   var(--ob-amber-dim);
+}
+
+.ob-img-placeholder {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            6px;
+  padding:        24px;
+  text-align:     center;
+}
+
+.ob-img-placeholder__icon { font-size: 26px; }
+
+.ob-img-placeholder__text {
+  font-family: var(--ob-display);
+  font-size:   14px;
+  font-weight: 500;
+  color:       var(--ob-off-white);
+}
+
+.ob-img-placeholder__hint {
+  font-family:    var(--ob-mono);
+  font-size:      10px;
+  letter-spacing: 0.5px;
+  color:          var(--ob-slate-dim);
+}
+
+.ob-img-preview {
+  width:      100%;
+  max-height: 200px;
+  object-fit: cover;
+  display:    block;
+}
+
+.ob-file-hidden { display: none; }
+
+.ob-img-remove {
+  background:      none;
+  border:          none;
+  font-family:     var(--ob-body);
+  font-size:       12px;
+  color:           var(--ob-slate);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor:          pointer;
+  align-self:      flex-start;
+  padding:         2px 0;
+  transition:      color var(--ob-ease);
+}
+.ob-img-remove:hover { color: var(--ob-red); }
+
+/* ════════════════════════════════════════════════════════════════
+   ACTIONS ROW
+════════════════════════════════════════════════════════════════ */
+.ob-actions {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  gap:             12px;
+  margin-top:      36px;
+  flex-wrap:       wrap;
+}
+
+.ob-actions--right { justify-content: flex-end; }
+
+/* three children: back — skip — primary spread naturally */
+.ob-actions--three { justify-content: space-between; }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.ob-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  font-family:     var(--ob-display);
+  font-weight:     600;
+  font-size:       15px;
+  border-radius:   var(--ob-r);
+  padding:         12px 26px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  white-space:     nowrap;
+  transition:
+    background var(--ob-ease),
+    box-shadow var(--ob-ease),
+    transform  var(--ob-ease);
+}
+
+.ob-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ob-btn--primary {
+  background: var(--ob-amber);
+  color:      var(--ob-deep);
+}
+.ob-btn--primary:hover:not(:disabled) {
+  background: #ffc933;
+  box-shadow: 0 6px 24px var(--ob-amber-glow);
+  transform:  translateY(-1px);
+}
+.ob-btn--primary:active:not(:disabled) { transform: translateY(0); }
+
+.ob-btn--ghost {
+  background:   transparent;
+  border-color: var(--ob-border);
+  color:        var(--ob-slate);
+}
+.ob-btn--ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.2);
+  color:        var(--ob-white);
+}
+
+.ob-btn--lg {
+  padding:       14px 32px;
+  font-size:     16px;
+  border-radius: var(--ob-r-lg);
+}
+
+/* skip link (step 4) */
+.ob-skip {
+  background:      none;
+  border:          none;
+  font-family:     var(--ob-body);
+  font-size:       13px;
+  color:           var(--ob-slate-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor:          pointer;
+  transition:      color var(--ob-ease);
+  padding:         6px 4px;
+}
+.ob-skip:hover:not(:disabled) { color: var(--ob-slate); }
+.ob-skip:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Loading spinner ─────────────────────────────────────────── */
+.ob-spinner {
+  width:            15px;
+  height:           15px;
+  border:           2px solid rgba(4, 15, 26, 0.3);
+  border-top-color: var(--ob-deep);
+  border-radius:    50%;
+  animation:        ob-spin 0.7s linear infinite;
+  flex-shrink:      0;
+}
+
+@keyframes ob-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SUMMARY CARD (step 5)
+════════════════════════════════════════════════════════════════ */
+.ob-summary {
+  background:    var(--ob-card);
+  border:        1px solid var(--ob-amber-line);
+  border-radius: var(--ob-r-xl);
+  padding:       28px;
+  display:       flex;
+  flex-direction: column;
+  gap:           18px;
+  box-shadow:    0 8px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ob-summary__header {
+  padding-bottom: 14px;
+  border-bottom:  1px solid var(--ob-border);
+}
+
+.ob-summary__label {
+  font-size:      10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color:          var(--ob-slate-dim);
+}
+
+.ob-summary__section {
+  display:        flex;
+  flex-direction: column;
+  gap:            8px;
+}
+
+.ob-summary__section-label {
+  font-size:      10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color:          var(--ob-amber);
+  margin-bottom:  2px;
+}
+
+.ob-summary__row {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     baseline;
+  gap:             16px;
+}
+
+.ob-summary__key {
+  font-size: 13px;
+  color:     var(--ob-slate);
+  flex-shrink: 0;
+}
+
+.ob-summary__val {
+  font-size:  14px;
+  color:      var(--ob-white);
+  text-align: right;
+  word-break: break-word;
+}
+
+.ob-summary__divider {
+  height:     1px;
+  background: var(--ob-border);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════════ */
+
+/* ── Tablet (≤ 940px): stack split panel ─────────────────────── */
+@media (max-width: 940px) {
+  .ob-step {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .ob-step__left  { padding-top: 16px; }
+  .ob-step__right { padding-top: 0;    }
+
+  .ob-ghost-num {
+    font-size: 130px;
+    top:       -20px;
+    left:      -10px;
+  }
+}
+
+/* ── Mobile (≤ 640px) ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .ob-topbar { padding: 0 20px; }
+
+  .ob-progress-wrap { padding: 28px 16px 4px; }
+
+  /* hide labels, shrink nodes */
+  .ob-progress__label { display: none; }
+
+  .ob-node {
+    width:     28px;
+    height:    28px;
+    font-size: 11px;
+  }
+
+  .ob-progress__line {
+    top:   13px;
+    left:  calc(50% + 20px);
+    width: calc(100% - 40px);
+  }
+
+  .ob-panel { padding: 32px 20px 64px; }
+
+  .ob-form__row,
+  .ob-form__grid { grid-template-columns: 1fr; }
+
+  .ob-ghost-num { font-size: 100px; letter-spacing: -4px; }
+
+  .ob-step__title { font-size: 24px; }
+
+  /* actions stack: primary full-width on top, others below */
+  .ob-actions,
+  .ob-actions--three {
+    flex-direction: column-reverse;
+    align-items:    stretch;
+  }
+
+  .ob-btn { width: 100%; justify-content: center; }
+
+  .ob-skip { text-align: center; }
+}
+
+/* ── Small mobile (≤ 380px) ───────────────────────────────────── */
+@media (max-width: 380px) {
+  .ob-topbar__step { display: none; }
+  .ob-summary      { padding: 20px; }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ob-panel--forward,
+  .ob-panel--back { animation: none; }
+
+  .ob-btn,
+  .ob-node,
+  .ob-input,
+  .ob-welcome-step,
+  .ob-img-drop,
+  .ob-skip { transition: none; }
+
+  .ob-btn--primary:hover:not(:disabled) {
+    transform:  none;
+    box-shadow: none;
+  }
+
+  .ob-spinner { animation: none; }
+}
+
+/* ── Focus visible ────────────────────────────────────────────── */
+.ob-btn:focus-visible,
+.ob-skip:focus-visible,
+.ob-input:focus-visible,
+.ob-img-drop:focus-visible,
+.ob-img-remove:focus-visible {
+  outline:        2px solid var(--ob-amber);
+  outline-offset: 3px;
+  border-radius:  var(--ob-r);
+}

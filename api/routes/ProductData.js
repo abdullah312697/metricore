@@ -5,9 +5,117 @@ import{decryptUserData} from '../verifyuser.js';
 import ClientProduct from "../models/ClientProduct.js";
 import mongoose from 'mongoose';
 import ExtraFieldConfig from '../models/ExtraFieldConfig.js';
+import { limitFor } from "../config/plans.js";   // + Companies import if not present
+
+router.post("/createInitialCost", async (req, res) => {
+  try {
+    const { employeeId, companyId } = req.cookies;
+    const newemplyeeId = decryptUserData(employeeId);
+    const newcompanyId = decryptUserData(companyId);
+ 
+    if (!newemplyeeId || !newcompanyId)
+      return res.status(401).json({ message: "Login/Register please!" });
+ 
+    const {
+      productId,
+      goalId,
+      AdCost              = 0,
+      OtherCost           = 0,
+      DelibaryCostPersale = 0,
+      PackgingCost        = 0,
+      PrductBuyingCost    = 0,
+      ShippingCost        = 0,
+    } = req.body;
+ 
+    // ── Validate ids ──────────────────────────────────────────
+    if (!productId || !mongoose.Types.ObjectId.isValid(productId))
+      return res.status(400).json({ message: "Valid productId is required" });
+ 
+    if (!mongoose.Types.ObjectId.isValid(newcompanyId))
+      return res.status(400).json({ message: "Invalid companyId" });
+ 
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(newcompanyId);
+    const productObjId = mongoose.Types.ObjectId.createFromHexString(productId);
+ 
+    // ── Multi-tenant safety: product must belong to this company ─
+    const product = await ClientProduct.findOne({
+      _id:       productObjId,
+      companyId: companyObjId,
+    });
+ 
+    if (!product)
+      return res.status(404).json({ message: "Product not found or unauthorized" });
+ 
+    // ── Optional extra check: product must be in this goal ───────
+    if (goalId && !product.GoalIdentifire.includes(goalId))
+      return res.status(400).json({ message: "Product does not belong to this goal" });
+ 
+    // ── Sanitize numbers (negative / NaN → 0) ────────────────────
+    const toNum = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) && n >= 0 ? n : 0;
+    };
+ 
+    // ── Today window — same as the lazy upsert uses ──────────────
+    const startOfToday = new Date();
+    startOfToday.setUTCHours(0, 0, 0, 0);
+    const endOfToday = new Date();
+    endOfToday.setUTCHours(23, 59, 59, 999);
+ 
+    // ── Upsert today's record ────────────────────────────────────
+    // If a record for today already exists → update cost fields.
+    // If not → create it with zeroed metrics + empty extraFields.
+    const costDoc = await ProductsCost.findOneAndUpdate(
+      {
+        companyId: companyObjId,
+        ProductId: productObjId,
+        createdAt: { $gte: startOfToday, $lte: endOfToday },
+      },
+      {
+        $set: {
+          AdCost:              toNum(AdCost),
+          OtherCost:           toNum(OtherCost),
+          DelibaryCostPersale: toNum(DelibaryCostPersale),
+          PackgingCost:        toNum(PackgingCost),
+          PrductBuyingCost:    toNum(PrductBuyingCost),
+          ShippingCost:        toNum(ShippingCost),
+        },
+        $setOnInsert: {
+          SoldQuentity:     0,
+          Return:           0,
+          TargetSaleAmount: 0,
+          extraFields:      [],
+        },
+      },
+      { upsert: true, new: true }
+    );
+ 
+    return res.status(201).json({
+      message: "Initial cost record created",
+      data:    costDoc,
+    });
+ 
+  } catch (err) {
+    console.error("❌ createInitialCost error:", err.message);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+});
 
 router.post("/addEverydayData", async (req, res) => {
   try {
+    const { employeeId, companyId } = req.cookies;
+    const newemplyeeId = decryptUserData(employeeId);
+    const newcompanyId = decryptUserData(companyId);
+ 
+    if (!newemplyeeId || !newcompanyId)
+      return res.status(401).json({ message: "Login/Register please!" });
+
+    const billing = await Companies.findById(newcompanyId).select("planId subscriptionStatus trialEndsAt").lean();
+    const max = limitFor(billing, "products");
+    if (max !== Infinity) {
+      const n = await ClientProduct.countDocuments({ companyId: newcompanyId });
+      if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} Data. Upgrade to add more.` });
+    }
     const todayData = req.body;
 
     // Validate required fields

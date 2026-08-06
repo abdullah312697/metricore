@@ -1,0 +1,192 @@
+/* AdminLogin.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Prefix : alg- (admin login)
+
+   Centered restricted-entry card. Signature: the amber top edge on
+   the card + the lock eyebrow — instantly reads "not the customer
+   app" while staying in the family.                                  */
+
+:root {
+  --alg-navy:       #011626;
+  --alg-card:       #071e30;
+  --alg-deep:       #040f1a;
+  --alg-amber:      #ffb100;
+  --alg-amber-dim:  rgba(255, 177, 0, 0.10);
+  --alg-amber-line: rgba(255, 177, 0, 0.28);
+  --alg-white:      #ffffff;
+  --alg-off-white:  #dde6ee;
+  --alg-slate:      #8899aa;
+  --alg-slate-dim:  #4d6070;
+  --alg-border:     rgba(255, 255, 255, 0.08);
+  --alg-red:        #ef4444;
+  --alg-red-dim:    rgba(239, 68, 68, 0.10);
+  --alg-red-line:   rgba(239, 68, 68, 0.30);
+
+  --alg-display: 'Space Grotesk', sans-serif;
+  --alg-body:    'Inter', sans-serif;
+  --alg-mono:    'IBM Plex Mono', monospace;
+
+  --alg-r:    10px;
+  --alg-ease: 0.18s ease;
+}
+
+.alg-mono { font-family: var(--alg-mono); }
+
+.alg-root {
+  min-height:      100vh;
+  background:      var(--alg-navy);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         24px;
+  font-family:     var(--alg-body);
+}
+
+.alg-card {
+  width:          100%;
+  max-width:      380px;
+  background:     var(--alg-card);
+  border:         1px solid var(--alg-border);
+  border-top:     3px solid var(--alg-amber);     /* the signature edge */
+  border-radius:  14px;
+  padding:        30px 28px 24px;
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+  color:          var(--alg-white);
+}
+
+.alg-eyebrow {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            6px;
+  font-size:      10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color:          var(--alg-amber);
+}
+
+.alg-title {
+  font-family:    var(--alg-display);
+  font-size:      24px;
+  font-weight:    700;
+  letter-spacing: -0.4px;
+  margin:         0;
+}
+
+.alg-sub {
+  font-size: 13px;
+  color:     var(--alg-slate);
+  margin:    -10px 0 0;
+}
+
+.alg-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            6px;
+}
+
+.alg-label {
+  font-family: var(--alg-display);
+  font-size:   13px;
+  font-weight: 500;
+  color:       var(--alg-off-white);
+}
+
+.alg-input {
+  width:         100%;
+  box-sizing:    border-box;
+  background:    var(--alg-deep);
+  border:        1.5px solid var(--alg-border);
+  border-radius: var(--alg-r);
+  padding:       12px 14px;
+  font-family:   var(--alg-body);
+  font-size:     15px;
+  color:         var(--alg-white);
+  outline:       none;
+  transition:    border-color var(--alg-ease), box-shadow var(--alg-ease), background var(--alg-ease);
+}
+.alg-input:hover { border-color: rgba(255, 255, 255, 0.16); }
+.alg-input:focus {
+  border-color: var(--alg-amber);
+  background:   rgba(255, 177, 0, 0.04);
+  box-shadow:   0 0 0 3px var(--alg-amber-dim);
+}
+
+.alg-pass-wrap { position: relative; }
+.alg-pass-wrap .alg-input { padding-right: 44px; }
+.alg-pass-toggle {
+  position:   absolute;
+  right:      10px;
+  top:        50%;
+  transform:  translateY(-50%);
+  background: none;
+  border:     none;
+  color:      var(--alg-slate-dim);
+  cursor:     pointer;
+  padding:    5px;
+  display:    flex;
+  transition: color var(--alg-ease);
+}
+.alg-pass-toggle:hover { color: var(--alg-slate); }
+
+.alg-error {
+  font-size:     13px;
+  color:         var(--alg-red);
+  background:    var(--alg-red-dim);
+  border:        1px solid var(--alg-red-line);
+  border-radius: var(--alg-r);
+  padding:       10px 13px;
+  line-height:   1.5;
+}
+
+.alg-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  width:           100%;
+  font-family:     var(--alg-display);
+  font-weight:     600;
+  font-size:       15px;
+  background:      var(--alg-amber);
+  color:           var(--alg-deep);
+  border:          none;
+  border-radius:   var(--alg-r);
+  padding:         13px;
+  cursor:          pointer;
+  transition:      background var(--alg-ease), transform var(--alg-ease);
+}
+.alg-btn:hover:not(:disabled) { background: #ffc933; transform: translateY(-1px); }
+.alg-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.alg-spinner {
+  width:            15px;
+  height:           15px;
+  border:           2px solid rgba(4, 15, 26, 0.3);
+  border-top-color: var(--alg-deep);
+  border-radius:    50%;
+  animation:        alg-spin 0.7s linear infinite;
+}
+@keyframes alg-spin { to { transform: rotate(360deg); } }
+
+.alg-foot {
+  font-size:  11px;
+  color:      var(--alg-slate-dim);
+  text-align: center;
+  margin:     4px 0 0;
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alg-btn, .alg-input, .alg-pass-toggle { transition: none; }
+  .alg-btn:hover:not(:disabled) { transform: none; }
+  .alg-spinner { animation: none; }
+}
+
+.alg-btn:focus-visible,
+.alg-input:focus-visible,
+.alg-pass-toggle:focus-visible {
+  outline:        2px solid var(--alg-amber);
+  outline-offset: 3px;
+}

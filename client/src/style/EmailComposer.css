@@ -1,0 +1,285 @@
+/* EmailComposer.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body/inputs) · IBM Plex Mono (—)
+   Prefix : ec- (email composer) — zero collision with other stylesheets
+
+   Modal used by BOTH the employee-list page (group email) and the
+   Employee profile page (single email). Recipient chips adapt to
+   count; overlay dims the page; the card animates up on open.        */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --ec-navy:       #011626;
+  --ec-card:       #071e30;
+  --ec-deep:       #040f1a;
+  --ec-amber:      #ffb100;
+  --ec-amber-dim:  rgba(255, 177, 0, 0.10);
+  --ec-amber-line: rgba(255, 177, 0, 0.28);
+  --ec-amber-glow: rgba(255, 177, 0, 0.22);
+  --ec-white:      #ffffff;
+  --ec-off-white:  #dde6ee;
+  --ec-slate:      #8899aa;
+  --ec-slate-dim:  #4d6070;
+  --ec-border:     rgba(255, 255, 255, 0.08);
+  --ec-border-s:   rgba(255, 255, 255, 0.04);
+  --ec-green:      #22c55e;
+  --ec-green-dim:  rgba(34, 197, 94, 0.10);
+  --ec-green-line: rgba(34, 197, 94, 0.30);
+  --ec-red:        #ef4444;
+  --ec-red-dim:    rgba(239, 68, 68, 0.10);
+  --ec-red-line:   rgba(239, 68, 68, 0.30);
+
+  --ec-display: 'Space Grotesk', sans-serif;
+  --ec-body:    'Inter', sans-serif;
+
+  --ec-r:    10px;
+  --ec-r-lg: 16px;
+  --ec-ease: 0.18s ease;
+}
+
+/* ── overlay ──────────────────────────────────────────────────── */
+.ec-overlay {
+  position:        fixed;
+  inset:           0;
+  z-index:         2000;
+  background:      rgba(2, 8, 15, 0.72);
+  backdrop-filter: blur(3px);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         20px;
+  animation:       ec-fade 0.16s ease;
+}
+@keyframes ec-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── modal card ───────────────────────────────────────────────── */
+.ec-modal {
+  width:          100%;
+  max-width:      520px;
+  max-height:     90vh;
+  background:     var(--ec-card);
+  border:         1px solid var(--ec-border);
+  border-radius:  var(--ec-r-lg);
+  box-shadow:     0 30px 80px rgba(0, 0, 0, 0.6);
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+  font-family:    var(--ec-body);
+  color:          var(--ec-white);
+  animation:      ec-rise 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 5px;
+}
+@keyframes ec-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── header ───────────────────────────────────────────────────── */
+.ec-head {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  padding:         18px 20px;
+  background:      var(--ec-deep);
+  border-bottom:   1px solid var(--ec-border);
+  flex-shrink:     0;
+  border-radius: 10px 10px 10px 10px;
+  margin-bottom: 5px;
+}
+
+.ec-title {
+  font-family:    var(--ec-display);
+  font-size:      17px;
+  font-weight:    600;
+  letter-spacing: -0.2px;
+  margin:         0;
+  white-space:    nowrap;
+  overflow:       hidden;
+  text-overflow:  ellipsis;
+}
+
+.ec-close {
+  width:           32px;
+  height:          32px;
+  flex-shrink:     0;
+  border-radius:   8px;
+  border:          none;
+  background:      transparent;
+  color:           var(--ec-slate);
+  font-size:       15px;
+  cursor:          pointer;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      background var(--ec-ease), color var(--ec-ease);
+}
+.ec-close:hover { background: rgba(239, 68, 68, 0.15); color: var(--ec-red); }
+
+/* ── scrollable body wrap (recipients + fields) ───────────────── */
+.ec-modal > .ec-recipients,
+.ec-modal > .ec-input,
+.ec-modal > .ec-textarea,
+.ec-modal > .ec-result {
+  margin: 0 20px;
+}
+.ec-modal > .ec-recipients { margin-top: 18px; }
+
+/* ── recipient chips ──────────────────────────────────────────── */
+.ec-recipients {
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           6px;
+  max-height:    92px;
+  overflow-y:    auto;
+  padding-bottom: 4px;
+}
+
+.ec-chip {
+  font-family:    var(--ec-display);
+  font-size:      12px;
+  font-weight:    500;
+  color:          var(--ec-amber);
+  background:     var(--ec-amber-dim);
+  border:         1px solid var(--ec-amber-line);
+  border-radius:  20px;
+  padding:        4px 12px;
+  white-space:    nowrap;
+}
+.ec-chip--more {
+  color:        var(--ec-slate);
+  background:   var(--ec-deep);
+  border-color: var(--ec-border);
+}
+
+/* ── inputs ───────────────────────────────────────────────────── */
+.ec-input,
+.ec-textarea {
+  width:         100%;
+  box-sizing:    border-box;
+  background:    var(--ec-deep);
+  border:        1.5px solid var(--ec-border);
+  border-radius: var(--ec-r);
+  padding:       12px 14px;
+  font-family:   var(--ec-body);
+  font-size:     15px;
+  color:         var(--ec-white);
+  outline:       none;
+  transition:    border-color var(--ec-ease), box-shadow var(--ec-ease), background var(--ec-ease);
+}
+.ec-input { margin-top: 14px; }
+.ec-textarea {
+  margin-top:  12px;
+  resize:      vertical;
+  min-height:  150px;
+  line-height: 1.6;
+}
+.ec-input::placeholder,
+.ec-textarea::placeholder { color: var(--ec-slate-dim); }
+.ec-input:hover,
+.ec-textarea:hover { border-color: rgba(255, 255, 255, 0.16); }
+.ec-input:focus,
+.ec-textarea:focus {
+  border-color: var(--ec-amber);
+  background:   rgba(255, 177, 0, 0.04);
+  box-shadow:   0 0 0 3px var(--ec-amber-dim);
+}
+
+/* ── result message ───────────────────────────────────────────── */
+.ec-result {
+  font-size:     13px;
+  line-height:   1.55;
+  margin-top:    12px;
+  padding:       10px 13px;
+  border-radius: var(--ec-r);
+  border:        1px solid;
+}
+.ec-result--ok {
+  color:        var(--ec-green);
+  background:   var(--ec-green-dim);
+  border-color: var(--ec-green-line);
+}
+.ec-result--err {
+  color:        var(--ec-red);
+  background:   var(--ec-red-dim);
+  border-color: var(--ec-red-line);
+}
+
+/* ── actions ──────────────────────────────────────────────────── */
+.ec-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             10px;
+  padding:         18px 20px;
+  margin-top:      18px;
+  border-top:      1px solid var(--ec-border-s);
+  flex-shrink:     0;
+}
+
+.ec-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             7px;
+  font-family:     var(--ec-display);
+  font-weight:     600;
+  font-size:       14px;
+  border-radius:   var(--ec-r);
+  padding:         11px 22px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  transition:      background var(--ec-ease), color var(--ec-ease), border-color var(--ec-ease), box-shadow var(--ec-ease), transform var(--ec-ease);
+}
+.ec-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.ec-btn--primary { background: var(--ec-amber); color: var(--ec-deep); }
+.ec-btn--primary:hover:not(:disabled) {
+  background: #ffc933;
+  box-shadow: 0 6px 20px var(--ec-amber-glow);
+  transform:  translateY(-1px);
+}
+.ec-btn--primary:active:not(:disabled) { transform: translateY(0); }
+
+.ec-btn--ghost {
+  background:   transparent;
+  border-color: var(--ec-border);
+  color:        var(--ec-slate);
+}
+.ec-btn--ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  color:        var(--ec-white);
+}
+
+/* ── responsive ───────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .ec-overlay { padding: 0; align-items: flex-end; }
+  .ec-modal {
+    max-width:     none;
+    max-height:    94vh;
+    border-radius: var(--ec-r-lg) var(--ec-r-lg) 0 0;
+    animation:     ec-sheet 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes ec-sheet {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+  .ec-actions { flex-direction: column-reverse; }
+  .ec-btn     { width: 100%; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ec-overlay, .ec-modal { animation: none; }
+  .ec-btn, .ec-input, .ec-textarea, .ec-close { transition: none; }
+  .ec-btn--primary:hover:not(:disabled) { transform: none; box-shadow: none; }
+}
+
+/* ── focus visible ────────────────────────────────────────────── */
+.ec-btn:focus-visible,
+.ec-input:focus-visible,
+.ec-textarea:focus-visible,
+.ec-close:focus-visible {
+  outline:        2px solid var(--ec-amber);
+  outline-offset: 3px;
+  border-radius:  6px;
+}

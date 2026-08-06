@@ -1,13 +1,14 @@
 import express, { json } from "express";
 import fs from "fs";
 import https from "https";
+import http from "http"; 
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import webpush from "web-push";
 import { initSocket } from "./socket/socket.js";
-
-
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { verifySmtpConnection } from "./mailer.js";
 // =========================
 // ✅ Import Route Modules
 // =========================
@@ -15,7 +16,7 @@ import productData from "./routes/deshbord.js";
 import userRouter from "./routes/UserProcess.js";
 import sliderAction from "./routes/SliderAction.js";
 import CustomerReview from "./routes/CustomerReview.js";
-import ContactTo from "./routes/ContactTo.js";
+import contactRoutes from "./routes/contactRoutes.js";
 import AddOrder from "./routes/AddOrder.js";
 import Facebook from "./routes/Facebook.js";
 import Banner from "./routes/Banner.js";
@@ -29,6 +30,20 @@ import produstData from "./routes/ProductData.js";
 import ExtraFieldAdd from "./routes/ExtraFieldAdd.js";
 import TargetAmountRoute from "./routes/TargetAmountRoute.js";
 import ChartData from "./routes/ChartData.js";
+import ingestRoutes  from "./routes/ingestRoutes.js";
+import apiKeyRoutes  from "./routes/apiKeyRoutes.js";
+import announcementRoutes from "./routes/announcementRoutes.js";
+
+//=================admin=====================//
+import adminStatsRoutes from "./routes/adminStatsRoutes.js";
+import adminAuthRoutes from "./routes/adminAuthRoutes.js";
+import adminCompanyRoutes from "./routes/adminCompanyRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
+import adminFeedbackRoutes from "./routes/adminFeedbackRoutes.js";
+import adminAnnouncementRoutes from "./routes/adminAnnouncementRoutes.js";
+import { stripeWebhookHandler } from "./routes/stripeWebhook.js";
+import stripeRoutes, { requireActiveSubscription } from "./routes/stripeRoutes.js";
+import adminBillingRoutes from "./routes/adminBillingRoutes.js";
 // =========================
 // ✅ App Initialization
 // =========================
@@ -39,14 +54,36 @@ mongoose.set("bufferCommands", false);
 // =========================
 // ✅ Middleware Setup
 // =========================
+app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
 app.use(json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+verifySmtpConnection().then((r) => !r.ok && console.error("⚠️", r.error));
+
+const apiV1Limiter = rateLimit({
+  windowMs: 60_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Authenticated requests → limit per API key (the real identity)
+    const auth = req.headers.authorization;
+    if (auth) return auth;
+    // Unauthenticated (missing key) → limit per IP, IPv6-safe
+    return ipKeyGenerator(req.ip);
+  },
+  message: { error: "rate_limited", message: "Too many requests — max 60 per minute per key." },
+});
 // =========================
 // ✅ CORS Configuration
 // =========================
 const allowedOrigins = [
+  "https://metricore.app",
+  "https://www.metricore.app",
   "https://192.168.8.103:3000",
+  "https://10.21.177.23:3000",
+  "http://10.21.177.23:3000",
   "https://localhost:3000",
 ];
 
@@ -73,32 +110,65 @@ app.use("/api/addproduct", productData);
 app.use("/api/slider", sliderAction);
 app.use("/api/review", CustomerReview);
 app.use("/api/order", AddOrder);
-app.use("/api/contact", ContactTo);
+app.use("/api/contact", contactRoutes);
 app.use("/api/facebook", Facebook);
 app.use("/api/banner", Banner);
-app.use("/api/setgole", Setmytarget);
-app.use("/api/newemplyee", AddEmplyee);
-app.use("/api/newproduct", ClientAddProduct);
+app.use("/api/setgole", requireActiveSubscription, Setmytarget);
+app.use("/api/newemplyee", requireActiveSubscription, AddEmplyee);
+app.use("/api/newproduct", requireActiveSubscription, ClientAddProduct);
 app.use("/api/conversation", conversationRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/calls", callsRoutes);
-app.use("/api/productdata", produstData);
-app.use("/api/extrafield", ExtraFieldAdd);
+app.use("/api/productdata", requireActiveSubscription, produstData);
+app.use("/api/extrafield", requireActiveSubscription, ExtraFieldAdd);
 app.use("/api/goalTarget", TargetAmountRoute);
 app.use("/api/chart", ChartData);
+app.use("/api/v1", apiV1Limiter, ingestRoutes); 
+app.use("/api/apikeys", apiKeyRoutes);  
+
+// admin dashbord 
+app.use("/api/admin", adminAuthRoutes);
+app.use("/api/admin", adminStatsRoutes);
+app.use("/api/admin", adminCompanyRoutes);
+app.use("/api/feedback", feedbackRoutes);        // company side
+app.use("/api/admin",    adminFeedbackRoutes);   // admin side
+app.use("/api/admin",         adminAnnouncementRoutes);  
+app.use("/api/admin", adminBillingRoutes);
+app.use("/api/announcements", announcementRoutes);        // company feed
+
+// payment
+app.use("/api/stripe", stripeRoutes);
+
 // =========================
 // ✅ HTTP & Socket.IO Setup
 // =========================
-const server = https.createServer(
-  {
-    key: fs.readFileSync("./cert/key.pem"),
-    cert: fs.readFileSync("./cert/cert.pem"),
-  },
-  app
-);
+// const server = https.createServer(
+//   {
+//     key: fs.readFileSync("./cert/key.pem"),
+//     cert: fs.readFileSync("./cert/cert.pem"),
+//   },
+//   app
+// );
+
+// initSocket(server, allowedOrigins);
+let server;
+
+if (process.env.NODE_ENV === "production") {
+  // Railway/Render terminate SSL in front of the app — run plain HTTP behind it.
+  // The cert files don't exist there, so we must NOT read them.
+  server = http.createServer(app);
+} else {
+  // Local dev — your self-signed HTTPS, exactly as before.
+  server = https.createServer(
+    {
+      key: fs.readFileSync("./cert/key.pem"),
+      cert: fs.readFileSync("./cert/cert.pem"),
+    },
+    app
+  );
+}
 
 initSocket(server, allowedOrigins);
-
 // =========================
 // ✅ Web Push Configuration
 // =========================

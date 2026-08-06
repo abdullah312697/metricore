@@ -1,0 +1,378 @@
+/* ApiKeysCard.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Prefix : ak- (api keys) — zero collision with other stylesheets
+   Lives inside the Company Settings page — matches the cp- card family.
+
+   Signature: the one-time key reveal — an amber-bordered strip holding
+   the full key in large mono with a copy button. It looks important
+   because it is: this is the only moment the key exists in a UI.     */
+
+:root {
+  --ak-navy:       #011626;
+  --ak-card:       #071e30;
+  --ak-deep:       #040f1a;
+  --ak-amber:      #ffb100;
+  --ak-amber-dim:  rgba(255, 177, 0, 0.10);
+  --ak-amber-line: rgba(255, 177, 0, 0.30);
+  --ak-white:      #ffffff;
+  --ak-off-white:  #dde6ee;
+  --ak-slate:      #8899aa;
+  --ak-slate-dim:  #4d6070;
+  --ak-border:     rgba(255, 255, 255, 0.08);
+  --ak-border-s:   rgba(255, 255, 255, 0.04);
+  --ak-red:        #ef4444;
+  --ak-red-dim:    rgba(239, 68, 68, 0.10);
+  --ak-red-line:   rgba(239, 68, 68, 0.30);
+
+  --ak-display: 'Space Grotesk', sans-serif;
+  --ak-body:    'Inter', sans-serif;
+  --ak-mono:    'IBM Plex Mono', monospace;
+
+  --ak-r:    10px;
+  --ak-r-lg: 14px;
+  --ak-ease: 0.18s ease;
+}
+
+.ak-mono { font-family: var(--ak-mono); }
+
+/* ── card shell — matches cp- cards ───────────────────────────── */
+.ak-card {
+  background:     var(--ak-card);
+  border:         1px solid var(--ak-border);
+  border-radius:  var(--ak-r-lg);
+  padding:        24px;
+  display:        flex;
+  flex-direction: column;
+  gap:            18px;
+  font-family:    var(--ak-body);
+  color:          var(--ak-white);
+}
+
+.ak-head {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  gap:             16px;
+  padding-bottom:  14px;
+  border-bottom:   1px solid var(--ak-border-s);
+}
+
+.ak-heading {
+  font-family:   var(--ak-display);
+  font-size:     15px;
+  font-weight:   600;
+  margin:        0 0 4px;
+}
+
+.ak-sub {
+  font-size:   13px;
+  color:       var(--ak-slate);
+  line-height: 1.6;
+  margin:      0;
+  max-width:   380px;
+}
+
+/* ── one-time key reveal — the signature ──────────────────────── */
+.ak-reveal {
+  background:     var(--ak-amber-dim);
+  border:         1px solid var(--ak-amber-line);
+  border-radius:  var(--ak-r);
+  padding:        16px;
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+}
+
+.ak-reveal__title {
+  font-size:   13px;
+  color:       var(--ak-off-white);
+  line-height: 1.5;
+  margin:      0;
+}
+.ak-reveal__title strong { color: var(--ak-amber); }
+
+.ak-reveal__keyrow {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+}
+
+.ak-reveal__key {
+  flex:          1;
+  font-size:     13px;
+  color:         var(--ak-amber);
+  background:    var(--ak-deep);
+  border:        1px solid var(--ak-border);
+  border-radius: 8px;
+  padding:       11px 13px;
+  word-break:    break-all;
+  line-height:   1.5;
+  user-select:   all;               /* one tap selects the whole key */
+}
+
+.ak-icon-btn {
+  width:           38px;
+  height:          38px;
+  flex-shrink:     0;
+  border-radius:   8px;
+  border:          1px solid var(--ak-amber-line);
+  background:      transparent;
+  color:           var(--ak-amber);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  transition:      background var(--ak-ease);
+}
+.ak-icon-btn:hover { background: var(--ak-amber-dim); }
+
+/* ── create form ──────────────────────────────────────────────── */
+.ak-form {
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+}
+
+.ak-input {
+  background:    var(--ak-deep);
+  border:        1.5px solid var(--ak-border);
+  border-radius: var(--ak-r);
+  padding:       11px 13px;
+  font-family:   var(--ak-body);
+  font-size:     14px;
+  color:         var(--ak-white);
+  width:         100%;
+  outline:       none;
+  transition:    border-color var(--ak-ease), box-shadow var(--ak-ease);
+}
+.ak-input::placeholder { color: var(--ak-slate-dim); }
+.ak-input:focus {
+  border-color: var(--ak-amber);
+  box-shadow:   0 0 0 3px var(--ak-amber-dim);
+}
+
+.ak-form__actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             8px;
+}
+
+/* ── key list ─────────────────────────────────────────────────── */
+.ak-list {
+  display:        flex;
+  flex-direction: column;
+}
+
+.ak-row {
+  display:       grid;
+  grid-template-columns: 1fr auto auto;
+  align-items:   center;
+  gap:           16px;
+  padding:       13px 0;
+  border-bottom: 1px solid var(--ak-border-s);
+}
+.ak-row:last-child { border-bottom: none; }
+
+.ak-row--revoked { opacity: 0.45; }
+
+.ak-row__main {
+  display:        flex;
+  flex-direction: column;
+  gap:            3px;
+  min-width:      0;
+}
+
+.ak-row__name {
+  font-family:   var(--ak-display);
+  font-size:     14px;
+  font-weight:   500;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.ak-row__prefix {
+  font-size:      11px;
+  color:          var(--ak-slate-dim);
+  letter-spacing: 0.5px;
+}
+
+.ak-row__meta {
+  display:        flex;
+  flex-direction: column;
+  gap:            3px;
+  font-size:      10px;
+  color:          var(--ak-slate-dim);
+  letter-spacing: 0.4px;
+  text-align:     right;
+  white-space:    nowrap;
+}
+
+.ak-chip {
+  font-size:      9px;
+  letter-spacing: 1.5px;
+  padding:        4px 10px;
+  border-radius:  20px;
+  border:         1px solid;
+}
+.ak-chip--revoked { color: var(--ak-red); border-color: var(--ak-red-line); }
+
+.ak-revoke {
+  background:    transparent;
+  border:        1px solid var(--ak-red-line);
+  border-radius: 8px;
+  color:         var(--ak-red);
+  font-family:   var(--ak-display);
+  font-size:     12px;
+  font-weight:   600;
+  padding:       7px 14px;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    background var(--ak-ease), color var(--ak-ease);
+}
+.ak-revoke:hover { background: var(--ak-red); color: #fff; }
+
+/* ── docs ─────────────────────────────────────────────────────── */
+.ak-docs {
+  border:        1px solid var(--ak-border-s);
+  border-radius: var(--ak-r);
+  background:    var(--ak-deep);
+}
+
+.ak-docs__summary {
+  font-family:   var(--ak-display);
+  font-size:     13px;
+  font-weight:   500;
+  color:         var(--ak-off-white);
+  padding:       12px 14px;
+  cursor:        pointer;
+  user-select:   none;
+  list-style:    none;
+}
+.ak-docs__summary::-webkit-details-marker { display: none; }
+.ak-docs__summary::before {
+  content:      "▸ ";
+  color:        var(--ak-amber);
+  font-family:  var(--ak-mono);
+  font-size:    11px;
+}
+.ak-docs[open] .ak-docs__summary::before { content: "▾ "; }
+
+.ak-docs__body {
+  padding:        0 14px 16px;
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+}
+
+.ak-docs__label {
+  font-size:      9px;
+  letter-spacing: 2px;
+  color:          var(--ak-amber);
+  margin:         6px 0 0;
+}
+
+.ak-pre {
+  background:    var(--ak-navy);
+  border:        1px solid var(--ak-border-s);
+  border-radius: 8px;
+  padding:       12px 14px;
+  font-size:     11px;
+  line-height:   1.7;
+  color:         var(--ak-off-white);
+  overflow-x:    auto;
+  margin:        0;
+  white-space:   pre;
+}
+
+.ak-docs__note {
+  font-size:   12px;
+  color:       var(--ak-slate);
+  line-height: 1.65;
+  margin:      2px 0 0;
+}
+.ak-docs__note code { color: var(--ak-amber); font-size: 11px; }
+.ak-docs__note strong { color: var(--ak-off-white); }
+
+/* ── shared bits ──────────────────────────────────────────────── */
+.ak-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             7px;
+  font-family:     var(--ak-display);
+  font-weight:     600;
+  border-radius:   var(--ak-r);
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  white-space:     nowrap;
+  transition:      background var(--ak-ease), color var(--ak-ease), border-color var(--ak-ease);
+}
+.ak-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ak-btn--sm { padding: 8px 15px; font-size: 13px; }
+
+.ak-btn--primary { background: var(--ak-amber); color: var(--ak-deep); }
+.ak-btn--primary:hover:not(:disabled) { background: #ffc933; }
+
+.ak-btn--ghost {
+  background:   transparent;
+  border-color: var(--ak-border);
+  color:        var(--ak-slate);
+}
+.ak-btn--ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  color:        var(--ak-white);
+}
+
+.ak-spinner {
+  width:            13px;
+  height:           13px;
+  border:           2px solid rgba(4, 15, 26, 0.3);
+  border-top-color: var(--ak-deep);
+  border-radius:    50%;
+  animation:        ak-spin 0.7s linear infinite;
+}
+@keyframes ak-spin { to { transform: rotate(360deg); } }
+
+.ak-error {
+  font-size: 12px;
+  color:     var(--ak-red);
+}
+
+.ak-dim {
+  font-size:      12px;
+  color:          var(--ak-slate-dim);
+  letter-spacing: 0.5px;
+}
+
+/* ── responsive ───────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .ak-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "main action"
+      "meta action";
+  }
+  .ak-row__main  { grid-area: main; }
+  .ak-row__meta  { grid-area: meta; text-align: left; flex-direction: row; gap: 10px; }
+  .ak-revoke,
+  .ak-chip       { grid-area: action; }
+
+  .ak-head { flex-direction: column; }
+}
+
+/* ── reduced motion / focus ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ak-btn, .ak-input, .ak-revoke, .ak-icon-btn { transition: none; }
+  .ak-spinner { animation: none; }
+}
+
+.ak-btn:focus-visible,
+.ak-input:focus-visible,
+.ak-revoke:focus-visible,
+.ak-icon-btn:focus-visible,
+.ak-docs__summary:focus-visible {
+  outline:        2px solid var(--ak-amber);
+  outline-offset: 3px;
+}

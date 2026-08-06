@@ -1,0 +1,306 @@
+/* ProductList.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body) · IBM Plex Mono (sku/price/units)
+   Prefix : pl- (product list)
+
+   Sibling of EmployeeList.css — same three-region skeleton so the two
+   dashboard cards look and behave identically:
+
+     .pl-topbar  — fixed height, never scrolls
+     .pl-head    — fixed column labels, never scrolls
+     .pl-scroll  — flex:1, THE ONLY scrolling region (holds .pl-row)
+
+   .pl-root is height:100% + flex column, so .pl-scroll absorbs the
+   leftover height — grows automatically if the parent gets taller.
+
+   Columns come from ONE shared grid template (--pl-cols) used by both
+   .pl-head and .pl-row, so labels always align with cells. No absolute
+   left: pixel positioning — adding/removing a column can't break it.  */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --pl-navy:       #011626;
+  --pl-card:       #071e30;
+  --pl-deep:       #040f1a;
+  --pl-amber:      #ffb100;
+  --pl-amber-dim:  rgba(255, 177, 0, 0.10);
+  --pl-amber-line: rgba(255, 177, 0, 0.28);
+  --pl-white:      #ffffff;
+  --pl-off-white:  #dde6ee;
+  --pl-slate:      #8899aa;
+  --pl-slate-dim:  #4d6070;
+  --pl-border:     rgba(255, 255, 255, 0.08);
+  --pl-border-s:   rgba(255, 255, 255, 0.04);
+
+  --pl-display: 'Space Grotesk', sans-serif;
+  --pl-body:    'Inter', sans-serif;
+  --pl-mono:    'IBM Plex Mono', monospace;
+
+  --pl-r:    9px;
+  --pl-ease: 0.16s ease;
+  --pl-padx: 14px;
+
+  /* Sized for a 600px parent: 44+90+70+56+58 fixed = 318px,
+     + 5 gaps x 8px = 40, leaves ~200px for the name column. */
+  --pl-cols: 44px 1.5fr 90px 70px 56px 58px;
+}
+
+/* ── shell — fills the fixed parent ───────────────────────────── */
+.pl-root {
+  height:         100%;
+  display:        flex;
+  flex-direction: column;
+  min-height:     0;          /* lets the scroll child shrink properly */
+  font-family:    var(--pl-body);
+  color:          var(--pl-white);
+  box-sizing:     border-box;
+}
+
+.pl-mono { font-family: var(--pl-mono); }
+
+/* ══ REGION 1 — top bar (fixed) ═══════════════════════════════ */
+.pl-topbar {
+  flex-shrink:     0;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             10px;
+  padding:         11px var(--pl-padx);
+  border-bottom:   1px solid var(--pl-border-s);
+  box-sizing:      border-box;
+}
+
+.pl-topbar__left {
+  display:     flex;
+  align-items: center;
+  gap:         9px;
+  min-width:   0;
+}
+
+.pl-title {
+  font-family:    var(--pl-display);
+  font-size:      16px;
+  font-weight:    700;
+  letter-spacing: -0.2px;
+  margin:         0;
+  white-space:    nowrap;
+}
+
+.pl-count {
+  font-size:     11px;
+  color:         var(--pl-amber);
+  background:    var(--pl-amber-dim);
+  border:        1px solid var(--pl-amber-line);
+  border-radius: 20px;
+  padding:       1px 9px;
+}
+
+.pl-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             6px;
+  font-family:     var(--pl-display);
+  font-weight:     600;
+  font-size:       12.5px;
+  border-radius:   var(--pl-r);
+  padding:         7px 13px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  text-decoration: none;
+  white-space:     nowrap;
+  flex-shrink:     0;
+  transition:      background var(--pl-ease), transform var(--pl-ease);
+}
+.pl-btn--add { background: var(--pl-amber); color: var(--pl-deep); }
+.pl-btn--add:hover { background: #ffc933; transform: translateY(-1px); }
+
+/* ══ REGION 2 — column header (fixed) ═════════════════════════ */
+.pl-head {
+  flex-shrink:           0;
+  display:               grid;
+  grid-template-columns: var(--pl-cols);
+  align-items:           center;
+  gap:                   8px;
+  padding:               0 var(--pl-padx);
+  height:                34px;
+  background:            var(--pl-deep);
+  border-top:            1px solid var(--pl-border-s);
+  border-bottom:         1px solid var(--pl-border);
+  box-sizing:            border-box;
+  scrollbar-gutter:      stable;   /* keeps labels aligned once rows scroll */
+}
+
+.pl-head span {
+  font-family:    var(--pl-mono);
+  font-size:      8.5px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color:          var(--pl-slate-dim);
+  white-space:    nowrap;
+}
+
+/* ══ REGION 3 — THE SCROLL AREA (only this scrolls) ═══════════ */
+.pl-scroll {
+  flex:       1;
+  min-height: 0;              /* critical: allows overflow inside flex */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.pl-scroll::-webkit-scrollbar       { width: 7px; }
+.pl-scroll::-webkit-scrollbar-track { background: transparent; }
+.pl-scroll::-webkit-scrollbar-thumb {
+  background:    rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+.pl-scroll::-webkit-scrollbar-thumb:hover { background: var(--pl-amber-line); }
+.pl-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+
+/* ── product row ──────────────────────────────────────────────── */
+.pl-row {
+  display:               grid;
+  grid-template-columns: var(--pl-cols);
+  align-items:           center;
+  gap:                   8px;
+  padding:               0 var(--pl-padx);
+  min-height:            54px;
+  border-bottom:         1px solid var(--pl-border-s);
+  box-sizing:            border-box;
+  transition:            background var(--pl-ease);
+}
+.pl-row:last-child { border-bottom: none; }
+.pl-row:hover      { background: rgba(255, 255, 255, 0.03); }
+
+/* ── cells ────────────────────────────────────────────────────── */
+.pl-col-img { display: flex; align-items: center; }
+
+.pl-thumb {
+  width:         38px;
+  height:        38px;
+  border-radius: 7px;
+  object-fit:    cover;
+  border:        1px solid var(--pl-border);
+  background:    var(--pl-deep);
+  display:       block;
+}
+.pl-thumb--empty {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       17px;
+  opacity:         0.45;
+}
+
+.pl-col-name {
+  font-family:   var(--pl-display);
+  font-size:     13.5px;
+  font-weight:   500;
+  color:         var(--pl-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  min-width:     0;
+}
+
+.pl-col-sku { min-width: 0; }
+.pl-sku-chip {
+  display:       inline-block;
+  max-width:     100%;
+  font-size:     10.5px;
+  color:         var(--pl-amber);
+  background:    var(--pl-amber-dim);
+  border:        1px solid var(--pl-amber-line);
+  border-radius: 5px;
+  padding:       2px 8px;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  box-sizing:    border-box;
+  letter-spacing: 0.3px;
+}
+.pl-dash { color: var(--pl-slate-dim); font-size: 12px; }
+
+.pl-col-price {
+  font-size:   13px;
+  font-weight: 500;
+  color:       var(--pl-off-white);
+  white-space: nowrap;
+}
+.pl-currency {
+  color:       var(--pl-amber);
+  font-size:   11px;
+  margin-right: 1px;
+}
+
+.pl-col-units {
+  font-size:   12.5px;
+  color:       var(--pl-off-white);
+  white-space: nowrap;
+}
+
+.pl-col-action { display: flex; justify-content: flex-end; }
+.pl-view {
+  font-family:     var(--pl-display);
+  font-size:       11.5px;
+  font-weight:     600;
+  color:           var(--pl-amber);
+  text-decoration: none;
+  border:          1px solid var(--pl-amber-line);
+  border-radius:   7px;
+  padding:         5px 11px;
+  white-space:     nowrap;
+  transition:      background var(--pl-ease);
+}
+.pl-view:hover { background: var(--pl-amber-dim); }
+
+/* ── empty state — fills the scroll region ────────────────────── */
+.pl-scroll--empty {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  overflow:        hidden;
+}
+
+.pl-empty {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             8px;
+  padding:         26px 34px;
+  border:          1.5px dashed var(--pl-border);
+  border-radius:   12px;
+  text-decoration: none;
+  transition:      border-color var(--pl-ease), background var(--pl-ease);
+}
+.pl-empty:hover {
+  border-color: var(--pl-amber-line);
+  background:   var(--pl-amber-dim);
+}
+.pl-empty h4 {
+  font-family: var(--pl-display);
+  font-size:   13.5px;
+  font-weight: 600;
+  color:       var(--pl-off-white);
+  margin:      0;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — drop lower-priority columns instead of overflowing
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  :root { --pl-cols: 42px 1.5fr 80px 56px 58px; }
+  .pl-col-units { display: none; }
+}
+
+@media (max-width: 430px) {
+  :root { --pl-cols: 40px 1fr 70px 56px; }
+  .pl-col-sku { display: none; }
+  .pl-title   { font-size: 15px; }
+  .pl-btn     { padding: 6px 10px; font-size: 11.5px; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pl-btn, .pl-row, .pl-view, .pl-empty { transition: none; }
+  .pl-btn--add:hover { transform: none; }
+}

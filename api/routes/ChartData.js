@@ -30,17 +30,19 @@ router.get("/companyChartData", async (req, res) => {
       return res.status(400).json({ message: "Invalid companyId" });
 
     // 👇 Date format WITHOUT timezone (removed "+06:00")
+// In backend route — shorter format for day groupBy
     const dateFormat = {
-      hour:  { $dateToString: { format: "%H:00",    date: "$createdAt" } },
-      day:   { $dateToString: { format: "%d %b %Y", date: "$createdAt" } },
-      month: { $dateToString: { format: "%b %Y",    date: "$createdAt" } },
-    }[groupBy] || { $dateToString: { format: "%d %b %Y", date: "$createdAt" } };
+      hour:  { $dateToString: { format: "%H:00",  date: "$createdAt" } }, // "14:00"
+      day:   { $dateToString: { format: "%d %b",  date: "$createdAt" } }, // "06 May" ← no year
+      month: { $dateToString: { format: "%b %Y",  date: "$createdAt" } }, // "May 2026"
+    }[groupBy] || { $dateToString: { format: "%d %b", date: "$createdAt" } };
+// In backend route — shorter format for day groupBy
 
     const companyObjId = mongoose.Types.ObjectId.createFromHexString(newcompanyId);
 
     // 👇 First check if any docs exist for this company
-    const docCount = await ProductsCost.countDocuments({ companyId: companyObjId });
-
+    // const docCount = await ProductsCost.countDocuments({ companyId: companyObjId });
+    // if(docCount === 0 ) return res.status(400).json({ message: "no data available" });
     const chartData = await ProductsCost.aggregate([
       {
         $match: {
@@ -129,6 +131,117 @@ router.get("/companyChartData", async (req, res) => {
   } catch (err) {
     console.error("❌ companyChartData error:", err.message);
     return res.status(500).json({ message: err.message }); // 👈 sends real error
+  }
+});
+
+router.get("/dailySummary", async (req, res) => {
+  try {
+    const { employeeId, companyId } = req.cookies;
+    const newemplyeeId = decryptUserData(employeeId);
+    const newcompanyId = decryptUserData(companyId);
+
+    if (!newemplyeeId || !newcompanyId)
+      return res.status(401).json({ message: "Login/Register please!" });
+
+    if (!mongoose.Types.ObjectId.isValid(newcompanyId))
+      return res.status(400).json({ message: "Invalid companyId" });
+
+    const rangeStart = (() => { const d = new Date(); d.setUTCHours(0,0,0,0); return d; })();
+
+    const rangeEnd =  (() => { const d = new Date(); d.setUTCHours(23,59,59,999); return d; })();
+
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(newcompanyId);
+
+    const dailySummary = await ProductsCost.aggregate([
+
+      {
+        $match: {
+          companyId: companyObjId,
+          createdAt: { $gte: rangeStart, $lte: rangeEnd },
+        },
+      },
+
+      {
+        $lookup: {
+          from:         "ClientProduct",
+          localField:   "ProductId",
+          foreignField: "_id",
+          as:           "product",
+        },
+      },
+      {
+        $unwind: {
+          path:                       "$product",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $addFields: {
+          Revenue: {
+            $multiply: [
+              { $ifNull: ["$SoldQuentity",        0] },
+              { $ifNull: ["$product.ProductPrice", 0] },
+            ],
+          },
+          TotalCost: {
+            $add: [
+              { $ifNull: ["$AdCost",          0] },
+              { $ifNull: ["$OtherCost",        0] },
+              { $ifNull: ["$PackgingCost",     0] },
+              { $ifNull: ["$PrductBuyingCost", 0] },
+              { $ifNull: ["$ShippingCost",     0] },
+              {
+                $multiply: [
+                  { $ifNull: ["$DelibaryCostPersale", 0] },
+                  { $ifNull: ["$SoldQuentity",        0] },
+                ],
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          EstimatedProfit: { $subtract: ["$Revenue", "$TotalCost"] },
+        },
+      },
+
+      {
+        $group: {
+          _id: null,
+          date:            { $first: "$createdAt" },
+          TotalUnitsSold:  { $sum: { $ifNull: ["$SoldQuentity", 0] } },
+          TotalRevenue:    { $sum: "$Revenue"},
+          EstimatedProfit: { $sum: "$EstimatedProfit"  },
+        },
+      },
+
+      { $sort: { date: 1 } },
+
+      {
+        $project: {
+          _id:             0,
+          TotalUnitsSold:  { $round: ["$TotalUnitsSold",  0] },
+          TotalRevenue:    { $round: ["$TotalRevenue",    0] },
+          EstimatedProfit: { $round: ["$EstimatedProfit", 0] },
+        },
+      },
+    ]);
+
+
+    return res.status(200).json({
+      message: "ok",
+      data: dailySummary[0] || {
+        TotalUnitsSold: 0,
+        TotalRevenue: 0,
+        EstimatedProfit: 0,
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ dailySummary error:", err.message);
+    return res.status(500).json({ message: err.message });
   }
 });
 

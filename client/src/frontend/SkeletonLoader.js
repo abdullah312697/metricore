@@ -1,6 +1,6 @@
 // src/components/SkeletonLoader.js
 import React from 'react';
-import './SkeletonLoader.css';
+import '../style/SkeletonLoader.css';
 
 const SkeletonLoader = ({mainGap,mainWidth,mainHeight,headingW,headingH,chaildOneW,allChaieldH,chaildTwoW,chaildThreeW,chaildForeW}) => {
   return (

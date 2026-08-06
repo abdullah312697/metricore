@@ -655,11 +655,12 @@ body{
 .MainContainerChunk{
     width: 600px;
     height: 300px;
-    border: 1px solid #ccc3;
+    border: 1px solid #ffffff14;
     border-radius: 10px;
     box-sizing: border-box;
     margin-bottom: 50px;
     overflow: hidden;
+    background: #071e30;
 }
 .live_msg_and_salse{
     width: 100%;
@@ -675,7 +676,7 @@ body{
 .live_message_main{
     width: 600px;
     height: 130px;
-    border: 1px solid #ccc3;
+    border: 1px solid #ffffff14;
     border-radius: 10px;
     position: relative;
 }
@@ -693,6 +694,8 @@ body{
     align-items: center;
     justify-content: space-between;
     position: relative;
+    background: #071e30;
+    border-radius: 10px;
 }
 .messangerHeadrFunction{
     position: absolute;
@@ -816,6 +819,7 @@ body{
     border: 1px solid #ccc3;
     border-radius: 10px;
     position: relative;
+    background: #071e30;
 }
 .live_salse_header{
 padding: 5px;
@@ -823,8 +827,7 @@ padding: 5px;
     font-weight: 600;
     color: #b17f00;
     text-align: center;
-    border-bottom: 1px solid #ccc3;
-    background: #6985833d;
+    border-bottom: 1px solid #ffffff14;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
@@ -836,7 +839,6 @@ padding: 5px;
     height: auto;
     box-sizing: border-box;
     position: relative;
-    background: #cccccc0d;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
@@ -852,6 +854,12 @@ padding: 5px;
 .live_salesContainerGroup>h2{
     font-size: 32px;
     margin-bottom: 10px;
+    width: 100%;
+    overflow-x: scroll;
+    text-align: center;
+}
+.live_salesContainerGroup>h2::-webkit-scrollbar{
+    display: none;
 }
 .live_salesContainerGroup>h6{
     font-size: 10px;
@@ -1160,7 +1168,7 @@ border-color: #85858563;
 .employeeTopHeader>span>strong{
     color: rgb(0, 120, 212);
 }
-.employeeTopHeader>button{
+.employeeTopHeader>a{
     width: 125px;
     background: transparent;
     border: 1px solid #ccc3;
@@ -1170,6 +1178,8 @@ border-color: #85858563;
     font-weight: bold;
     cursor: pointer;
     color: #00fff2;
+    text-decoration: none;
+    text-align: center;
 }
 .EmployeeHeader{
     width: 100%;
@@ -1185,8 +1195,11 @@ border-color: #85858563;
     align-items: center;
     justify-content: space-between;
     position: relative;
+    height: 10px;
 }
-/* .EmployeeHeader>ul>li{} */
+.EmployeeHeader>ul>li{
+    position: absolute;
+}
 .EmplyeeListContainer{
     width: 100%;
     height: 200px;
@@ -1205,8 +1218,11 @@ border-color: #85858563;
     position: relative;
     border-bottom: 1px solid #ccc3;
     padding: 10px;
+    height: 55px;
 }
-/* .EmplyeeListContainer>ul>li{} */
+.EmplyeeListContainer>ul>li{
+    position: absolute;
+}
 .EmplyeeListContainer>ul>li>a{
     cursor: pointer;
     text-decoration: none;
@@ -4305,8 +4321,29 @@ border-color: #85858563;
     width: 375px;
     height: 32px;
     padding: 5px;
-    color: #ccc;
+    color: hsl(0, 0%, 80%);
 }
+
+/* .addProductInputSelctGrp{
+    width: 375px;
+    height: 30px;
+    background: #011626;
+    border: 1px solid #ccc3;
+    border-radius: 5px;
+    padding: 2px;
+    color: #00cbc0;
+    font-size: 15px;
+    font-weight: bold;
+}
+.addProductInputSelctGrp:focus{
+    outline: none;
+}
+.addProductInputSelctGrp>option{
+    border: 1px solid #ccc3;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+} */
 .inputAllClientTitle{
     font-size: 13px;
     margin-right: 10px;
@@ -4675,6 +4712,25 @@ border-color: #85858563;
     /* client Addproduct </> */
 /* Employee Status update<> */
 /* .userStatusScrollingMain{} */
+.liveChatIconPart{
+    position: relative;
+    width: 42px;
+    height: 42px;
+    background: #040f1a;
+    border: 1px solid #ffffff14;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+.liveChatIconPart:hover {
+  border-color: rgba(255, 177, 0, 0.28);
+  background:   rgba(255, 177, 0, 0.10);
+  transform:    translateY(-2px);
+}
+
 .previewStatusContainer{
     width: 220px;
     height: auto;
@@ -4745,38 +4801,9 @@ border-color: #85858563;
 /* Employee Status update</> */
 
 /* Live Chats page Styles<> */
-.liveChatsMain{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;        /* full viewport width  */
-    height: 100vh;       /* full viewport height */
-    pointer-events: none;/* allow clicks “through” this layer when not on children */
-    z-index: 9999;     
-}
-.liveChatsLogo{
-    position: fixed;
-    bottom: 5%;   
-    right: 1%;
-    width: 50px;
-    height: 50px;
-    background-color: #007bff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    z-index: 9999;     /* always on top */
-    pointer-events: all;
-    touch-action: none;     /* disable native scrolling/zooming */
-    user-select: none;  
-}
-.liveChatsLogo:active {
-    cursor: grabbing;
-  }
 .liveChatsLogoIcon{
-    font-size: 25px !important;
-    margin-top: 5px;
+    font-size: 25px !important; 
+    color: #00cbc0 !important;
 }
 .liveChatsMain_dbh{
     width: 100%;
@@ -4844,13 +4871,13 @@ border-color: #85858563;
     color:#00ffa1 !important;
 }
 .liveChatAciveSigne{
-    background: #33ff00;
-    width: 10px;
-    height: 10px;
+    background: #48ff00;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     position: absolute;
-    top: 3px;
-    right: 1px;
+    top: -1px;
+    right: -0px;
     z-index: 1;
 }
 .liveChatFirstPopup{
@@ -4905,7 +4932,23 @@ border-color: #85858563;
     width: 30px;
     cursor: pointer;
   }
-.liveChatsInnerPart,
+
+.liveChatsInnerPart{
+    position: fixed;
+    bottom: 0px;
+    left: 510px;
+    width: 320px;
+    height: 400px;
+    background: #011626;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+    pointer-events: all;
+    border: 1px solid #ffffff14;
+    transition: bottom 150ms ease;
+}
 .liveChats_dbhInner{
     position: fixed;
     bottom: 0px;
@@ -4944,7 +4987,7 @@ border-color: #85858563;
 }
 .liveConverstaionHeder{
     padding: 10px;
-  background: #007bff;
+  background: #092133;
   color: #fff;
   user-select: none;
   display: flex;
@@ -4977,7 +5020,7 @@ border-color: #85858563;
 .toggleMinimizebtn{
     font-size: 30px !important;
     cursor: pointer;
-    color: #011626;
+    color: #0af;
 }
 .supportagettext{
     font-size: 14px;
@@ -4986,7 +5029,7 @@ border-color: #85858563;
 }
 .liveChatclosebtn{
     font-size: 21px !important;
-    color: #ff00c6;
+    color: #bfbfbf;
     cursor: pointer;
 }
 .liveCustomerMessages{
@@ -5142,7 +5185,7 @@ border-color: #85858563;
 
 /* Preview Container */
 .preview-container {
-    width: 300px;
+    width: 316px;
     display: flex;
     overflow-x: auto;
     gap: 15px;
@@ -5150,7 +5193,7 @@ border-color: #85858563;
     border: 1px solid #dddddd52;
     max-width: 100%;
     scroll-behavior: smooth;
-    position: fixed;
+    position: absolute;
     bottom: 50px;
     border-radius: 10px;
     background: #011626;

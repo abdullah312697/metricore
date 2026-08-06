@@ -5,6 +5,7 @@ import ExtraFieldConfig from "../models/ExtraFieldConfig.js";
 import ProductsCost from "../models/ProductCost.js";
 import ClientProduct from "../models/ClientProduct.js";
 import { decryptUserData } from "../verifyuser.js";
+import { limitFor } from "../config/plans.js"; 
 
 const getAuthIds = (req) => {
   const { employeeId, companyId } = req.cookies;
@@ -102,6 +103,14 @@ router.post("/createExtraFieldConfig", async (req, res) => {
     const { newEmployeeId, newCompanyId } = getAuthIds(req);
     if (!newEmployeeId || !newCompanyId)
     return res.status(401).json({ message: "Login/Register please!" });
+
+  const billing = await Companies.findById(newCompanyId).select("planId subscriptionStatus trialEndsAt").lean();
+  const max = limitFor(billing, "products");
+  if (max !== Infinity) {
+    const n = await ClientProduct.countDocuments({ companyId: newCompanyId });
+    if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} Field. Upgrade to add more.` });
+  }
+
     const { fieldName, calculateWith, goalId, value } = req.body;
     // ── Validate ──────────────────────────────────────────────────
     if (!fieldName?.trim())
@@ -188,6 +197,12 @@ router.put("/updateExtraFieldConfig/:fieldId", async (req, res) => {
     if (!newEmployeeId || !newCompanyId)
       return res.status(401).json({ message: "Login/Register please!" });
 
+const billing = await Companies.findById(newCompanyId).select("planId subscriptionStatus trialEndsAt").lean();
+const max = limitFor(billing, "products");
+if (max !== Infinity) {
+  const n = await ClientProduct.countDocuments({ companyId: newCompanyId });
+  if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} Field. Upgrade to add more.` });
+}
     const { fieldId }    = req.params;
     const { fieldName, calculateWith, goalId, productId, fieldValue } = req.body;
 

@@ -1,0 +1,254 @@
+/* AdminHome.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Prefix : adh- (admin home / overview)
+
+   Stat cards + recent-signups list rendered inside .adm-main.
+   Page title/sub and the loading ghosts come from AdminLayout.css.   */
+
+:root {
+  --adh-card:       #071e30;
+  --adh-deep:       #040f1a;
+  --adh-amber:      #ffb100;
+  --adh-amber-dim:  rgba(255, 177, 0, 0.10);
+  --adh-amber-line: rgba(255, 177, 0, 0.28);
+  --adh-white:      #ffffff;
+  --adh-off-white:  #dde6ee;
+  --adh-slate:      #8899aa;
+  --adh-slate-dim:  #4d6070;
+  --adh-border:     rgba(255, 255, 255, 0.08);
+  --adh-border-s:   rgba(255, 255, 255, 0.04);
+  --adh-green:      #22c55e;
+  --adh-red:        #ef4444;
+
+  --adh-display: 'Space Grotesk', sans-serif;
+  --adh-body:    'Inter', sans-serif;
+  --adh-mono:    'IBM Plex Mono', monospace;
+
+  --adh-ease: 0.16s ease;
+}
+
+.adh-mono { font-family: var(--adh-mono); }
+
+/* ══ STAT CARDS ════════════════════════════════════════════════ */
+.adh-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  gap:                   14px;
+  max-width:             980px;
+  margin-bottom:         34px;
+}
+
+.adh-card {
+  background:     var(--adh-card);
+  border:         1px solid var(--adh-border);
+  border-radius:  13px;
+  padding:        18px;
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+  transition:     border-color var(--adh-ease);
+}
+.adh-card:hover { border-color: rgba(255, 255, 255, 0.14); }
+
+.adh-card__icon {
+  width:           34px;
+  height:          34px;
+  border-radius:   9px;
+  background:      rgba(255, 255, 255, 0.05);
+  color:           var(--adh-slate);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  margin-bottom:   8px;
+}
+.adh-card__icon svg { font-size: 19px !important; }
+
+.adh-card__icon--accent {
+  background: var(--adh-amber-dim);
+  color:      var(--adh-amber);
+}
+
+.adh-card__value {
+  font-family:    var(--adh-display);
+  font-size:      27px;
+  font-weight:    700;
+  letter-spacing: -0.6px;
+  line-height:    1.1;
+  color:          var(--adh-white);
+}
+
+.adh-card__label {
+  font-size:      9px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color:          var(--adh-slate-dim);
+}
+
+.adh-card__sub {
+  font-family: var(--adh-body);
+  font-size:   11px;
+  color:       var(--adh-slate-dim);
+  margin-top:  2px;
+}
+
+/* ══ RECENT SIGNUPS ════════════════════════════════════════════ */
+.adh-recent {
+  max-width:     980px;
+  background:    var(--adh-card);
+  border:        1px solid var(--adh-border);
+  border-radius: 13px;
+  overflow:      hidden;
+}
+
+.adh-recent__head {
+  padding:       14px 18px;
+  background:    var(--adh-deep);
+  border-bottom: 1px solid var(--adh-border);
+}
+
+.adh-recent__title {
+  font-family:    var(--adh-display);
+  font-size:      14px;
+  font-weight:    600;
+  letter-spacing: -0.1px;
+  margin:         0;
+  color:          var(--adh-white);
+}
+
+.adh-recent__list { display: flex; flex-direction: column; }
+
+.adh-row {
+  display:       flex;
+  align-items:   center;
+  gap:           13px;
+  padding:       12px 18px;
+  border-bottom: 1px solid var(--adh-border-s);
+  transition:    background var(--adh-ease);
+}
+.adh-row:last-child { border-bottom: none; }
+.adh-row:hover      { background: rgba(255, 255, 255, 0.02); }
+
+.adh-row__logo {
+  width:         38px;
+  height:        38px;
+  border-radius: 9px;
+  object-fit:    cover;
+  border:        1px solid var(--adh-border);
+  background:    var(--adh-deep);
+  flex-shrink:   0;
+}
+.adh-row__logo--fallback {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--adh-display);
+  font-weight:     700;
+  font-size:       15px;
+  color:           var(--adh-amber);
+  background:      var(--adh-amber-dim);
+  border-color:    var(--adh-amber-line);
+}
+
+.adh-row__meta {
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+  min-width:      0;
+  flex:           1;
+}
+
+.adh-row__name {
+  font-family:   var(--adh-display);
+  font-size:     13.5px;
+  font-weight:   600;
+  color:         var(--adh-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.adh-row__email {
+  font-size:     11.5px;
+  color:         var(--adh-slate-dim);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.adh-chip {
+  flex-shrink:   0;
+  font-family:   var(--adh-display);
+  font-size:     10.5px;
+  font-weight:   600;
+  border-radius: 20px;
+  padding:       3px 11px;
+  white-space:   nowrap;
+}
+.adh-chip--ok {
+  color:      var(--adh-green);
+  background: rgba(34, 197, 94, 0.10);
+  border:     1px solid rgba(34, 197, 94, 0.30);
+}
+.adh-chip--pending {
+  color:      var(--adh-amber);
+  background: var(--adh-amber-dim);
+  border:     1px solid var(--adh-amber-line);
+}
+
+.adh-row__time {
+  flex-shrink: 0;
+  font-size:   10.5px;
+  color:       var(--adh-slate-dim);
+  min-width:   58px;
+  text-align:  right;
+}
+
+.adh-recent__empty {
+  padding:    26px 18px;
+  font-size:  13px;
+  color:      var(--adh-slate-dim);
+  text-align: center;
+}
+
+/* ══ ERROR STATE ═══════════════════════════════════════════════ */
+.adh-error {
+  max-width:     420px;
+  background:    rgba(239, 68, 68, 0.08);
+  border:        1px solid rgba(239, 68, 68, 0.28);
+  border-radius: 12px;
+  padding:       18px;
+}
+.adh-error p {
+  font-size:   13.5px;
+  color:       var(--adh-off-white);
+  margin:      0 0 12px;
+  line-height: 1.6;
+}
+.adh-retry {
+  font-family:   var(--adh-display);
+  font-size:     13px;
+  font-weight:   600;
+  color:         var(--adh-deep);
+  background:    var(--adh-amber);
+  border:        none;
+  border-radius: 8px;
+  padding:       8px 16px;
+  cursor:        pointer;
+  transition:    background var(--adh-ease);
+}
+.adh-retry:hover { background: #ffc933; }
+
+/* ── responsive ───────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .adh-row__time  { display: none; }
+  .adh-card__value { font-size: 23px; }
+}
+
+/* ── reduced motion / focus ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .adh-card, .adh-row, .adh-retry { transition: none; }
+}
+.adh-retry:focus-visible {
+  outline:        2px solid var(--adh-amber);
+  outline-offset: 3px;
+}

@@ -82,7 +82,7 @@ const emailVerify = async (verifyCode) => {
   };
 
     const updateProfile = async (employeeId,employeeData) => {
-    const updEmployeeProfile = await Altaxios.put(`/newemplyee/ChangeProfile/${encodeURIComponent(employeeId)}`,employeeData,
+    const updEmployeeProfile = await Altaxios.patch(`/newemplyee/ChangeProfile/${encodeURIComponent(employeeId)}`,employeeData,
       {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -101,7 +101,7 @@ const emailVerify = async (verifyCode) => {
 
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, register, emailVerify, updateEmployee, updateProfile }}>
+    <AuthContext.Provider value={{ user, setUser, loading, login, logout, register, emailVerify, updateEmployee, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,0 +1,367 @@
+/* ViewProduct.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body) · IBM Plex Mono (labels/sku)
+   Prefix : vp- (view product) — zero collision with other stylesheets
+
+   Detail-view sibling of the AddProduct family: large product image
+   left with edit/delete beneath it, details right — name + SKU, two
+   stat tiles (price / stock), and the attached-goal chips. Uses the
+   shared ConfirmDialog for deletion instead of the old inline popup. */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --vp-navy:       #011626;
+  --vp-card:       #071e30;
+  --vp-deep:       #040f1a;
+  --vp-amber:      #ffb100;
+  --vp-amber-dim:  rgba(255, 177, 0, 0.10);
+  --vp-amber-line: rgba(255, 177, 0, 0.28);
+  --vp-white:      #ffffff;
+  --vp-off-white:  #dde6ee;
+  --vp-slate:      #8899aa;
+  --vp-slate-dim:  #4d6070;
+  --vp-border:     rgba(255, 255, 255, 0.08);
+  --vp-border-s:   rgba(255, 255, 255, 0.04);
+  --vp-red:        #ef4444;
+  --vp-red-dim:    rgba(239, 68, 68, 0.10);
+  --vp-red-line:   rgba(239, 68, 68, 0.30);
+
+  --vp-display: 'Space Grotesk', sans-serif;
+  --vp-body:    'Inter', sans-serif;
+  --vp-mono:    'IBM Plex Mono', monospace;
+
+  --vp-r:    10px;
+  --vp-r-lg: 14px;
+  --vp-ease: 0.18s ease;
+}
+
+/* ── root ─────────────────────────────────────────────────────── */
+.vp-root {
+  min-height:  100%;
+  background:  var(--vp-navy);
+  color:       var(--vp-white);
+  font-family: var(--vp-body);
+  font-size:   16px;
+  line-height: 1.7;
+  padding:     24px 0 72px;
+}
+
+.vp-container {
+  max-width: 940px;
+  margin:    0 auto;
+  padding:   0 24px;
+}
+
+.vp-mono { font-family: var(--vp-mono); }
+
+.vp-link {
+  color:                 var(--vp-amber);
+  text-decoration:       underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--vp-amber-line);
+  transition:            text-decoration-color var(--vp-ease);
+}
+.vp-link:hover { text-decoration-color: var(--vp-amber); }
+
+/* ── top bar ──────────────────────────────────────────────────── */
+.vp-topbar {
+  display:       flex;
+  align-items:   center;
+  gap:           14px;
+  margin-bottom: 24px;
+}
+
+.vp-back {
+  width:           40px;
+  height:          40px;
+  border-radius:   var(--vp-r);
+  border:          1px solid var(--vp-border);
+  color:           var(--vp-amber);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  text-decoration: none;
+  transition:      border-color var(--vp-ease), background var(--vp-ease);
+}
+.vp-back:hover { border-color: var(--vp-amber-line); background: var(--vp-amber-dim); }
+
+.vp-eyebrow {
+  font-size:      10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color:          var(--vp-amber);
+}
+
+/* ── layout ───────────────────────────────────────────────────── */
+.vp-grid {
+  display:               grid;
+  grid-template-columns: 340px 1fr;
+  gap:                   24px;
+  align-items:           start;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LEFT — MEDIA + ACTIONS
+════════════════════════════════════════════════════════════════ */
+.vp-media {
+  display:        flex;
+  flex-direction: column;
+  gap:            14px;
+  position:       sticky;
+  top:            84px;
+}
+
+.vp-image-wrap {
+  background:     var(--vp-card);
+  border:         1px solid var(--vp-border);
+  border-radius:  var(--vp-r-lg);
+  padding:        16px;
+}
+
+.vp-image {
+  width:         100%;
+  aspect-ratio:  1 / 1;
+  object-fit:    cover;
+  border-radius: var(--vp-r);
+  display:       block;
+  background:    var(--vp-deep);
+}
+
+.vp-image--empty {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       56px;
+  opacity:         0.4;
+}
+
+/* actions */
+.vp-actions {
+  display: flex;
+  gap:     10px;
+}
+
+.vp-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  flex:            1;
+  font-family:     var(--vp-display);
+  font-weight:     600;
+  font-size:       14px;
+  border-radius:   var(--vp-r);
+  padding:         11px 18px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  text-decoration: none;
+  transition:      background var(--vp-ease), color var(--vp-ease), border-color var(--vp-ease), transform var(--vp-ease);
+}
+
+.vp-btn--edit {
+  background: var(--vp-amber);
+  color:      var(--vp-deep);
+}
+.vp-btn--edit:hover { background: #ffc933; transform: translateY(-1px); }
+
+.vp-btn--delete {
+  background:   transparent;
+  border-color: var(--vp-red-line);
+  color:        var(--vp-red);
+}
+.vp-btn--delete:hover { background: var(--vp-red); color: #fff; }
+
+.vp-btn--ghost {
+  background:   transparent;
+  border-color: var(--vp-border);
+  color:        var(--vp-slate);
+}
+.vp-btn--ghost:hover { border-color: rgba(255,255,255,0.22); color: var(--vp-white); }
+
+/* ════════════════════════════════════════════════════════════════
+   RIGHT — DETAILS
+════════════════════════════════════════════════════════════════ */
+.vp-details {
+  display:        flex;
+  flex-direction: column;
+  gap:            22px;
+  min-width:      0;
+}
+
+.vp-header {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+  flex-wrap:   wrap;
+}
+
+.vp-name {
+  font-family:    var(--vp-display);
+  font-size:      clamp(24px, 3.5vw, 32px);
+  font-weight:    700;
+  letter-spacing: -0.4px;
+  line-height:    1.2;
+  margin:         0;
+  word-break:     break-word;
+}
+
+.vp-sku {
+  font-size:      12px;
+  color:          var(--vp-amber);
+  background:     var(--vp-amber-dim);
+  border:         1px solid var(--vp-amber-line);
+  border-radius:  6px;
+  padding:        3px 10px;
+  letter-spacing: 0.5px;
+}
+
+/* stat tiles */
+.vp-stats {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   14px;
+}
+
+.vp-stat {
+  background:     var(--vp-card);
+  border:         1px solid var(--vp-border);
+  border-radius:  var(--vp-r-lg);
+  padding:        18px 20px;
+  display:        flex;
+  flex-direction: column;
+  gap:            8px;
+}
+
+.vp-stat__label {
+  font-size:      10px;
+  letter-spacing: 2px;
+  color:          var(--vp-slate-dim);
+}
+
+.vp-stat__value {
+  font-family:    var(--vp-display);
+  font-size:      26px;
+  font-weight:    700;
+  color:          var(--vp-white);
+  letter-spacing: -0.5px;
+  display:        flex;
+  align-items:    baseline;
+  gap:            6px;
+}
+
+.vp-stat__currency {
+  font-size: 18px;
+  color:     var(--vp-amber);
+}
+
+.vp-stat__unit {
+  font-family:    var(--vp-body);
+  font-size:      13px;
+  font-weight:    400;
+  color:          var(--vp-slate);
+  letter-spacing: 0;
+}
+
+/* section */
+.vp-section {
+  background:     var(--vp-card);
+  border:         1px solid var(--vp-border);
+  border-radius:  var(--vp-r-lg);
+  padding:        20px;
+  display:        flex;
+  flex-direction: column;
+  gap:            14px;
+}
+
+.vp-section__title {
+  font-size:      10px;
+  letter-spacing: 2px;
+  color:          var(--vp-slate-dim);
+}
+
+/* goal chips */
+.vp-goals {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       8px;
+}
+
+.vp-goal {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           8px;
+  font-family:   var(--vp-display);
+  font-size:     13px;
+  font-weight:   500;
+  color:         var(--vp-off-white);
+  background:    var(--vp-deep);
+  border:        1px solid var(--vp-border);
+  border-radius: 20px;
+  padding:       7px 14px;
+}
+
+.vp-goal__dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  background:    var(--vp-amber);
+  flex-shrink:   0;
+}
+
+.vp-empty-line {
+  font-size: 13px;
+  color:     var(--vp-slate);
+  margin:    0;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LOADING / ERROR
+════════════════════════════════════════════════════════════════ */
+.vp-loading {
+  padding:        90px 24px;
+  text-align:     center;
+  color:          var(--vp-slate-dim);
+  font-size:      12px;
+  letter-spacing: 3px;
+}
+
+.vp-load-error {
+  padding:        90px 24px;
+  text-align:     center;
+  color:          var(--vp-slate);
+  font-size:      15px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            18px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 800px) {
+  .vp-grid  { grid-template-columns: 1fr; }
+  .vp-media { position: static; }
+
+  .vp-image { max-width: 320px; margin: 0 auto; }
+}
+
+@media (max-width: 460px) {
+  .vp-stats   { grid-template-columns: 1fr; }
+  .vp-actions { flex-direction: column; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vp-btn, .vp-back, .vp-link { transition: none; }
+  .vp-btn--edit:hover { transform: none; }
+}
+
+/* ── focus visible ────────────────────────────────────────────── */
+.vp-btn:focus-visible,
+.vp-back:focus-visible,
+.vp-link:focus-visible {
+  outline:        2px solid var(--vp-amber);
+  outline-offset: 3px;
+  border-radius:  6px;
+}

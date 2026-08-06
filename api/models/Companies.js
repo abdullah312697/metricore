@@ -14,7 +14,17 @@ const CompanySchema = new Schema(
         companyName:{type:String},
         industry:{type:String},
         numberofEmployees:{type:String},
+        isOnboarded: { type: Boolean, default: false },
+        resetPasswordToken:   { type: String },
+        resetPasswordExpires: { type: Date },
+        stripeCustomerId:   { type: String },
+        subscriptionStatus: { type: String, default: "none" },
+        planId:             { type: String, default: null },
+        billingInterval:    { type: String, default: null },
+        currentPeriodEnd:   { type: Date },
+        trialEndsAt:        { type: Date },
     },
+
     {timestamps:true},
 );
 

@@ -1,0 +1,245 @@
+/* ConfirmDialog.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate · #ef4444 danger
+   Type   : Space Grotesk (title/buttons) · Inter (message) · IBM Plex Mono (icon glyph)
+   Prefix : cfd- (confirm dialog) — zero collision with other stylesheets
+
+   Signature: the "!" icon badge — a red ring with a soft pulse halo on
+   danger variant. One quiet, memorable warning; everything else stays
+   disciplined so the message and the two choices carry the moment.    */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --cfd-navy:       #011626;
+  --cfd-card:       #071e30;
+  --cfd-deep:       #040f1a;
+  --cfd-amber:      #ffb100;
+  --cfd-amber-dim:  rgba(255, 177, 0, 0.10);
+  --cfd-amber-line: rgba(255, 177, 0, 0.28);
+  --cfd-white:      #ffffff;
+  --cfd-off-white:  #dde6ee;
+  --cfd-slate:      #8899aa;
+  --cfd-border:     rgba(255, 255, 255, 0.10);
+  --cfd-red:        #ef4444;
+  --cfd-red-dim:    rgba(239, 68, 68, 0.12);
+  --cfd-red-line:   rgba(239, 68, 68, 0.35);
+  --cfd-red-glow:   rgba(239, 68, 68, 0.22);
+
+  --cfd-display: 'Space Grotesk', sans-serif;
+  --cfd-body:    'Inter', sans-serif;
+  --cfd-mono:    'IBM Plex Mono', monospace;
+
+  --cfd-r:    10px;
+  --cfd-r-lg: 16px;
+  --cfd-ease: 0.18s ease;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   OVERLAY — position: fixed, covers the app
+════════════════════════════════════════════════════════════════ */
+.cfd-overlay {
+  position:        fixed;
+  inset:           0;
+  z-index:         1200;
+  background:      rgba(1, 10, 18, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         20px;
+  animation:       cfd-fade 0.18s ease;
+}
+
+@keyframes cfd-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CARD — inner box with border + two buttons
+════════════════════════════════════════════════════════════════ */
+.cfd-card {
+  background:    var(--cfd-card);
+  border:        1px solid var(--cfd-border);
+  border-radius: var(--cfd-r-lg);
+  box-shadow:    0 24px 64px rgba(0, 0, 0, 0.55);
+  width:         100%;
+  max-width:     420px;
+  padding:       28px;
+  display:       flex;
+  flex-direction: column;
+  gap:           12px;
+  font-family:   var(--cfd-body);
+  animation:     cfd-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cfd-pop {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+/* ── Icon badge — the signature ──────────────────────────────── */
+.cfd-icon {
+  width:           44px;
+  height:          44px;
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--cfd-mono);
+  font-size:       20px;
+  font-weight:     600;
+  margin-bottom:   4px;
+  flex-shrink:     0;
+}
+
+.cfd-icon--danger {
+  color:      var(--cfd-red);
+  background: var(--cfd-red-dim);
+  border:     1.5px solid var(--cfd-red-line);
+  box-shadow: 0 0 0 0 var(--cfd-red-glow);
+  animation:  cfd-pulse 2s ease-out infinite;
+}
+
+@keyframes cfd-pulse {
+  0%   { box-shadow: 0 0 0 0 var(--cfd-red-glow); }
+  70%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.cfd-icon--primary {
+  color:      var(--cfd-amber);
+  background: var(--cfd-amber-dim);
+  border:     1.5px solid var(--cfd-amber-line);
+}
+
+/* ── Text ────────────────────────────────────────────────────── */
+.cfd-title {
+  font-family:    var(--cfd-display);
+  font-size:      18px;
+  font-weight:    700;
+  color:          var(--cfd-white);
+  line-height:    1.3;
+  letter-spacing: -0.2px;
+}
+
+.cfd-message {
+  font-size:   14px;
+  color:       var(--cfd-slate);
+  line-height: 1.7;
+}
+
+.cfd-error {
+  font-size:     13px;
+  color:         var(--cfd-red);
+  line-height:   1.55;
+  background:    var(--cfd-red-dim);
+  border:        1px solid var(--cfd-red-line);
+  border-radius: var(--cfd-r);
+  padding:       10px 12px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BUTTONS
+════════════════════════════════════════════════════════════════ */
+.cfd-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             10px;
+  margin-top:      12px;
+}
+
+.cfd-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  font-family:     var(--cfd-display);
+  font-weight:     600;
+  font-size:       14px;
+  border-radius:   var(--cfd-r);
+  padding:         10px 20px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  white-space:     nowrap;
+  transition:
+    background var(--cfd-ease),
+    box-shadow var(--cfd-ease),
+    color      var(--cfd-ease),
+    border-color var(--cfd-ease);
+}
+
+.cfd-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Cancel — quiet */
+.cfd-btn--ghost {
+  background:   transparent;
+  border-color: var(--cfd-border);
+  color:        var(--cfd-slate);
+}
+.cfd-btn--ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  color:        var(--cfd-white);
+}
+
+/* Danger confirm — red */
+.cfd-btn--danger {
+  background: var(--cfd-red);
+  color:      #ffffff;
+}
+.cfd-btn--danger:hover:not(:disabled) {
+  background: #dc2626;
+  box-shadow: 0 4px 20px var(--cfd-red-glow);
+}
+
+/* Primary confirm — amber (non-destructive confirmations) */
+.cfd-btn--primary {
+  background: var(--cfd-amber);
+  color:      var(--cfd-deep);
+}
+.cfd-btn--primary:hover:not(:disabled) {
+  background: #ffc933;
+  box-shadow: 0 4px 20px rgba(255, 177, 0, 0.2);
+}
+
+/* ── Spinner ─────────────────────────────────────────────────── */
+.cfd-spinner {
+  width:         14px;
+  height:        14px;
+  border:        2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation:     cfd-spin 0.7s linear infinite;
+  flex-shrink:   0;
+}
+
+.cfd-btn--primary .cfd-spinner {
+  border-color:     rgba(4, 15, 26, 0.3);
+  border-top-color: var(--cfd-deep);
+}
+
+@keyframes cfd-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE + A11Y
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 420px) {
+  .cfd-card    { padding: 22px 18px; }
+  .cfd-actions { flex-direction: column-reverse; }
+  .cfd-btn     { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cfd-overlay,
+  .cfd-card         { animation: none; }
+  .cfd-icon--danger { animation: none; box-shadow: none; }
+  .cfd-spinner      { animation: none; }
+  .cfd-btn          { transition: none; }
+}
+
+.cfd-btn:focus-visible {
+  outline:        2px solid var(--cfd-amber);
+  outline-offset: 3px;
+}

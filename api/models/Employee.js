@@ -6,7 +6,13 @@ import { Schema, model } from "mongoose";
     CloudinaryPublicId:{type:String},
     YemplyeeName:{type:String},
     employeePosition:{type:String},
-    YemplyeeEmail:{type:String},
+    YemplyeeEmail:{
+      type:      String,
+      required:  true,
+      unique:    true,
+      lowercase: true,
+      trim:      true,
+    },
     YemplyeePhone:{type:String},
     YemplyeeLeaving:{type:String},
     EmplyeeJoinDate:{type:String},
@@ -31,7 +37,10 @@ import { Schema, model } from "mongoose";
                 ],
                 default: "Owner"
     },
-    employeeAccessPassword:{type:String},
+    employeeAccessPassword:{
+        type:String,
+        select: false,
+    },
     currency:{type:String},
     EmplyeeSellary:{type:Number},
     FirstSelarry:{type:Number},
@@ -49,6 +58,7 @@ import { Schema, model } from "mongoose";
     isOnline: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
     deviceTokens: [{ type: String }],
+    isSuspended: { type: Boolean, default: false },
 },{timestamps:true});
 
 export default model("Employee", EmplyeeSchima, "Employee");

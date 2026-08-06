@@ -1,0 +1,181 @@
+/* WhatsNew.css — company-side announcements bell + panel
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Prefix : wn- (what's new)                                           */
+
+:root {
+  --wn-card:       #071e30;
+  --wn-deep:       #040f1a;
+  --wn-amber:      #ffb100;
+  --wn-amber-dim:  rgba(255, 177, 0, 0.10);
+  --wn-amber-line: rgba(255, 177, 0, 0.28);
+  --wn-white:      #ffffff;
+  --wn-off-white:  #dde6ee;
+  --wn-slate:      #8899aa;
+  --wn-slate-dim:  #4d6070;
+  --wn-border:     rgba(255, 255, 255, 0.08);
+  --wn-border-s:   rgba(255, 255, 255, 0.04);
+  --wn-red:        #ef4444;
+
+  --wn-display: 'Space Grotesk', sans-serif;
+  --wn-body:    'Inter', sans-serif;
+  --wn-mono:    'IBM Plex Mono', monospace;
+
+  --wn-ease: 0.16s ease;
+}
+
+.wn-mono { font-family: var(--wn-mono); }
+
+.wn-wrap { position: relative; display: inline-flex; }
+
+/* ── bell ─────────────────────────────────────────────────────── */
+.wn-bell {
+  position:        relative;
+  width:           38px;
+  height:          38px;
+  border-radius:   10px;
+  border:          1px solid var(--wn-border);
+  background:      transparent;
+  color:           var(--wn-slate);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  transition:      border-color var(--wn-ease), color var(--wn-ease), background var(--wn-ease);
+}
+.wn-bell:hover {
+  border-color: var(--wn-amber-line);
+  background:   var(--wn-amber-dim);
+  color:        var(--wn-amber);
+}
+
+.wn-dot {
+  position:      absolute;
+  top:           7px;
+  right:         7px;
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+  background:    var(--wn-amber);
+  border:        2px solid var(--wn-deep);
+}
+
+/* ── panel ────────────────────────────────────────────────────── */
+.wn-panel {
+  position:       absolute;
+  top:            46px;
+  right:          0;
+  z-index:        1500;
+  width:          340px;
+  max-height:     440px;
+  background:     var(--wn-card);
+  border:         1px solid var(--wn-border);
+  border-radius:  14px;
+  box-shadow:     0 24px 60px rgba(0, 0, 0, 0.55);
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+  animation:      wn-drop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family:    var(--wn-body);
+}
+@keyframes wn-drop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.wn-head {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         12px 15px;
+  background:      var(--wn-deep);
+  border-bottom:   1px solid var(--wn-border);
+  flex-shrink:     0;
+}
+
+.wn-head__title {
+  font-family: var(--wn-display);
+  font-size:   13.5px;
+  font-weight: 700;
+  color:       var(--wn-white);
+}
+
+.wn-close {
+  width:           26px;
+  height:          26px;
+  border-radius:   7px;
+  border:          none;
+  background:      transparent;
+  color:           var(--wn-slate);
+  cursor:          pointer;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      background var(--wn-ease), color var(--wn-ease);
+}
+.wn-close:hover { background: rgba(239, 68, 68, 0.15); color: var(--wn-red); }
+
+.wn-list {
+  overflow-y:      auto;
+  min-height:      0;
+  scrollbar-width: thin;
+}
+.wn-list::-webkit-scrollbar { width: 6px; }
+.wn-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+.wn-empty {
+  padding:    30px 16px;
+  text-align: center;
+  font-size:  12.5px;
+  color:      var(--wn-slate-dim);
+}
+
+.wn-item {
+  padding:       13px 15px;
+  border-bottom: 1px solid var(--wn-border-s);
+}
+.wn-item:last-child { border-bottom: none; }
+
+.wn-item__top {
+  display:         flex;
+  align-items:     baseline;
+  justify-content: space-between;
+  gap:             10px;
+  margin-bottom:   4px;
+}
+
+.wn-item__title {
+  font-family: var(--wn-display);
+  font-size:   13px;
+  font-weight: 600;
+  color:       var(--wn-white);
+  line-height: 1.4;
+}
+
+.wn-item__time {
+  font-size:   9.5px;
+  color:       var(--wn-slate-dim);
+  flex-shrink: 0;
+}
+
+.wn-item__body {
+  font-size:   12px;
+  color:       var(--wn-slate);
+  line-height: 1.65;
+  margin:      0;
+  white-space: pre-wrap;
+}
+
+/* ── responsive ───────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .wn-panel { width: calc(100vw - 32px); right: -8px; }
+}
+
+/* ── reduced motion / focus ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .wn-panel { animation: none; }
+  .wn-bell, .wn-close { transition: none; }
+}
+.wn-bell:focus-visible, .wn-close:focus-visible {
+  outline:        2px solid var(--wn-amber);
+  outline-offset: 2px;
+}

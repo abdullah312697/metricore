@@ -1,6 +1,6 @@
 //ExtraFieldUpdate.js
 import { useState, forwardRef, useEffect } from "react";
-import './ExtraFieldForm.css';
+import '../../../style/ExtraFieldForm.css';
 import {Altaxios} from '../../Altaxios';
 
 const MAIN_FIELDS = [

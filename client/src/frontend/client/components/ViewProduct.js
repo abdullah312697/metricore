@@ -1,132 +1,176 @@
-import { useEffect, useState } from "react"
-import {Altaxios} from '../../Altaxios';
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import EditIcon      from "@mui/icons-material/Edit";
+import DeleteIcon    from "@mui/icons-material/Delete";
+import ConfirmDialog from "./ConfirmDialog";
+import { Altaxios }  from "../../Altaxios";
+import "../../../style/ViewProduct.css";
 
-function ViewProduct() {
-    const [allGoalsData,setAllGoalsData] = useState([]);
-    const [currentProducs,setCurrentProducts] = useState({});
-    const {productId} = useParams();
-    const [isOpend,setIsOpend] = useState(false);
-    const goback = useNavigate();
-    useEffect(() => {
-      Altaxios.get('/setgole/getGoleData').then((res) => {
-        if(res.status === 200){
-          setAllGoalsData(res.data);
-        }
-        })
-    },[]);
+export default function ViewProduct() {
+  const { productId,companyName } = useParams();
+  const navigate = useNavigate();
 
-      useEffect(()=>{
-          const getAllProducts = async () => {
-          try{
-            const product = await Altaxios.get(`/newproduct/getSingleProduct/${productId}`);
-          if(product.status === 200){
-            setCurrentProducts(product.data.data)
-          }
-        }catch(error){
-          if(error.response){
-            console.log(error.response.data.message);
-          }else{
-            console.log(error);
-          }
-        }
-        };
-        getAllProducts();
-    
-      },[productId]);
+  const [product,   setProduct]   = useState(null);
+  const [goals,     setGoals]     = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-      
-      const findGola = currentProducs?.GoalIdentifire !== null && currentProducs?.GoalIdentifire !== undefined ? 
-        currentProducs?.GoalIdentifire : [];
-      const finalGolaData = allGoalsData.filter((goal) => (
-        findGola.includes(goal._id)
-      ));
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting,    setDeleting]    = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
-      const DeletePorduct = async() => {
-          try{
-          const product = await Altaxios.delete(`/newproduct/deleteProduct/${productId}`,{
-            withCredentials: true,
-          });
-          if(product.status === 200){
-            goback("/addproduct");
-            setIsOpend(false);
-          }
-        }catch(error){
-          if(error.response){
-            console.log(error.response.data.message);
-          }else{
-            console.log(error);
-          }
-        }
-      }
+  // ── Load product + goals ────────────────────────────────────────
+  useEffect(() => {
+    setLoading(true);
+    Altaxios.get(`/newproduct/getSingleProduct/${productId}`)
+      .then((res) => setProduct(res.data.data))
+      .catch((err) => setLoadError(err.response?.data?.message || "Failed to load this product"))
+      .finally(() => setLoading(false));
+  }, [productId]);
 
-    const PredeltePopup = () => {
-      setIsOpend(true)
-    };
+  useEffect(() => {
+    Altaxios.get("/setgole/getGoleData")
+      .then((res) => setGoals(res.data || []))
+      .catch(() => {});
+  }, []);
 
-    const cencelPopup = () => {
-        setIsOpend(false)
+  // ── Which goals is this product attached to ─────────────────────
+  const attachedIds = Array.isArray(product?.GoalIdentifire) ? product.GoalIdentifire : [];
+  const attachedGoals = goals.filter((g) => attachedIds.includes(g._id));
+
+  // ── Delete ──────────────────────────────────────────────────────
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await Altaxios.delete(`/newproduct/deleteProduct/${productId}`, { withCredentials: true });
+      navigate(`/company/${companyName}/addproduct`, { replace: true });
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || "Failed to delete product. Please try again.");
+      setDeleting(false);
     }
+  };
 
+  /* ═══════════════════════════════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════════════════════════════ */
+  if (loading) {
+    return (
+      <div className="vp-root">
+        <div className="vp-loading vp-mono">LOADING PRODUCT…</div>
+      </div>
+    );
+  }
 
-  return (
-    <div className="clientAddproductMain">
-      <div className="clientAddProductInner" style={{justifyContent:'center'}}>
-  <div className='preDeletebtnContainer' style={{display:`${!isOpend ? 'none' : 'block'}`,left:'455px'}}>
-    <div className="preDeletePopup">
-        <h6>Are you sure to Delete!?</h6>
-        <div className='deleteornotbutton'>
-            <button className='nextnotsupportbtn' onClick={cencelPopup}>No</button>
-            <button className='nextsupportbtn' onClick={DeletePorduct}>Yes</button>
-        </div>
-    </div>
-    </div>
-
-        <Link to="/addproduct"><ArrowBackIcon/></Link>
-        <div className="clientAddProductLeft" style={{height:'560px'}}>
-            <div className="addProductClientFrom">
-              <div className="addProductInputClientMainInView">
-                <div className="inputAllClientTitle InputClientMainInViewNameTitle">Product/Service Name:</div>
-                <div className="inputAllClientInput InputClientMainInViewName">{currentProducs?.ProductName}</div>
-              </div>
-              <div className="addProductInputClientMainInView">
-                <div className="inputAllClientTitle InputClientMainInViewPriceTitle">Product/Service Price:</div>
-                <div className="inputAllClientInput InputClientMainInViewPrice">{currentProducs?.ProductPrice}</div>
-              </div>
-              <div className="addProductInputClientMainInView">
-                <div className="inputAllClientTitle InputClientMainInViewImageTitle">Product/Service Image:</div>
-                <img src={currentProducs?.productImgFile}  className="InputClientMainInViewImage" alt="productImage" />
-              </div>
-              <div className="addProductInputClientMainInView">
-                <div className="inputAllClientTitle InputClientMainInViewQtyTitle">Total Quantity:</div>
-                <div className="inputAllClientInput InputClientMainInViewQty">{currentProducs?.InStockQuentity}</div>
-              </div>
-              <div className="addProductInputClientMainInView">
-                <div className="inputAllClientTitle InputClientMainInViewGolaTitle">Selected Goal:</div>
-              <div className="clientAddProductGoalSelection" style={{margin:'15px 0px'}}>
-                  {
-                    finalGolaData.length > 0 ? finalGolaData.map((data) => (
-                    <div className="GoalSelectionInner" key={data._id}>
-                      <span style={{fontSize:'14px'}}>{data.targetName}</span>
-                    </div>
-                    )) : (
-                          <div className="GoalSelectionInner">
-                            <span>You don't have any goal</span>
-                          </div>
-                        )
-                  }
-                </div>
-              </div>
-            </div>
-            <div className="ClientAddProductEditandDeletSection">
-              <Link to={`/editproduct/${productId}`} style={{textDecoration:'none'}}><button style={{borderColor:'#ffb700',color:'#ffd400'}}>Edit</button></Link>
-              <button style={{borderColor:'#be1080',color:'#ff00f5'}} onClick={PredeltePopup}>Delete</button>
-            </div>
+  if (loadError || !product) {
+    return (
+      <div className="vp-root">
+        <div className="vp-load-error">
+          <p>{loadError || "Product not found."}</p>
+          <Link to={`/company/${companyName}/addproduct`} className="vp-btn vp-btn--ghost">← Back to products</Link>
         </div>
       </div>
-    </div>
-  )
-}
+    );
+  }
 
-export default ViewProduct
+  return (
+    <div className="vp-root">
+      <div className="vp-container">
+
+        {/* ── Top bar ─────────────────────────────────────────── */}
+        <div className="vp-topbar">
+          <Link to={`/company/${companyName}/addproduct`} className="vp-back" aria-label="Back to products">
+            <ArrowBackIcon style={{ fontSize: 22 }} />
+          </Link>
+          <span className="vp-eyebrow vp-mono">Product detail</span>
+        </div>
+
+        <div className="vp-grid">
+
+          {/* ══ LEFT — image + actions ═════════════════════════ */}
+          <aside className="vp-media">
+            <div className="vp-image-wrap">
+              {product.productImgFile ? (
+                <img src={product.productImgFile} alt={product.ProductName} className="vp-image" />
+              ) : (
+                <div className="vp-image vp-image--empty">📦</div>
+              )}
+            </div>
+
+            <div className="vp-actions">
+              <Link to={`/company/${companyName}/editproduct/${productId}`} className="vp-btn vp-btn--edit">
+                <EditIcon style={{ fontSize: 17 }} /> Edit product
+              </Link>
+              <button
+                className="vp-btn vp-btn--delete"
+                onClick={() => { setDeleteError(""); setConfirmOpen(true); }}
+              >
+                <DeleteIcon style={{ fontSize: 17 }} /> Delete
+              </button>
+            </div>
+          </aside>
+
+          {/* ══ RIGHT — details ════════════════════════════════ */}
+          <main className="vp-details">
+
+            <div className="vp-header">
+              <h1 className="vp-name">{product.ProductName}</h1>
+              {product.sku && <span className="vp-sku vp-mono">{product.sku}</span>}
+            </div>
+
+            {/* Stat tiles */}
+            <div className="vp-stats">
+              <div className="vp-stat">
+                <span className="vp-stat__label vp-mono">PRICE</span>
+                <span className="vp-stat__value">
+                  <span className="vp-stat__currency">$</span>{product.ProductPrice}
+                </span>
+              </div>
+              <div className="vp-stat">
+                <span className="vp-stat__label vp-mono">IN STOCK</span>
+                <span className="vp-stat__value">
+                  {product.InStockQuentity}
+                  <span className="vp-stat__unit">units</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Attached goals */}
+            <div className="vp-section">
+              <h2 className="vp-section__title vp-mono">ATTACHED GOALS</h2>
+              {attachedGoals.length > 0 ? (
+                <div className="vp-goals">
+                  {attachedGoals.map((g) => (
+                    <span className="vp-goal" key={g._id}>
+                      <span className="vp-goal__dot" />
+                      {g.targetName}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="vp-empty-line">
+                  This product isn't attached to any goal.{" "}
+                  <Link to={`/editproduct/${productId}`} className="vp-link">Edit to add one →</Link>
+                </p>
+              )}
+            </div>
+
+          </main>
+        </div>
+      </div>
+
+      {/* ── Delete confirmation ──────────────────────────────────── */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete this product?"
+        message={`"${product.ProductName}" will be permanently removed, along with its image. This can't be undone.`}
+        error={deleteError}
+        confirmLabel="Delete product"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </div>
+  );
+}

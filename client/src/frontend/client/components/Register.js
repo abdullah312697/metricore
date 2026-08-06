@@ -1,281 +1,414 @@
-import { useRef,useState } from 'react'
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+import { useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import VisibilityOutlinedIcon    from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import { useAuth } from "../../../context/AuthContext";
+import "../../../style/Register.css";
 
-// import { trackPageView, trackRegistration } from '../../../js/trackEvents';
-// import {handleFbclidCookie} from '../../../js/fbclidUtils';
+/* ── Option data ─────────────────────────────────────────────────
+   Industry values are IDENTICAL strings to your old <select> so
+   existing company records stay consistent.                       */
+const INDUSTRIES = [
+  "Technology and IT", "Healthcare and Pharmaceuticals", "Finance and Banking",
+  "Energy", "Retail and E-commerce", "Manufacturing", "Food and Beverage",
+  "Media and Entertainment", "Transportation and Logistics",
+  "Real Estate and Construction", "Tourism and Hospitality", "Telecommunications",
+  "Education and Training", "Environmental and Sustainability Services",
+  "Aerospace and Defense", "Agriculture and Agribusiness", "Fashion and Apparel",
+  "Professional Services", "Personal Care and Wellness", "Automotive and Mobility",
+  "Mining and Natural Resources", "Insurance", "Supply Chain and Procurement",
+  "Public Sector and Government Services", "Nonprofits and Social Enterprises",
+  "Sports and Recreation", "Luxury and High-End Markets",
+  "Cybersecurity and Data Protection",
+];
 
-function Register() {        
-    const [userdata,SetuserData] = useState({companyName:"",industry:"",numberofEmployees:"",companyEmail:"",companyPassword:"",rePassword:"",verifyCode:null});
-    const [resMessage,setResMessage] = useState("");
-    const [resMsgStyle,setResMsgStyle] = useState({});
-    const [loading,setLoading] = useState(false);
-    const navigate = useNavigate();
-    const isCodeGenerated = useRef(false);
-    const [inVisible,setIsVisible] = useState(false)
-    const passwordOne = useRef(null);
-    const passwordTwo = useRef(null);
-      const inputFile = useRef(null);
-      const preview = useRef(null);
-      const [emplyeeProfile,setEmplyeeProfile] = useState(null);
-      const { register } = useAuth();
-  console.log(emplyeeProfile);
-    // const fbc = handleFbclidCookie();
-  // fbc click id</>
+// Same ranges as the Company Settings page — one taxonomy everywhere
+const TEAM_SIZES = ["Just me", "2-10", "11-50", "51-200", "200+"];
 
-  //facebook pixle event<>
-  // useEffect(() => {
-  //   const pageData = {
-  //             page_title: document.title,
-  //             page_path: window.location.pathname,
-  //             page_url: window.location.href,
-  //             fbc : fbc || null,
-  //   };
-  //     trackPageView(pageData);
-  //   }, [fbc]);
-  //facebook pixle event</>
+/* ── Password rules — EXACTLY mirror the backend regex ───────────
+   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+   so the checklist can never pass while the server would reject.  */
+const PASSWORD_RULES = [
+  { re: /.{8,}/,       label: "At least 8 characters" },
+  { re: /[A-Z]/,       label: "One uppercase letter (A–Z)" },
+  { re: /[a-z]/,       label: "One lowercase letter (a–z)" },
+  { re: /\d/,          label: "One number (0–9)" },
+  { re: /[@$!%*?&]/,   label: "One special character (@ $ ! % * ? &)" },
+];
 
+const STRONG_PASSWORD =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    let toggleButton = useRef(true);
-    if(userdata.companyName !== "" &&
-       userdata.industry !== "" &&
-       userdata.numberofEmployees !== "" &&
-       userdata.companyEmail !== "" &&
-       userdata.companyPassword &&
-      userdata.rePassword !== ""){
-      toggleButton.current = false;
-    }else{
-      toggleButton.current = true;
-    }
+const EMAIL_RE =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    const getData = (e) => {
-      let sibling = e.currentTarget.previousElementSibling;
-      let value = e.currentTarget.value;
-      let name = e.currentTarget.name;
-     if(value !== ""){
-      if(sibling){
-        sibling.style.display = "block";
-      }
-      if(name === "companyPassword"){
-        const passBtnreg = document.querySelector(".passBtnreg");
-        if (window.matchMedia("(max-width: 600px)").matches) {
-          passBtnreg.style = `top:34px`;
-        } else {
-          passBtnreg.style = `top:38px`;
-      }
-       }
+export default function Register() {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  const fileRef = useRef(null);
 
-      }else{
-      if(sibling){
-        sibling.style.display = "none";
-      }
-      if(name === "companyPassword"){
-        const passBtnreg = document.querySelector(".passBtnreg");
-        passBtnreg.style = `top:23px`;
-       }
-     }
-     SetuserData({...userdata,[name] : value});
-  
-     if(!isCodeGenerated.current){
-      const minm = 100000;
-      const maxm = 999999;
-      const result = Math.floor(Math.random() * (maxm - minm + 1)) + minm;
-      SetuserData(prevUserData => (
-        {
-          ...prevUserData,
-          verifyCode: result
-        }
-      ));      
-      isCodeGenerated.current = true;
-     }
+  const [form, setForm] = useState({
+    companyName:       "",
+    industry:          "",
+    numberofEmployees: "",
+    companyEmail:      "",
+    companyPassword:   "",
+    rePassword:        "",
+  });
+
+  const [logoFile,    setLogoFile]    = useState(null);
+  const [logoPreview, setLogoPreview] = useState("");
+
+  const [errors,      setErrors]      = useState({});
+  const [serverError, setServerError] = useState("");
+  const [loading,     setLoading]     = useState(false);
+  const [success,     setSuccess]     = useState(false);
+  const [showPass,    setShowPass]    = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((p) => ({ ...p, [name]: value }));
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
+    if (serverError)  setServerError("");
   };
-//registation <>
-// Registration Function (Corrected)
-const submitRegistation = async () => {
-  setLoading(true);
-  setResMessage("");
 
-  try {
-    const CompanyData = new FormData();
-    CompanyData.append("files", emplyeeProfile);
-    CompanyData.append("companyName", userdata.companyName);
-    CompanyData.append("industry", userdata.industry);
-    CompanyData.append("numberofEmployees", userdata.numberofEmployees);
-    CompanyData.append("companyEmail", userdata.companyEmail);
-    CompanyData.append("companyPassword", userdata.companyPassword);
-    CompanyData.append("rePassword", userdata.rePassword);
-    CompanyData.append("verifyCode", userdata.verifyCode);
-
-    const res = await register(CompanyData);
-    console.log(res);
-    // Success message
-    setResMessage(res.data.message);
-    setResMsgStyle({ color: "green", opacity: 1, marginTop: "15px" });
-
-    // Save Access Data
-    localStorage.setItem("AccessData", JSON.stringify(res.data.AccessData));
-
-    // Reset form
-    SetuserData({
-      companyName: "",
-      industry: "",
-      numberofEmployees: "",
-      companyEmail: "",
-      companyPassword: "",
-      rePassword: "",
-      verifyCode: null
-    });
-
-    setTimeout(() => {
-      setResMsgStyle({ opacity: 0 });
-      navigate("/verifyemail");
-    }, 2500);
-
-  } catch (error) {
-    console.log(error);
-
-    if (error.response) {
-      setResMessage(error.response.data.message || "Something went wrong");
-    } else {
-      setResMessage("Network error or server issue. Please try again later.");
+  // ── Logo pick + preview (React state — no DOM manipulation) ───
+  const pickLogo = (e) => {
+    const f = e.currentTarget.files[0];
+    if (!f) return;
+    if (!/\.(jpe?g|png|gif|webp)$/i.test(f.name)) {
+      setErrors((p) => ({ ...p, logo: "Please choose a JPG, PNG, GIF or WEBP image" }));
+      return;
     }
-
-    setResMsgStyle({ color: "red", opacity: 1, marginTop: "15px" });
-
-    setTimeout(() => {
-      setResMsgStyle({ opacity: 0 });
-    }, 3000);
-
-  } finally {
-    setLoading(false);
-  }
-};
-//registation </>
-// toggle password <>
-const TogglePass = () => {
-if(inVisible){
-  passwordOne.current.type = "password";
-  passwordTwo.current.type = "password";
-  setIsVisible(false)
-}else{
-  passwordOne.current.type = "text";
-  passwordTwo.current.type = "text";
-  setIsVisible(true)
-}
-};
-// toggle password </> //
-
-//preview photos  start
-const uploadReviewPhotos = (e) => {
-  preview.current.innerHTML = "";
-  let file = e.currentTarget.files[0];
-  if(file){
-    setEmplyeeProfile(file);
-  function readAndPreview(file) {
-    if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
-      const reader = new FileReader();
-      reader.addEventListener(
-        "load",
-        () => {
-          const image = new Image();
-          image.className = "productPreviwstyle";
-          image.title = file.name;
-          image.src = reader.result;
-          preview.current.appendChild(image);
-        },
-        false,
-      );
-      reader.readAsDataURL(file);
-  
+    if (f.size > 5 * 1024 * 1024) {
+      setErrors((p) => ({ ...p, logo: "Image must be under 5MB" }));
+      return;
     }
-  }
-  readAndPreview(file);
-  }
-}
-//preview photos  end
+    setErrors((p) => ({ ...p, logo: "" }));
+    setLogoFile(f);
+    setLogoPreview(URL.createObjectURL(f));
+  };
+
+  const removeLogo = () => {
+    setLogoFile(null);
+    setLogoPreview("");
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  // ── Validation — mirrors every backend check ──────────────────
+  const validate = () => {
+    const e = {};
+    if (!form.companyName.trim())       e.companyName       = "Company name is required.";
+    if (!form.industry)                 e.industry          = "Please select your industry.";
+    if (!form.numberofEmployees)        e.numberofEmployees = "Please select your team size.";
+    if (!form.companyEmail.trim())      e.companyEmail      = "Email is required.";
+    else if (!EMAIL_RE.test(form.companyEmail))
+      e.companyEmail = "That doesn't look like a valid email address.";
+    if (!form.companyPassword)          e.companyPassword   = "Password is required.";
+    else if (!STRONG_PASSWORD.test(form.companyPassword))
+      e.companyPassword = "Password doesn't meet all the requirements below.";
+    if (form.companyPassword !== form.rePassword)
+      e.rePassword = "Passwords do not match.";
+    if (!logoFile)                      e.logo              = "Company logo is required.";
+    return e;
+  };
+
+  // ── Submit ─────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+
+    setLoading(true);
+    setServerError("");
+    try {
+
+      // ── FormData keys are IDENTICAL to your backend contract ──
+      const fd = new FormData();
+      fd.append("files",             logoFile);
+      fd.append("companyName",       form.companyName.trim());
+      fd.append("industry",          form.industry);
+      fd.append("numberofEmployees", form.numberofEmployees);
+      fd.append("companyEmail",      form.companyEmail.trim());
+      fd.append("companyPassword",   form.companyPassword);
+      fd.append("rePassword",        form.rePassword);
+
+      const res = await register(fd);
+
+      // Keep your existing session bootstrap
+      localStorage.setItem("AccessData", JSON.stringify(res.data.AccessData));
+
+      setSuccess(true);
+      setTimeout(() => navigate("/verifyemail"), 1200);
+    } catch (error) {
+      if (error.response?.status === 409) {
+        // Email already exists → attach to the field, not a banner
+        setErrors((p) => ({ ...p, companyEmail: error.response.data.message }));
+      } else {
+        setServerError(
+          error.response?.data?.message ||
+          "Network error or server issue. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="contactContainerMain">
-    <div className="contactinnerMain">
-      <div className='regLogTopNav'>
-        <h2>Register your Company</h2>
-          <Link to="/login">Login</Link>
-      </div>
-    <div className='contactInner'>
-      <label htmlFor='companyName'>
-            <span className='userinfotextdemo'>Company Name</span>
-            <input type="text" autoComplete="off" name="companyName" value={userdata.companyName} id="companyName" placeholder="Company Name" onChange={getData} className='contactinput'/>
-        </label>
-    <label htmlFor='industry'>
-    <select name="industry" id="industry"  onChange={getData}  className='contactinput selectContactInput'>
-            <option value="">--Industry/Category--</option>
-            <option value="Technology and IT">Technology and IT</option>
-            <option value="Healthcare and Pharmaceuticals">Healthcare and Pharmaceuticals</option>
-            <option value="Finance and Banking">Finance and Banking</option>
-            <option value="Energy">Energy</option>
-            <option value="Retail and E-commerce">Retail and E-commerce</option>
-            <option value="Manufacturing">Manufacturing</option>
-            <option value="Food and Beverage">Food and Beverage</option>
-            <option value="Media and Entertainment">Media and Entertainment</option>
-            <option value="Transportation and Logistics">Transportation and Logistics</option>
-            <option value="Real Estate and Construction">Real Estate and Construction</option>
-            <option value="Tourism and Hospitality">Tourism and Hospitality</option>
-            <option value="Telecommunications">Telecommunications</option>
-            <option value="Education and Training">Education and Training</option>
-            <option value="Environmental and Sustainability Services">Environmental and Sustainability Services</option>
-            <option value="Aerospace and Defense">Aerospace and Defense</option>
-            <option value="Agriculture and Agribusiness">Agriculture and Agribusiness</option>
-            <option value="Fashion and Apparel"> Fashion and Apparel</option>
-            <option value="Professional Services">Professional Services</option>
-            <option value="Personal Care and Wellness"> Personal Care and Wellness</option>
-            <option value="Automotive and Mobility"> Automotive and Mobility</option>
-            <option value="Mining and Natural Resources"> Mining and Natural Resources</option>
-            <option value="Insurance">Insurance</option>
-            <option value="Supply Chain and Procurement"> Supply Chain and Procurement</option>
-            <option value="Public Sector and Government Services"> Public Sector and Government Services</option>
-            <option value="Nonprofits and Social Enterprises">Nonprofits and Social Enterprises</option>
-            <option value="Sports and Recreation">Sports and Recreation</option>
-            <option value="Luxury and High-End Markets">Luxury and High-End Markets</option>
-            <option value="Cybersecurity and Data Protection">Cybersecurity and Data Protection</option>
-          </select>          
-    </label>
-    
-        <label htmlFor='numberofEmployees'>
-            <span className='userinfotextdemo'>Number of Employees</span>
-            <input type="number" autoComplete="off" name="numberofEmployees" value={userdata.numberofEmployees} id="numberofEmployees" placeholder="Number of Employees.." onChange={getData} className='contactinput'/>
-        </label>
-        <label htmlFor='companyEmail'>
-            <span className='userinfotextdemo'>Email</span>
-            <input type="email" autoComplete="off" name="companyEmail" value={userdata.companyEmail} id="companyEmail" placeholder="Enter your Email.." onChange={getData} className='contactinput'/>
-        </label>
-        <div className="passwordPr">
-        <label htmlFor='passOneIn' className="passwordContinerLabel">
-            <span className='userinfotextdemo'>password</span>
-            <input type="password" autoComplete="off" name="companyPassword" value={userdata.companyPassword} id="passOneIn" ref={passwordOne} placeholder="Enter password" onChange={getData} className='contactinput LogregsiterpassInput'/>
-        </label>
-        <div className="passBtnreg">
-            <VisibilityOutlinedIcon className="allPassBtn" style={{display:`${!inVisible ? 'block' : 'none'}`}} onClick={TogglePass}/>
-            <VisibilityOffOutlinedIcon  className="allPassBtn" style={{display:`${inVisible ? 'block' : 'none'}`}} onClick={TogglePass}/>
-        </div>
-        </div>
-        <label htmlFor='passTwoIn'>
-            <span className='userinfotextdemo'>re-password</span>
-            <input type="password" autoComplete="off" name="rePassword" ref={passwordTwo} value={userdata.rePassword} placeholder="Retype password" id="passTwoIn" onChange={getData} className='contactinput'/>
-        </label>
-        <div className='inputDataForYemployee' style={{marginBottom:'7px'}}>
-          <label htmlFor='yemplyee__Profile' style={{color:'#ccccccad',margin:'0px',fontSize:'11px'}}>Companies Profile / Logo</label>
-          <input type='file' id="yemplyee__Profile" name="EmplyeeProfile" multiple={false} onChange={uploadReviewPhotos} ref={inputFile} style={{width:'418px',height:'46px',lineHeight:'36px',borderRadius:'5px'}}/>
-        </div>
-        <div id="imageViewrlist" style={{width:'150px',margin:'10px auto'}} ref={preview}></div>
-      <button className='contactsendbtn' onClick={submitRegistation} disabled={toggleButton.current}>{loading ? "Trying..." : "Register"}</button>
-        <div className='showErrorOrSuccess' style={resMsgStyle}>{resMessage}</div>
-        </div>
-  </div>
-  </div>
-  )
-}
+    <div className="rg-root">
 
-export default Register
+      {/* ══ LEFT — brand panel ═══════════════════════════════════ */}
+      <aside className="rg-side">
+        <div className="rg-side__grid" />
+
+        <Link to="/" className="rg-brand">
+          <span className="rg-brand__mark">M</span>
+          <span className="rg-brand__name">MetriCore</span>
+        </Link>
+
+        <div className="rg-side__copy">
+          <h2 className="rg-side__title">
+            Know your real profit,<br />not just your revenue.
+          </h2>
+
+          <div className="rg-side__points">
+            {[
+              { n: "01", t: "Set revenue goals",   d: "MetriCore breaks them into daily targets." },
+              { n: "02", t: "Track every cost",    d: "Ads, delivery, packaging, buying, shipping." },
+              { n: "03", t: "See profit live",     d: "Charts and breakdowns update as you sell." },
+            ].map((p) => (
+              <div className="rg-point" key={p.n}>
+                <span className="rg-point__n rg-mono">{p.n}</span>
+                <div>
+                  <div className="rg-point__t">{p.t}</div>
+                  <div className="rg-point__d">{p.d}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rg-side__foot rg-mono">
+          <span>© {new Date().getFullYear()} MetriCore</span>
+          <div className="rg-side__foot-links">
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
+        </div>
+      </aside>
+
+      {/* ══ RIGHT — form ═════════════════════════════════════════ */}
+      <main className="rg-main">
+        <div className="rg-card">
+
+          <div className="rg-card__head">
+            <div>
+              <h1 className="rg-title">Create your company account</h1>
+              <p className="rg-sub">
+                Already have an account? <Link to="/login" className="rg-link">Log in</Link>
+              </p>
+            </div>
+          </div>
+
+          {success ? (
+            <div className="rg-success">
+              <span className="rg-success__icon">✓</span>
+              <h3>Account created</h3>
+              <p>We've emailed a verification code to <strong>{form.companyEmail}</strong>. Taking you there…</p>
+            </div>
+          ) : (
+            <div className="rg-form">
+
+              {/* Company name */}
+              <div className="rg-field">
+                <label className="rg-label" htmlFor="rg-companyName">Company name</label>
+                <input
+                  id="rg-companyName"
+                  name="companyName"
+                  type="text"
+                  autoComplete="organization"
+                  className={`rg-input ${errors.companyName ? "rg-input--error" : ""}`}
+                  placeholder="e.g. King Data Ltd"
+                  value={form.companyName}
+                  onChange={handleChange}
+                  maxLength={80}
+                />
+                {errors.companyName && <span className="rg-error">{errors.companyName}</span>}
+              </div>
+
+              {/* Industry + team size */}
+              <div className="rg-row">
+                <div className="rg-field">
+                  <label className="rg-label" htmlFor="rg-industry">Industry</label>
+                  <select
+                    id="rg-industry"
+                    name="industry"
+                    className={`rg-input rg-select ${errors.industry ? "rg-input--error" : ""}`}
+                    value={form.industry}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>Select industry…</option>
+                    {INDUSTRIES.map((ind) => (
+                      <option key={ind} value={ind}>{ind}</option>
+                    ))}
+                  </select>
+                  {errors.industry && <span className="rg-error">{errors.industry}</span>}
+                </div>
+
+                <div className="rg-field">
+                  <label className="rg-label" htmlFor="rg-team">Team size</label>
+                  <select
+                    id="rg-team"
+                    name="numberofEmployees"
+                    className={`rg-input rg-select ${errors.numberofEmployees ? "rg-input--error" : ""}`}
+                    value={form.numberofEmployees}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>Select…</option>
+                    {TEAM_SIZES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                  {errors.numberofEmployees && <span className="rg-error">{errors.numberofEmployees}</span>}
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="rg-field">
+                <label className="rg-label" htmlFor="rg-email">Work email</label>
+                <input
+                  id="rg-email"
+                  name="companyEmail"
+                  type="email"
+                  autoComplete="email"
+                  className={`rg-input ${errors.companyEmail ? "rg-input--error" : ""}`}
+                  placeholder="you@company.com"
+                  value={form.companyEmail}
+                  onChange={handleChange}
+                />
+                {errors.companyEmail && <span className="rg-error">{errors.companyEmail}</span>}
+              </div>
+
+              {/* Password */}
+              <div className="rg-field">
+                <label className="rg-label" htmlFor="rg-pass">Password</label>
+                <div className="rg-pass-wrap">
+                  <input
+                    id="rg-pass"
+                    name="companyPassword"
+                    type={showPass ? "text" : "password"}
+                    autoComplete="new-password"
+                    className={`rg-input ${errors.companyPassword ? "rg-input--error" : ""}`}
+                    placeholder="Create a strong password"
+                    value={form.companyPassword}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="rg-pass-toggle"
+                    onClick={() => setShowPass((p) => !p)}
+                    aria-label={showPass ? "Hide password" : "Show password"}
+                  >
+                    {showPass
+                      ? <VisibilityOffOutlinedIcon style={{ fontSize: 18 }} />
+                      : <VisibilityOutlinedIcon    style={{ fontSize: 18 }} />}
+                  </button>
+                </div>
+                {errors.companyPassword && <span className="rg-error">{errors.companyPassword}</span>}
+
+                {/* Live checklist — mirrors the backend regex */}
+                {form.companyPassword && (
+                  <ul className="rg-checklist">
+                    {PASSWORD_RULES.map((rule) => {
+                      const pass = rule.re.test(form.companyPassword);
+                      return (
+                        <li key={rule.label} className={`rg-check ${pass ? "rg-check--pass" : ""}`}>
+                          <span className="rg-check__dot">{pass ? "✓" : ""}</span>
+                          {rule.label}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+
+              {/* Confirm password */}
+              <div className="rg-field">
+                <label className="rg-label" htmlFor="rg-repass">Confirm password</label>
+                <input
+                  id="rg-repass"
+                  name="rePassword"
+                  type={showPass ? "text" : "password"}
+                  autoComplete="new-password"
+                  className={`rg-input ${errors.rePassword ? "rg-input--error" : ""}`}
+                  placeholder="Retype your password"
+                  value={form.rePassword}
+                  onChange={handleChange}
+                />
+                {errors.rePassword && <span className="rg-error">{errors.rePassword}</span>}
+              </div>
+
+              {/* Logo upload */}
+              <div className="rg-field">
+                <label className="rg-label">
+                  Company logo
+                  <span className="rg-label__hint">Shown in your workspace header · JPG, PNG, GIF or WEBP, max 5MB</span>
+                </label>
+
+                {!logoPreview ? (
+                  <button
+                    type="button"
+                    className={`rg-drop ${errors.logo ? "rg-drop--error" : ""}`}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    <span className="rg-drop__icon">🖼</span>
+                    <span className="rg-drop__text">Click to upload your logo</span>
+                  </button>
+                ) : (
+                  <div className="rg-logo-preview">
+                    <img src={logoPreview} alt="Logo preview" />
+                    <div className="rg-logo-preview__meta">
+                      <span className="rg-logo-preview__name rg-mono">{logoFile?.name}</span>
+                      <button type="button" className="rg-logo-remove" onClick={removeLogo}>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  className="rg-file-hidden"
+                  onChange={pickLogo}
+                />
+                {errors.logo && <span className="rg-error">{errors.logo}</span>}
+              </div>
+
+              {serverError && (
+                <div className="rg-server-error" role="alert">{serverError}</div>
+              )}
+
+              <button
+                className="rg-btn"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading && <span className="rg-spinner" />}
+                Create account
+              </button>
+
+              <p className="rg-agree">
+                By creating an account you agree to our{" "}
+                <Link to="/terms" className="rg-link">Terms of Service</Link> and{" "}
+                <Link to="/privacy" className="rg-link">Privacy Policy</Link>.
+              </p>
+
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}

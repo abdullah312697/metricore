@@ -1,0 +1,79 @@
+/* EditProduct.css
+   Edit-only additions on TOP of AddProduct.css (import BOTH — this
+   file only holds the pieces unique to editing: a single centered
+   card instead of the two-column add layout, and the current-image
+   swap row). Everything else (inputs, goal pills, buttons, tokens)
+   is inherited from the ap- classes in AddProduct.css.               */
+
+/* single centered column — no product-list sidebar when editing */
+.ep2-wrap {
+  max-width: 560px;
+  margin:    0 auto;
+}
+
+.ep2-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             10px;
+  margin-top:      4px;
+}
+
+/* ── current-image swap row ───────────────────────────────────── */
+.ep2-image-row {
+  display:     flex;
+  align-items: center;
+  gap:         16px;
+}
+
+.ep2-image-thumb {
+  width:           88px;
+  height:          88px;
+  flex-shrink:     0;
+  border-radius:   var(--ap-r-lg);
+  border:          1px solid var(--ap-border);
+  background:      var(--ap-deep);
+  overflow:        hidden;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+
+.ep2-image-thumb img {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  display:    block;
+}
+
+.ep2-image-thumb__empty {
+  font-size: 34px;
+  opacity:   0.4;
+}
+
+.ep2-image-actions {
+  display:        flex;
+  flex-direction: column;
+  align-items:    flex-start;
+  gap:            8px;
+  min-width:      0;
+}
+
+/* file input wrapped in a ghost-button label */
+.ep2-choose {
+  position: relative;
+  cursor:   pointer;
+}
+
+.ep2-image-name {
+  font-size:     11px;
+  color:         var(--ap-slate-dim);
+  max-width:     200px;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+@media (max-width: 520px) {
+  .ep2-actions        { flex-direction: column-reverse; }
+  .ep2-actions .ap-btn { width: 100%; }
+}

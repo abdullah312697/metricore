@@ -1,7 +1,7 @@
 // FieldVisibilityManager.jsx
 import { useState } from "react";
 import { DEFAULT_FIELDS, GROUPS } from "./fieldConfig";
-import "./FieldVisibilityManager.css"; // <-- Import the external CSS file
+import "../../../style/FieldVisibilityManager.css"; // <-- Import the external CSS file
 
 export const FieldVisibilityManager = ({
   visibleFields,

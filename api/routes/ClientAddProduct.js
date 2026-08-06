@@ -6,6 +6,7 @@ import ClientProduct from "../models/ClientProduct.js";
 import{decryptUserData} from '../verifyuser.js';
 import { deleteResorce } from '../cloudinaryDelete.js';
 import {generatePublicId} from '../reuseableFn.js';
+import { limitFor } from "../config/plans.js";   // + Companies import if not present
 
 
 router.post("/addNewProduct", async (req, res) => {
@@ -22,6 +23,13 @@ router.post("/addNewProduct", async (req, res) => {
     try {
       if (!newemplyeeId || !newcompanyId) {
         return res.status(400).json({ message: "Login/Register please!" });
+      }
+
+      const billing = await Companies.findById(newcompanyId).select("planId subscriptionStatus trialEndsAt").lean();
+      const max = limitFor(billing, "products");
+      if (max !== Infinity) {
+        const n = await ClientProduct.countDocuments({ companyId: newcompanyId });
+        if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} Products. Upgrade to add more.` });
       }
 
       const fname = "ProductImage";
@@ -51,14 +59,17 @@ router.post("/addNewProduct", async (req, res) => {
       const uploadResult = await uploadImage(imageStream, publicId, fname);
 
       // ✅ Create product document
+// ✅ Create product document — explicit fields only (no mass-assignment)
       const newProduct = await ClientProduct.create({
-        ...productData,
-        GoalIdentifire: goalIds,
-        companyId : newcompanyId,
-        productImgFile: uploadResult.secure_url,
+        companyId:          newcompanyId,      // from the COOKIE, never the body
+        ProductName:        productData.ProductName.trim(),
+        sku:                productData.sku?.trim() || undefined,   // 👈 SKU saved
+        ProductPrice:       productData.ProductPrice,
+        InStockQuentity:    productData.InStockQuentity,
+        GoalIdentifire:     goalIds,
+        productImgFile:     uploadResult.secure_url,
         CloudinaryPublicId: uploadResult.public_id,
       });
-
       return res.status(200).json({
         message: "New product added successfully!",
         data: newProduct
@@ -113,7 +124,7 @@ router.get("/getSingleProduct/:productId", async (req, res) => {
     const product = await ClientProduct.findOne({ _id: productId, companyId : newcompanyId });
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found!" });
+      return res.status(200).json({ message: "Product not found!", data:[] });
     }
 
     return res.status(200).json({
@@ -127,74 +138,6 @@ router.get("/getSingleProduct/:productId", async (req, res) => {
 });
 
 
-// PUT /updateProduct/:productId
-// router.put("/updateProduct/:productId", async (req, res) => {
-//   multerProcess(req, res, async (err) => {
-//     if (err) return res.status(400).json({ message: err.message });
-//     try {
-//       const { employeeId, companyId} = req.cookies;
-//       const newemplyeeId = decryptUserData(employeeId);
-//       const newcompanyId = decryptUserData(companyId);
-//       if (!newemplyeeId || !newcompanyId) return res.status(401).json({ message: "Login/Register please!" });
-//       const { productId } = req.params;
-//       const file = req.files[0];
-
-//       const filtered = {};
-//       for (const [key, val] of Object.entries(req.body || {})) {
-//         if (val !== "" && val !== null && val !== undefined) filtered[key] = val;
-//       }
-//       const imageStream = file.buffer;
-//       const originalName = file.originalname;
-//       let publicId = generatePublicId(originalName);
-
-//       if (file) {
-//         const uploadResult = await uploadImage(
-//           imageStream,
-//           publicId,
-//           "ProductImage",
-//         );
-//         if (!uploadResult?.secure_url) {
-//           return res.status(500).json({ message: "Image upload failed" });
-//         }
-//         filtered.productImgFile = uploadResult.secure_url;
-//         filtered.CloudinaryPublicId = uploadResult.public_id;
-//       }
-
-//       // STEP 3 — Find existing product by ID and company ownership
-//       const existingProduct = await ClientProduct.findOne({
-//         _id: productId,
-//         companyId : newcompanyId,
-//       });
-
-//       if (!existingProduct)
-//         return res.status(404).json({ message: "Product not found or unauthorized" });
-
-//       // STEP 4 — Delete old Cloudinary image (if replaced)
-//       if (
-//         filtered.CloudinaryPublicId &&
-//         existingProduct.CloudinaryPublicId
-//       ) {
-//         try {
-//           await deleteResorce(existingProduct.CloudinaryPublicId, "image").catch(() => {});
-//         } catch (delErr) {
-//           console.warn("Failed to delete old image:", delErr);
-//         }
-//       }
-
-//       // STEP 5 — Update and save
-//       Object.assign(existingProduct, filtered, { updatedAt: Date.now() });
-//       await existingProduct.save();
-
-//       return res.status(200).json({
-//         message: "Product updated successfully",
-//         data: existingProduct,
-//       });
-//     } catch (error) {
-//       console.error("updateProduct error:", error);
-//       return res.status(500).json({ message: "Something went wrong" });
-//     }
-//   });
-// });
 router.put("/updateProduct/:productId", async (req, res) => {
   multerProcess(req, res, async (err) => {
     if (err) return res.status(400).json({ message: err.message });
@@ -207,8 +150,10 @@ router.put("/updateProduct/:productId", async (req, res) => {
       const { productId } = req.params;
       const file = req.files?.[0];
 
+      const ALLOWED = ["ProductName", "sku", "ProductPrice", "InStockQuentity", "GoalIdentifire"];
       const filtered = {};
       for (const [key, val] of Object.entries(req.body || {})) {
+        if (!ALLOWED.includes(key) && key !== "GoalIdentifire[]") continue;   // 👈 drop everything else
         if (val !== "" && val !== null && val !== undefined) filtered[key] = val;
       }
 
@@ -265,10 +210,7 @@ router.put("/updateProduct/:productId", async (req, res) => {
       }
 
       // ✅ Update and save
-      Object.assign(existingProduct, filtered, { updatedAt: Date.now() });
-      if (filtered.GoalIdentifire) {
-        existingProduct.GoalIdentifire = [...filtered.GoalIdentifire];
-      }
+      Object.assign(existingProduct, filtered);
      const updatedProduct = await existingProduct.save();
 
       return res.status(200).json({

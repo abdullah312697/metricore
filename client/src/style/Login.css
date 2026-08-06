@@ -1,0 +1,446 @@
+/* Login.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body/inputs) · IBM Plex Mono (plate)
+   Prefix : lg- (login) — zero collision with other stylesheets
+
+   Sibling of Register.css — same split auth layout so login and
+   register feel like two doors into the same building. Login-specific
+   details: the Forgot-password link in the label row, and the Caps
+   Lock warning that appears the moment the key is on.               */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --lg-navy:       #011626;
+  --lg-card:       #071e30;
+  --lg-deep:       #040f1a;
+  --lg-amber:      #ffb100;
+  --lg-amber-dim:  rgba(255, 177, 0, 0.10);
+  --lg-amber-line: rgba(255, 177, 0, 0.28);
+  --lg-amber-glow: rgba(255, 177, 0, 0.20);
+  --lg-white:      #ffffff;
+  --lg-off-white:  #dde6ee;
+  --lg-slate:      #8899aa;
+  --lg-slate-dim:  #4d6070;
+  --lg-border:     rgba(255, 255, 255, 0.08);
+  --lg-border-s:   rgba(255, 255, 255, 0.04);
+  --lg-red:        #ef4444;
+  --lg-red-dim:    rgba(239, 68, 68, 0.10);
+  --lg-red-line:   rgba(239, 68, 68, 0.30);
+
+  --lg-display: 'Space Grotesk', sans-serif;
+  --lg-body:    'Inter', sans-serif;
+  --lg-mono:    'IBM Plex Mono', monospace;
+
+  --lg-r:    10px;
+  --lg-r-lg: 14px;
+  --lg-ease: 0.18s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── root: split screen ───────────────────────────────────────── */
+.lg-root {
+  min-height:            100vh;
+  display:               grid;
+  grid-template-columns: minmax(340px, 44%) 1fr;
+  background:            var(--lg-navy);
+  color:                 var(--lg-white);
+  font-family:           var(--lg-body);
+  font-size:             16px;
+  line-height:           1.6;
+}
+
+.lg-mono { font-family: var(--lg-mono); }
+
+.lg-link {
+  color:                 var(--lg-amber);
+  text-decoration:       underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--lg-amber-line);
+  transition:            text-decoration-color var(--lg-ease);
+}
+.lg-link:hover { text-decoration-color: var(--lg-amber); }
+
+/* ════════════════════════════════════════════════════════════════
+   LEFT — BRAND PANEL
+════════════════════════════════════════════════════════════════ */
+.lg-side {
+  position:       relative;
+  background:     var(--lg-deep);
+  border-right:   1px solid var(--lg-border);
+  padding:        36px 40px;
+  display:        flex;
+  flex-direction: column;
+  gap:            48px;
+  overflow:       hidden;
+}
+
+.lg-side__grid {
+  position:        absolute;
+  inset:           0;
+  background-image:
+    linear-gradient(rgba(255,177,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,177,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:  none;
+}
+
+.lg-side::after {
+  content:        "";
+  position:       absolute;
+  top:            -120px;
+  right:          -120px;
+  width:          420px;
+  height:         420px;
+  background:     radial-gradient(circle, rgba(255,177,0,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* brand */
+.lg-brand {
+  position:        relative;
+  z-index:         1;
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  text-decoration: none;
+  width:           fit-content;
+}
+
+.lg-brand__mark {
+  width:           36px;
+  height:          36px;
+  background:      var(--lg-amber);
+  color:           var(--lg-deep);
+  border-radius:   9px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--lg-display);
+  font-weight:     700;
+  font-size:       17px;
+}
+
+.lg-brand__name {
+  font-family: var(--lg-display);
+  font-weight: 700;
+  font-size:   18px;
+  color:       var(--lg-white);
+}
+
+/* copy */
+.lg-side__copy {
+  position:       relative;
+  z-index:        1;
+  margin:         auto 0;
+  display:        flex;
+  flex-direction: column;
+  gap:            22px;
+}
+
+.lg-side__title {
+  font-family:    var(--lg-display);
+  font-size:      clamp(26px, 3vw, 38px);
+  font-weight:    700;
+  line-height:    1.15;
+  letter-spacing: -0.6px;
+}
+
+.lg-side__sub {
+  font-size:   15px;
+  color:       var(--lg-slate);
+  line-height: 1.7;
+  max-width:   340px;
+}
+
+/* mono plate — quiet product summary */
+.lg-side__plate {
+  background:     rgba(1, 22, 38, 0.6);
+  border:         1px solid var(--lg-border);
+  border-radius:  var(--lg-r-lg);
+  padding:        16px 18px;
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+  max-width:      360px;
+}
+
+.lg-plate-row {
+  display:     flex;
+  align-items: baseline;
+  gap:         14px;
+}
+
+.lg-plate-row__key {
+  font-size:      9px;
+  letter-spacing: 2px;
+  color:          var(--lg-amber);
+  flex-shrink:    0;
+  min-width:      52px;
+}
+
+.lg-plate-row__val {
+  font-size:      11px;
+  color:          var(--lg-slate);
+  letter-spacing: 0.3px;
+}
+
+/* panel foot */
+.lg-side__foot {
+  position:        relative;
+  z-index:         1;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             16px;
+  font-size:       11px;
+  color:           var(--lg-slate-dim);
+  letter-spacing:  0.4px;
+}
+
+.lg-side__foot-links { display: flex; gap: 14px; }
+
+.lg-side__foot-links a {
+  color:           var(--lg-slate-dim);
+  text-decoration: none;
+  transition:      color var(--lg-ease);
+}
+.lg-side__foot-links a:hover { color: var(--lg-amber); }
+
+/* ════════════════════════════════════════════════════════════════
+   RIGHT — FORM
+════════════════════════════════════════════════════════════════ */
+.lg-main {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         48px 24px;
+}
+
+.lg-card {
+  width:     100%;
+  max-width: 420px;
+}
+
+.lg-card__head { margin-bottom: 28px; }
+
+.lg-title {
+  font-family:    var(--lg-display);
+  font-size:      clamp(22px, 3vw, 28px);
+  font-weight:    700;
+  letter-spacing: -0.4px;
+  line-height:    1.2;
+  margin-bottom:  8px;
+}
+
+.lg-sub {
+  font-size: 14px;
+  color:     var(--lg-slate);
+}
+
+/* ── Form ─────────────────────────────────────────────────────── */
+.lg-form {
+  display:        flex;
+  flex-direction: column;
+  gap:            18px;
+}
+
+.lg-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            6px;
+}
+
+/* label row — Password left, Forgot right */
+.lg-label-row {
+  display:         flex;
+  align-items:     baseline;
+  justify-content: space-between;
+  gap:             12px;
+}
+
+.lg-label {
+  font-family:    var(--lg-display);
+  font-size:      13px;
+  font-weight:    500;
+  color:          var(--lg-off-white);
+  letter-spacing: 0.2px;
+}
+
+.lg-forgot {
+  font-size:             12px;
+  color:                 var(--lg-slate);
+  text-decoration:       underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition:            color var(--lg-ease), text-decoration-color var(--lg-ease);
+  white-space:           nowrap;
+}
+.lg-forgot:hover {
+  color:                 var(--lg-amber);
+  text-decoration-color: var(--lg-amber-line);
+}
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+.lg-input {
+  background:    var(--lg-card);
+  border:        1.5px solid var(--lg-border);
+  border-radius: var(--lg-r);
+  padding:       12px 14px;
+  font-family:   var(--lg-body);
+  font-size:     15px;
+  color:         var(--lg-white);
+  width:         100%;
+  outline:       none;
+  transition:    border-color var(--lg-ease), box-shadow var(--lg-ease), background var(--lg-ease);
+  -webkit-appearance: none;
+}
+
+.lg-input::placeholder { color: var(--lg-slate-dim); }
+.lg-input:hover        { border-color: rgba(255, 255, 255, 0.16); }
+
+.lg-input:focus {
+  border-color: var(--lg-amber);
+  background:   rgba(255, 177, 0, 0.04);
+  box-shadow:   0 0 0 3px var(--lg-amber-dim);
+}
+
+.lg-input--error {
+  border-color: var(--lg-red) !important;
+  background:   var(--lg-red-dim) !important;
+  box-shadow:   none !important;
+}
+
+/* ── Password toggle ─────────────────────────────────────────── */
+.lg-pass-wrap { position: relative; }
+
+.lg-pass-wrap .lg-input { padding-right: 44px; }
+
+.lg-pass-toggle {
+  position:   absolute;
+  right:      10px;
+  top:        50%;
+  transform:  translateY(-50%);
+  background: none;
+  border:     none;
+  color:      var(--lg-slate-dim);
+  cursor:     pointer;
+  padding:    5px;
+  display:    flex;
+  transition: color var(--lg-ease);
+}
+.lg-pass-toggle:hover { color: var(--lg-slate); }
+
+/* ── Caps Lock warning ───────────────────────────────────────── */
+.lg-caps {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            6px;
+  font-family:    var(--lg-mono);
+  font-size:      11px;
+  letter-spacing: 0.5px;
+  color:          var(--lg-amber);
+  background:     var(--lg-amber-dim);
+  border:         1px solid var(--lg-amber-line);
+  border-radius:  6px;
+  padding:        4px 10px;
+  width:          fit-content;
+}
+
+/* ── Errors ──────────────────────────────────────────────────── */
+.lg-error {
+  font-size:   12px;
+  color:       var(--lg-red);
+  line-height: 1.4;
+}
+
+.lg-server-error {
+  font-size:     13px;
+  color:         var(--lg-red);
+  background:    var(--lg-red-dim);
+  border:        1px solid var(--lg-red-line);
+  border-radius: var(--lg-r);
+  padding:       11px 14px;
+  line-height:   1.55;
+}
+
+/* ── Submit ──────────────────────────────────────────────────── */
+.lg-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  width:           100%;
+  font-family:     var(--lg-display);
+  font-weight:     600;
+  font-size:       15px;
+  background:      var(--lg-amber);
+  color:           var(--lg-deep);
+  border:          none;
+  border-radius:   var(--lg-r);
+  padding:         14px 26px;
+  cursor:          pointer;
+  margin-top:      4px;
+  transition:      background var(--lg-ease), box-shadow var(--lg-ease), transform var(--lg-ease);
+}
+.lg-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.lg-btn:hover:not(:disabled) {
+  background: #ffc933;
+  box-shadow: 0 6px 24px var(--lg-amber-glow);
+  transform:  translateY(-1px);
+}
+.lg-btn:active:not(:disabled) { transform: translateY(0); }
+
+.lg-spinner {
+  width:            15px;
+  height:           15px;
+  border:           2px solid rgba(4, 15, 26, 0.3);
+  border-top-color: var(--lg-deep);
+  border-radius:    50%;
+  animation:        lg-spin 0.7s linear infinite;
+  flex-shrink:      0;
+}
+@keyframes lg-spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .lg-root { grid-template-columns: 1fr; }
+
+  .lg-side {
+    flex-direction:  row;
+    align-items:     center;
+    justify-content: space-between;
+    padding:         16px 24px;
+    border-right:    none;
+    border-bottom:   1px solid var(--lg-border);
+    gap:             16px;
+  }
+
+  .lg-side__copy,
+  .lg-side__foot { display: none; }
+
+  .lg-main { padding: 40px 20px 56px; align-items: flex-start; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .lg-btn, .lg-input,
+  .lg-pass-toggle, .lg-forgot, .lg-link { transition: none; }
+
+  .lg-btn:hover:not(:disabled) { transform: none; box-shadow: none; }
+  .lg-spinner { animation: none; }
+}
+
+/* ── focus visible ────────────────────────────────────────────── */
+.lg-btn:focus-visible,
+.lg-input:focus-visible,
+.lg-pass-toggle:focus-visible,
+.lg-forgot:focus-visible,
+.lg-link:focus-visible {
+  outline:        2px solid var(--lg-amber);
+  outline-offset: 3px;
+  border-radius:  4px;
+}

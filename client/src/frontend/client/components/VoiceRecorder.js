@@ -17,6 +17,7 @@ export const VoiceRecorder = ({
   onCancel,
   audioPlayerComponent: AudioPlayer,
   primaryColor = "#0af",
+  positionSetRight = "0px"
 }) => {
 
   const [status, setStatus] = useState("idle");
@@ -273,7 +274,7 @@ return (
 
   {showModal && (
 
-    <div className="vr-modal animate-in">
+    <div className="vr-modal animate-in" style={{right:positionSetRight}}>
 
       <div className="vr-modal-content">
 

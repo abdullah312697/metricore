@@ -1,0 +1,535 @@
+/* EditGoal.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (title/buttons) · Inter (body/inputs) · IBM Plex Mono (numbers)
+   Prefix : eg- (edit goal) — zero collision with other stylesheets
+
+   Sibling of SetTarget.css — same split layout and live breakdown,
+   plus edit-specific pieces: the "was ≈ $X/day" comparison line under
+   the hero number, the saved flash, and the danger zone at the foot. */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --eg-navy:       #011626;
+  --eg-card:       #071e30;
+  --eg-deep:       #040f1a;
+  --eg-amber:      #ffb100;
+  --eg-amber-dim:  rgba(255, 177, 0, 0.10);
+  --eg-amber-line: rgba(255, 177, 0, 0.28);
+  --eg-amber-glow: rgba(255, 177, 0, 0.20);
+  --eg-white:      #ffffff;
+  --eg-off-white:  #dde6ee;
+  --eg-slate:      #8899aa;
+  --eg-slate-dim:  #4d6070;
+  --eg-border:     rgba(255, 255, 255, 0.08);
+  --eg-border-s:   rgba(255, 255, 255, 0.04);
+  --eg-green:      #22c55e;
+  --eg-red:        #ef4444;
+  --eg-red-dim:    rgba(239, 68, 68, 0.08);
+  --eg-red-line:   rgba(239, 68, 68, 0.28);
+
+  --eg-display: 'Space Grotesk', sans-serif;
+  --eg-body:    'Inter', sans-serif;
+  --eg-mono:    'IBM Plex Mono', monospace;
+
+  --eg-r:    10px;
+  --eg-r-lg: 14px;
+  --eg-ease: 0.18s ease;
+}
+
+/* ── root ─────────────────────────────────────────────────────── */
+.eg-root {
+  min-height:  100%;
+  background:  var(--eg-navy);
+  color:       var(--eg-white);
+  font-family: var(--eg-body);
+  font-size:   16px;
+  line-height: 1.6;
+  padding:     24px 0 72px;
+}
+
+.eg-container {
+  max-width: 880px;
+  margin:    0 auto;
+  padding:   0 24px;
+}
+
+.eg-mono { font-family: var(--eg-mono); }
+
+/* ════════════════════════════════════════════════════════════════
+   TOP BAR + HEADER
+════════════════════════════════════════════════════════════════ */
+.eg-topbar {
+  display:       flex;
+  align-items:   center;
+  gap:           14px;
+  margin-bottom: 24px;
+}
+
+.eg-back {
+  width:           40px;
+  height:          40px;
+  border-radius:   var(--eg-r);
+  border:          1px solid var(--eg-border);
+  color:           var(--eg-amber);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  text-decoration: none;
+  transition:      border-color var(--eg-ease), background var(--eg-ease);
+}
+.eg-back:hover {
+  border-color: var(--eg-amber-line);
+  background:   var(--eg-amber-dim);
+}
+
+.eg-eyebrow {
+  font-size:      10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color:          var(--eg-amber);
+}
+
+/* success flash — appears after a save */
+.eg-saved-flash {
+  margin-left:    auto;
+  font-family:    var(--eg-display);
+  font-size:      13px;
+  font-weight:    600;
+  color:          var(--eg-green);
+  background:     rgba(34, 197, 94, 0.10);
+  border:         1px solid rgba(34, 197, 94, 0.30);
+  border-radius:  20px;
+  padding:        5px 14px;
+  opacity:        0;
+  transform:      translateY(4px);
+  transition:     opacity var(--eg-ease), transform var(--eg-ease);
+  pointer-events: none;
+}
+.eg-saved-flash--show { opacity: 1; transform: translateY(0); }
+
+.eg-header { margin-bottom: 32px; }
+
+.eg-title {
+  font-family:    var(--eg-display);
+  font-size:      clamp(26px, 4vw, 36px);
+  font-weight:    700;
+  letter-spacing: -0.4px;
+  line-height:    1.15;
+  margin-bottom:  10px;
+  word-break:     break-word;
+}
+
+.eg-sub {
+  font-size:   15px;
+  color:       var(--eg-slate);
+  max-width:   440px;
+  line-height: 1.7;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════════════════════════════ */
+.eg-grid {
+  display:               grid;
+  grid-template-columns: 1fr 280px;
+  gap:                   24px;
+  align-items:           start;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FORM CARD
+════════════════════════════════════════════════════════════════ */
+.eg-form-card {
+  background:     var(--eg-card);
+  border:         1px solid var(--eg-border);
+  border-radius:  var(--eg-r-lg);
+  padding:        28px;
+  display:        flex;
+  flex-direction: column;
+  gap:            22px;
+}
+
+.eg-form-row {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   16px;
+}
+
+.eg-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            7px;
+  min-width:      0;
+}
+
+.eg-label {
+  font-family:    var(--eg-display);
+  font-size:      13px;
+  font-weight:    500;
+  color:          var(--eg-off-white);
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+}
+
+.eg-label__hint {
+  font-family: var(--eg-body);
+  font-size:   11px;
+  font-weight: 400;
+  color:       var(--eg-slate-dim);
+}
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+.eg-input {
+  background:    var(--eg-deep);
+  border:        1.5px solid var(--eg-border);
+  border-radius: var(--eg-r);
+  padding:       12px 14px;
+  font-family:   var(--eg-body);
+  font-size:     15px;
+  color:         var(--eg-white);
+  width:         100%;
+  outline:       none;
+  transition:    border-color var(--eg-ease), box-shadow var(--eg-ease), background var(--eg-ease);
+  -webkit-appearance: none;
+}
+
+.eg-input::placeholder { color: var(--eg-slate-dim); }
+.eg-input:hover        { border-color: rgba(255, 255, 255, 0.16); }
+
+.eg-input:focus {
+  border-color: var(--eg-amber);
+  background:   rgba(255, 177, 0, 0.04);
+  box-shadow:   0 0 0 3px var(--eg-amber-dim);
+}
+
+.eg-input--error {
+  border-color: var(--eg-red) !important;
+  background:   var(--eg-red-dim) !important;
+  box-shadow:   none !important;
+}
+
+.eg-input[type="date"] { color-scheme: dark; }
+
+.eg-input[type="number"]::-webkit-outer-spin-button,
+.eg-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.eg-input[type="number"] { -moz-appearance: textfield; }
+
+/* ── $ prefix ────────────────────────────────────────────────── */
+.eg-prefix-wrap { position: relative; }
+
+.eg-prefix {
+  position:       absolute;
+  left:           14px;
+  top:            50%;
+  transform:      translateY(-50%);
+  font-size:      14px;
+  font-weight:    600;
+  color:          var(--eg-amber);
+  pointer-events: none;
+}
+
+.eg-input--prefixed { padding-left: 32px; }
+
+/* ── Errors ──────────────────────────────────────────────────── */
+.eg-error {
+  font-size:   12px;
+  color:       var(--eg-red);
+  line-height: 1.4;
+}
+
+.eg-server-error {
+  font-size:     13px;
+  color:         var(--eg-red);
+  background:    var(--eg-red-dim);
+  border:        1px solid var(--eg-red-line);
+  border-radius: var(--eg-r);
+  padding:       11px 14px;
+  line-height:   1.55;
+}
+
+/* ── Actions ─────────────────────────────────────────────────── */
+.eg-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             10px;
+  flex-wrap:       wrap;
+}
+
+.eg-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  font-family:     var(--eg-display);
+  font-weight:     600;
+  font-size:       15px;
+  border-radius:   var(--eg-r);
+  padding:         12px 24px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  white-space:     nowrap;
+  text-decoration: none;
+  transition:      background var(--eg-ease), box-shadow var(--eg-ease),
+                   color var(--eg-ease), border-color var(--eg-ease), transform var(--eg-ease);
+}
+.eg-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.eg-btn--primary {
+  background: var(--eg-amber);
+  color:      var(--eg-deep);
+}
+.eg-btn--primary:hover:not(:disabled) {
+  background: #ffc933;
+  box-shadow: 0 6px 24px var(--eg-amber-glow);
+  transform:  translateY(-1px);
+}
+.eg-btn--primary:active:not(:disabled) { transform: translateY(0); }
+
+.eg-btn--ghost {
+  background:   transparent;
+  border-color: var(--eg-border);
+  color:        var(--eg-slate);
+}
+.eg-btn--ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  color:        var(--eg-white);
+}
+
+.eg-spinner {
+  width:            15px;
+  height:           15px;
+  border:           2px solid rgba(4, 15, 26, 0.3);
+  border-top-color: var(--eg-deep);
+  border-radius:    50%;
+  animation:        eg-spin 0.7s linear infinite;
+  flex-shrink:      0;
+}
+@keyframes eg-spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════════════════════════════
+   LIVE BREAKDOWN — with the "was" comparison line
+════════════════════════════════════════════════════════════════ */
+.eg-breakdown {
+  background:     var(--eg-deep);
+  border:         1px solid var(--eg-amber-line);
+  border-radius:  var(--eg-r-lg);
+  padding:        22px;
+  display:        flex;
+  flex-direction: column;
+  gap:            18px;
+  position:       sticky;
+  top:            84px;
+}
+
+.eg-breakdown__label {
+  font-size:      10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color:          var(--eg-slate-dim);
+  padding-bottom: 12px;
+  border-bottom:  1px solid var(--eg-border-s);
+}
+
+.eg-breakdown__hero {
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+  padding:        4px 0;
+}
+
+.eg-breakdown__hero-val {
+  font-size:      clamp(28px, 3vw, 34px);
+  font-weight:    600;
+  color:          var(--eg-amber);
+  line-height:    1;
+  letter-spacing: -0.5px;
+}
+
+.eg-breakdown__hero-key {
+  font-size:      10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color:          var(--eg-slate);
+}
+
+/* edit-specific: what the daily target USED to be */
+.eg-breakdown__was {
+  font-size:      11px;
+  color:          var(--eg-slate-dim);
+  letter-spacing: 0.3px;
+  text-decoration: line-through;
+  text-decoration-color: rgba(136, 153, 170, 0.5);
+  margin-top:     2px;
+}
+
+.eg-breakdown__rows {
+  display:        flex;
+  flex-direction: column;
+}
+
+.eg-breakdown__row {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  padding:         9px 0;
+  border-bottom:   1px solid var(--eg-border-s);
+}
+.eg-breakdown__row:last-child { border-bottom: none; }
+
+.eg-breakdown__row--total {
+  border-top:  1px solid var(--eg-amber-line);
+  margin-top:  2px;
+  padding-top: 11px;
+}
+
+.eg-breakdown__key {
+  font-size:      9px;
+  letter-spacing: 2px;
+  color:          var(--eg-slate-dim);
+}
+
+.eg-breakdown__val {
+  font-size:   13px;
+  font-weight: 600;
+  color:       var(--eg-off-white);
+}
+
+.eg-breakdown__row--total .eg-breakdown__val { color: var(--eg-amber); }
+
+.eg-breakdown__empty {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            10px;
+  padding:        24px 8px;
+  text-align:     center;
+}
+
+.eg-breakdown__empty-icon {
+  font-size: 26px;
+  color:     var(--eg-amber);
+  opacity:   0.4;
+}
+
+.eg-breakdown__empty p {
+  font-size:   12px;
+  color:       var(--eg-slate-dim);
+  line-height: 1.65;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DANGER ZONE
+════════════════════════════════════════════════════════════════ */
+.eg-danger-zone {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             16px;
+  flex-wrap:       wrap;
+  margin-top:      28px;
+  padding:         18px 20px;
+  background:      var(--eg-red-dim);
+  border:          1px solid var(--eg-red-line);
+  border-radius:   var(--eg-r-lg);
+}
+
+.eg-danger-zone__copy h4 {
+  font-family: var(--eg-display);
+  font-size:   14px;
+  font-weight: 600;
+  color:       var(--eg-white);
+  margin:      0 0 4px;
+}
+
+.eg-danger-zone__copy p {
+  font-size:   12px;
+  color:       var(--eg-slate);
+  margin:      0;
+  line-height: 1.5;
+}
+
+.eg-danger-zone__btn {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           8px;
+  background:    transparent;
+  border:        1.5px solid rgba(239, 68, 68, 0.4);
+  border-radius: var(--eg-r);
+  color:         var(--eg-red);
+  font-family:   var(--eg-display);
+  font-size:     14px;
+  font-weight:   600;
+  padding:       9px 18px;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    background var(--eg-ease), color var(--eg-ease);
+}
+
+.eg-danger-zone__btn:hover {
+  background: var(--eg-red);
+  color:      #ffffff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LOADING / ERROR STATES
+════════════════════════════════════════════════════════════════ */
+.eg-loading {
+  padding:        90px 24px;
+  text-align:     center;
+  color:          var(--eg-slate-dim);
+  font-size:      12px;
+  letter-spacing: 3px;
+}
+
+.eg-load-error {
+  padding:        90px 24px;
+  text-align:     center;
+  color:          var(--eg-slate);
+  font-size:      15px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            18px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 820px) {
+  .eg-grid      { grid-template-columns: 1fr; }
+  .eg-breakdown { position: static; }
+}
+
+@media (max-width: 520px) {
+  .eg-form-row  { grid-template-columns: 1fr; }
+  .eg-form-card { padding: 20px; }
+
+  .eg-actions        { flex-direction: column-reverse; }
+  .eg-actions .eg-btn { width: 100%; }
+
+  .eg-danger-zone      { flex-direction: column; align-items: stretch; }
+  .eg-danger-zone__btn { justify-content: center; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .eg-btn, .eg-input, .eg-back,
+  .eg-saved-flash, .eg-danger-zone__btn { transition: none; }
+
+  .eg-btn--primary:hover:not(:disabled) { transform: none; box-shadow: none; }
+  .eg-spinner { animation: none; }
+}
+
+/* ── focus visible ────────────────────────────────────────────── */
+.eg-btn:focus-visible,
+.eg-back:focus-visible,
+.eg-input:focus-visible,
+.eg-danger-zone__btn:focus-visible {
+  outline:        2px solid var(--eg-amber);
+  outline-offset: 3px;
+}

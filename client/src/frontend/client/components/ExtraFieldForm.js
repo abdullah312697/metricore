@@ -1,5 +1,5 @@
 import { useState, forwardRef, useEffect } from "react";
-import './ExtraFieldForm.css';
+import '../../../style/ExtraFieldForm.css';
 
 const MAIN_FIELDS = [
   "ProductPrice", "SoldAmount", "TargetSaleAmount", "SoldQuentity",

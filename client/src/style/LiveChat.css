@@ -1,0 +1,662 @@
+/* LiveChat.css — for YOUR LiveChats component (original classNames)
+   Brand : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type  : Space Grotesk (headers/buttons) · Inter (messages/body)
+
+   STATIC panel: position:fixed, anchored bottom-left, slides up on
+   open, collapses to a bar when .minimized. No dragging, no JS
+   positioning — so it cannot flicker. Change --lc-gap-x / --lc-gap-y
+   to move the anchor; switch `left` to `right` on .liveChatsInnerPart
+   for a bottom-right dock instead.                                     */
+
+:root {
+  --lc-navy:       #011626;
+  --lc-card:       #071e30;
+  --lc-deep:       #040f1a;
+  --lc-amber:      #ffb100;
+  --lc-amber-dim:  rgba(255, 177, 0, 0.10);
+  --lc-amber-line: rgba(255, 177, 0, 0.28);
+  --lc-white:      #ffffff;
+  --lc-off-white:  #dde6ee;
+  --lc-slate:      #8899aa;
+  --lc-slate-dim:  #4d6070;
+  --lc-border:     rgba(255, 255, 255, 0.08);
+  --lc-border-s:   rgba(255, 255, 255, 0.04);
+  --lc-green:      #22c55e;
+  --lc-red:        #ef4444;
+  --lc-mine:       #ffb100;   /* my bubble */
+  --lc-them:       #0d2437;   /* their bubble */
+
+  --lc-display: 'Space Grotesk', sans-serif;
+  --lc-body:    'Inter', sans-serif;
+
+  --lc-gap-x: 24px;   /* distance from left edge  */
+  --lc-gap-y: 24px;   /* distance from bottom edge */
+  --lc-w:     360px;
+  --lc-h:     520px;
+  --lc-head:  60px;   /* header height (collapsed size) */
+  --lc-foot:  60px;
+  --lc-ease:  0.18s ease;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TRIGGER — the icon that sits under the employee profile
+════════════════════════════════════════════════════════════════ */
+.liveChatsMain { position: relative; display: inline-block; }
+
+.liveChatsLogoIcon {
+  color:         var(--lc-amber) !important;
+  font-size:     26px !important;
+  width:         44px;
+  height:        44px;
+  padding:       10px;
+  box-sizing:    border-box;
+  border-radius: 12px;
+  border:        1px solid var(--lc-amber-line);
+  background:    var(--lc-amber-dim);
+  cursor:        pointer;
+  transition:    background var(--lc-ease), transform var(--lc-ease);
+}
+.liveChatsLogoIcon:hover { background: rgba(255,177,0,0.18); transform: translateY(-2px); }
+
+/* little online/active dot on the trigger */
+.liveChatAciveSigne {
+  position:      absolute;
+  top:           6px;
+  right:         6px;
+  width:         9px;
+  height:        9px;
+  border-radius: 50%;
+  background:    var(--lc-green);
+  border:        2px solid var(--lc-navy);
+  pointer-events: none;
+}
+
+/* incoming-message toast above the trigger */
+.liveChatFirstPopup {
+  position:      absolute;
+  bottom:        54px;
+  left:          0;
+  min-width:     150px;
+  max-width:     240px;
+  background:    var(--lc-card);
+  border:        1px solid var(--lc-border);
+  border-radius: 12px 12px 12px 4px;
+  padding:       10px 12px;
+  font-family:   var(--lc-body);
+  font-size:     13px;
+  color:         var(--lc-off-white);
+  box-shadow:    0 12px 30px rgba(0,0,0,0.5);
+  opacity:       0;
+  transform:     translateY(6px);
+  pointer-events: none;
+  transition:    opacity var(--lc-ease), transform var(--lc-ease);
+  z-index:       1001;
+}
+.liveChatFirstPopup.visible { opacity: 1; transform: translateY(0); }
+.liveChatFirstPopup span {
+  display:       -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow:      hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PANEL — fixed bottom-left, slides up
+════════════════════════════════════════════════════════════════ */
+.liveChatsInnerPart {
+  position:       fixed;
+  left:           var(--lc-gap-x);
+  bottom:         var(--lc-gap-y);
+  z-index:        1000;
+  width:          var(--lc-w);
+  height:         var(--lc-h);
+  max-height:     calc(100vh - 48px);
+  background:     var(--lc-card);
+  border:         1px solid var(--lc-border);
+  border-radius:  16px;
+  box-shadow:     0 24px 70px rgba(0,0,0,0.6);
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+  transform-origin: bottom left;
+  animation:      lcRise 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:     height var(--lc-ease);
+}
+
+@keyframes lcRise {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* minimized → collapse to just the header bar */
+.liveChatsInnerPart.minimized { height: var(--lc-head); }
+
+/* ── header ───────────────────────────────────────────────────── */
+.liveConverstaionHeder {
+  position:       relative;
+  display:        flex;
+  align-items:    center;
+  gap:            10px;
+  height:         var(--lc-head);
+  box-sizing:     border-box;
+  padding:        0 10px 0 14px;
+  background:     var(--lc-deep);
+  border-bottom:  1px solid var(--lc-border);
+  flex-shrink:    0;
+}
+
+.liveHeaderAvatarImg {
+  width:         36px;
+  height:        36px;
+  border-radius: 50%;
+  object-fit:    cover;
+  border:        1px solid var(--lc-border);
+  flex-shrink:   0;
+}
+.liveConversationAvater {
+  width:           36px !important;
+  height:          36px !important;
+  padding:         6px;
+  box-sizing:      border-box;
+  border-radius:   50%;
+  background:      var(--lc-amber-dim);
+  color:           var(--lc-amber) !important;
+  flex-shrink:     0;
+}
+
+/* small green "live" dot next to avatar */
+.liveChatHeaderLive {
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+  background:    var(--lc-green);
+  flex-shrink:   0;
+  margin-left:   -6px;
+  margin-top:    14px;
+}
+
+.supportagettext {
+  font-family:   var(--lc-display);
+  font-size:     15px;
+  font-weight:   600;
+  color:         var(--lc-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  flex:          1;
+  min-width:     0;
+}
+
+/* header action icons */
+.liveSectionAudioCallIcon,
+.liveSectionVidioCallIcon,
+.toggleMinimizebtn,
+.liveChatclosebtn {
+  color:           var(--lc-slate) !important;
+  cursor:          pointer;
+  padding:         6px;
+  border-radius:   8px;
+  flex-shrink:     0;
+  transition:      background var(--lc-ease), color var(--lc-ease);
+  font-size:       22px !important;
+}
+.liveSectionAudioCallIcon:hover,
+.liveSectionVidioCallIcon:hover { background: var(--lc-amber-dim); color: var(--lc-amber) !important; }
+.toggleMinimizebtn:hover        { background: rgba(255,255,255,0.06); color: var(--lc-white) !important; }
+.liveChatclosebtn:hover         { background: rgba(239,68,68,0.15);   color: var(--lc-red) !important; }
+
+/* ════════════════════════════════════════════════════════════════
+   MESSAGE LIST
+════════════════════════════════════════════════════════════════ */
+.liveCustomerMessages {
+  flex:           1;
+  overflow-y:     auto;
+  padding:        16px;
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+  background:     var(--lc-navy);
+}
+.liveCustomerMessages::-webkit-scrollbar { width: 6px; }
+.liveCustomerMessages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+/* date separator */
+.chatDateSeparator {
+  align-self:     center;
+  font-family:    var(--lc-body);
+  font-size:      11px;
+  color:          var(--lc-slate-dim);
+  background:     var(--lc-card);
+  border:         1px solid var(--lc-border-s);
+  border-radius:  20px;
+  padding:        3px 12px;
+  margin:         12px 0;
+}
+
+/* message rows */
+.liveCustomerMessagesCustomer,
+.liveCustomerMessagesAgent {
+  display:        flex;
+  flex-direction: column;
+  max-width:      82%;
+  margin:         2px 0;
+}
+.liveCustomerMessagesCustomer { align-self: flex-end;   align-items: flex-end; }
+.liveCustomerMessagesAgent    { align-self: flex-start; align-items: flex-start; }
+
+.senderName {
+  font-family:  var(--lc-display);
+  font-size:    11px;
+  font-weight:  600;
+  color:        var(--lc-amber);
+  margin:       4px 0 2px 4px;
+}
+
+.chatAvatar {
+  width:         26px;
+  height:        26px;
+  border-radius: 50%;
+  object-fit:    cover;
+  border:        1px solid var(--lc-border);
+  margin-bottom: 2px;
+}
+
+.message_containerInner { display: flex; flex-direction: column; min-width: 0; }
+
+/* text bubble */
+.liveCustomerMessagesText {
+  padding:       9px 13px;
+  border-radius: 16px;
+  font-family:   var(--lc-body);
+  font-size:     14px;
+  line-height:   1.5;
+  word-break:    break-word;
+  background:    var(--lc-them);
+  color:         var(--lc-off-white);
+  border-bottom-left-radius: 5px;
+}
+.liveCustomerMessagesText.liveAgentMessage {
+  background:    var(--lc-mine);
+  color:         var(--lc-deep);
+  font-weight:   500;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 5px;
+}
+
+/* time + status row */
+.messageInnerTimeAndStatus {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  margin:      3px 4px 0;
+}
+.liveCustomerMessagesCustomer .messageInnerTimeAndStatus { justify-content: flex-end; }
+
+.liveCustomerMessagesTime {
+  font-family: var(--lc-body);
+  font-size:   10px;
+  color:       var(--lc-slate-dim);
+}
+.messageStatusTicks {
+  font-family:    var(--lc-body);
+  font-size:      10px;
+  color:          var(--lc-slate);
+  font-style:     italic;
+}
+
+/* ── media grid (images / video) ──────────────────────────────── */
+.mediaGrid {
+  display:       grid;
+  gap:           3px;
+  border-radius: 14px;
+  overflow:      hidden;
+  max-width:     240px;
+}
+.mediaGrid.mediaCount_1 { grid-template-columns: 1fr; }
+.mediaGrid.mediaCount_2 { grid-template-columns: 1fr 1fr; }
+.mediaGrid.mediaCount_3,
+.mediaGrid.mediaCount_4 { grid-template-columns: 1fr 1fr; }
+
+.mediaItem {
+  position:   relative;
+  cursor:     pointer;
+  overflow:   hidden;
+  background: var(--lc-deep);
+}
+.mediaItem img,
+.mediaItem video {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  display:    block;
+  max-height: 160px;
+}
+.mediaOverlay {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(0,0,0,0.55);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           #fff;
+  font-family:     var(--lc-display);
+  font-size:       22px;
+  font-weight:     700;
+}
+
+/* pdf thumb */
+.pdfpopUPshow {
+  display:        inline-block;
+  background:     var(--lc-red);
+  color:          #fff;
+  font-family:    var(--lc-display);
+  font-size:      10px;
+  font-weight:    700;
+  padding:        2px 8px;
+  border-radius:  5px;
+  margin-bottom:  4px;
+}
+
+/* file/doc card */
+.previewDownlaodFile {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             10px;
+  background:      var(--lc-deep);
+  border:          1px solid var(--lc-border);
+  border-radius:   10px;
+  padding:         10px 12px;
+  min-width:       190px;
+}
+.fileDocsSeperator { margin: 6px 0; }
+.iconsforFiles { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.iconsforFiles img { width: 26px; height: 26px; object-fit: contain; }
+.iconsforFiles svg { color: var(--lc-amber); }
+.fileInnerText {
+  font-family:   var(--lc-body);
+  font-size:     12px;
+  color:         var(--lc-off-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+.filedownloadIcon {
+  width:           30px;
+  height:          30px;
+  flex-shrink:     0;
+  border:          none;
+  border-radius:   8px;
+  background:      var(--lc-amber-dim);
+  color:           var(--lc-amber);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  transition:      background var(--lc-ease);
+}
+.filedownloadIcon:hover { background: var(--lc-amber); color: var(--lc-deep); }
+
+/* ════════════════════════════════════════════════════════════════
+   OUTGOING FILE PREVIEW STRIP (before send)
+════════════════════════════════════════════════════════════════ */
+.preview-container {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        8px;
+  padding:    10px;
+  margin-top: 8px;
+  border-top: 1px solid var(--lc-border-s);
+}
+.preview-item {
+  position:      relative;
+  width:         58px;
+  height:        58px;
+  border-radius: 10px;
+  overflow:      hidden;
+  border:        1px solid var(--lc-border);
+}
+.preview-image { width: 100%; height: 100%; object-fit: cover; }
+.file-box {
+  width:           100%;
+  height:          100%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  background:      var(--lc-deep);
+  color:           var(--lc-slate);
+  font-family:     var(--lc-body);
+  font-size:       10px;
+}
+.remove-btn {
+  position:      absolute;
+  top:           2px;
+  right:         2px;
+  width:         18px;
+  height:        18px;
+  border:        none;
+  border-radius: 50%;
+  background:    rgba(0,0,0,0.65);
+  color:         #fff;
+  font-size:     11px;
+  line-height:   1;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+}
+.add-btn {
+  width:           58px;
+  height:          58px;
+  border:          1.5px dashed var(--lc-border);
+  border-radius:   10px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           var(--lc-slate);
+  font-family:     var(--lc-display);
+  font-size:       13px;
+  cursor:          pointer;
+}
+.add-btn:hover { border-color: var(--lc-amber-line); color: var(--lc-amber); }
+
+/* ════════════════════════════════════════════════════════════════
+   MEDIA PREVIEW MODAL
+════════════════════════════════════════════════════════════════ */
+.mediaModal {
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0,0,0,0.8);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  z-index:         2000;
+  padding:         20px;
+}
+.mediaModalContent {
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+  max-width:      560px;
+  width:          100%;
+  max-height:     90vh;
+}
+.mediaModalContent img,
+.mediaModalContent video {
+  max-width:      100%;
+  max-height:     70vh;
+  object-fit:     contain;
+  border-radius:  12px;
+  margin:         0 auto;
+}
+.mediaModalTopBar {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  flex-wrap:       wrap;
+}
+.downloadBtn, .closeBtn {
+  font-family:   var(--lc-display);
+  font-size:     13px;
+  font-weight:   500;
+  border:        1px solid var(--lc-border);
+  border-radius: 8px;
+  background:    var(--lc-card);
+  color:         var(--lc-off-white);
+  padding:       7px 13px;
+  cursor:        pointer;
+  transition:    background var(--lc-ease);
+}
+.downloadBtn:hover:not(:disabled) { background: var(--lc-amber-dim); border-color: var(--lc-amber-line); }
+.downloadBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.closeBtn:hover { background: rgba(239,68,68,0.15); color: var(--lc-red); border-color: rgba(239,68,68,0.3); }
+
+/* ════════════════════════════════════════════════════════════════
+   UPLOAD PROGRESS
+════════════════════════════════════════════════════════════════ */
+.uploadProgressWrapper { padding: 8px 14px; }
+.uploadProgressTrack {
+  position:      relative;
+  height:        26px;
+  border-radius: 8px;
+  background:    var(--lc-deep);
+  border:        1px solid var(--lc-border);
+  overflow:      hidden;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  font-family:   var(--lc-body);
+  font-size:     11px;
+  color:         var(--lc-white);
+  z-index:       0;
+}
+.uploadProgressFill { position: absolute; inset: 0; }
+.uloadPrgressFillinner {
+  position:      absolute;
+  left:          0; top: 0; bottom: 0;
+  background:    var(--lc-amber-dim);
+  border-right:  2px solid var(--lc-amber);
+  z-index:       -1;
+  transition:    width 0.2s ease;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FOOTER / COMPOSER
+════════════════════════════════════════════════════════════════ */
+.liveConverstaionFooter {
+  position:       relative;
+  display:        flex;
+  align-items:    center;
+  gap:            8px;
+  min-height:     var(--lc-foot);
+  box-sizing:     border-box;
+  padding:        10px 12px;
+  background:     var(--lc-deep);
+  border-top:     1px solid var(--lc-border);
+  flex-shrink:    0;
+}
+
+.liveChatfileInput { display: flex; cursor: pointer; }
+.liveChatfileInput input { display: none; }
+.footerliveMedia {
+  color:         var(--lc-slate) !important;
+  cursor:        pointer;
+  padding:       6px;
+  border-radius: 8px;
+  transition:    background var(--lc-ease), color var(--lc-ease);
+}
+.footerliveMedia:hover { background: var(--lc-amber-dim); color: var(--lc-amber) !important; }
+.inActiveLiveChantsendbtn { opacity: 0.4; pointer-events: none; }
+
+.messagnesEmojiINputContainer {
+  position:      relative;
+  flex:          1;
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+  background:    var(--lc-navy);
+  border:        1.5px solid var(--lc-border);
+  border-radius: 22px;
+  padding:       4px 6px 4px 12px;
+  min-width:     0;
+}
+.messagnesEmojiINputContainer:focus-within { border-color: var(--lc-amber-line); }
+.messagnesEmojiINputContainer svg { color: var(--lc-slate); cursor: pointer; flex-shrink: 0; }
+.messagnesEmojiINputContainer svg:hover { color: var(--lc-amber); }
+
+.liveConverstaionInput {
+  flex:        1;
+  border:      none;
+  outline:     none;
+  background:  transparent;
+  font-family: var(--lc-body);
+  font-size:   14px;
+  color:       var(--lc-white);
+  min-width:   0;
+  padding:     6px 0;
+}
+.liveConverstaionInput::placeholder { color: var(--lc-slate-dim); }
+
+/* emoji picker floated above the input */
+.emojiPickerWrap {
+  position:      absolute;
+  bottom:        46px;
+  right:         0;
+  z-index:       1000;
+  height:        280px;
+  width:         245px;
+  overflow:      hidden;
+  border-radius: 12px;
+  box-shadow:    0 12px 40px rgba(0,0,0,0.6);
+}
+
+.thumbUpandVoiceSection { display: flex; align-items: center; flex-shrink: 0; }
+
+.liveChatsSendbtn {
+  width:           36px;
+  height:          36px;
+  padding:         8px;
+  box-sizing:      border-box;
+  border-radius:   50%;
+  background:      var(--lc-amber);
+  color:           var(--lc-deep) !important;
+  cursor:          pointer;
+  transition:      background var(--lc-ease), transform var(--lc-ease);
+}
+.liveChatsSendbtn:hover { background: #ffc933; transform: scale(1.06); }
+
+.thumbUpbigEmoji {
+  color:         var(--lc-amber) !important;
+  cursor:        pointer;
+  padding:       6px;
+  border-radius: 8px;
+  flex-shrink:   0;
+  transition:    background var(--lc-ease);
+}
+.thumbUpbigEmoji:hover { background: var(--lc-amber-dim); }
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — full-width bottom sheet on phones
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .liveChatsInnerPart {
+    left:          0;
+    right:         0;
+    bottom:        0;
+    width:         auto;
+    height:        78vh;
+    border-radius: 16px 16px 0 0;
+    transform-origin: bottom center;
+  }
+  .liveChatsInnerPart.minimized { height: var(--lc-head); }
+  .liveChatFirstPopup { max-width: 200px; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .liveChatsInnerPart { animation: none; }
+  .liveChatsLogoIcon, .liveChatsSendbtn, .liveChatFirstPopup,
+  .liveChatsInnerPart, .filedownloadIcon { transition: none; }
+  .liveChatsLogoIcon:hover, .liveChatsSendbtn:hover { transform: none; }
+}

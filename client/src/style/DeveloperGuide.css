@@ -1,0 +1,554 @@
+/* DeveloperGuide.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings) · Inter (body) · IBM Plex Mono (code)
+   Prefix : dg- (developer guide) — zero collision with other stylesheets
+
+   Layout: sticky scroll-spy sidebar + long-form content, same skeleton
+   as the Terms page — this is the family's "reference document" shape.
+   Signature: the four ranked WHEN-TO-SEND pattern cards (BEST → NEVER),
+   because the timing question is the one every integrator asks.       */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --dg-navy:       #011626;
+  --dg-card:       #071e30;
+  --dg-deep:       #040f1a;
+  --dg-amber:      #ffb100;
+  --dg-amber-dim:  rgba(255, 177, 0, 0.10);
+  --dg-amber-line: rgba(255, 177, 0, 0.30);
+  --dg-white:      #ffffff;
+  --dg-off-white:  #c9d5e0;
+  --dg-slate:      #8899aa;
+  --dg-slate-dim:  #4d6070;
+  --dg-border:     rgba(255, 255, 255, 0.08);
+  --dg-border-s:   rgba(255, 255, 255, 0.04);
+  --dg-green:      #22c55e;
+  --dg-yellow:     #eab308;
+  --dg-red:        #ef4444;
+  --dg-red-dim:    rgba(239, 68, 68, 0.08);
+  --dg-green-dim:  rgba(34, 197, 94, 0.08);
+  --dg-yellow-dim: rgba(234, 179, 8, 0.08);
+
+  --dg-display: 'Space Grotesk', sans-serif;
+  --dg-body:    'Inter', sans-serif;
+  --dg-mono:    'IBM Plex Mono', monospace;
+
+  --dg-r:    10px;
+  --dg-r-lg: 14px;
+  --dg-ease: 0.18s ease;
+}
+
+/* ── root ─────────────────────────────────────────────────────── */
+.dg-root {
+  background:  var(--dg-navy);
+  color:       var(--dg-white);
+  font-family: var(--dg-body);
+  font-size:   15px;
+  line-height: 1.75;
+  padding:     48px 0 96px;
+  min-height:  100%;
+}
+
+.dg-container {
+  max-width: 1080px;
+  margin:    0 auto;
+  padding:   0 24px;
+}
+
+.dg-mono  { font-family: var(--dg-mono); }
+.dg-amber { color: var(--dg-amber) !important; }
+
+.dg-link {
+  color:                 var(--dg-amber);
+  text-decoration:       underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--dg-amber-line);
+  transition:            text-decoration-color var(--dg-ease);
+}
+.dg-link:hover { text-decoration-color: var(--dg-amber); }
+
+/* ════════════════════════════════════════════════════════════════
+   HERO
+════════════════════════════════════════════════════════════════ */
+.dg-hero {
+  margin-bottom:  48px;
+  padding-bottom: 36px;
+  border-bottom:  1px solid var(--dg-border);
+}
+
+.dg-eyebrow {
+  display:        block;
+  font-size:      10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color:          var(--dg-amber);
+  margin-bottom:  12px;
+}
+
+.dg-title {
+  font-family:    var(--dg-display);
+  font-size:      clamp(28px, 4.5vw, 42px);
+  font-weight:    700;
+  letter-spacing: -0.6px;
+  line-height:    1.15;
+  margin:         0 0 14px;
+}
+
+.dg-sub {
+  font-size:   16px;
+  color:       var(--dg-slate);
+  max-width:   560px;
+  line-height: 1.7;
+  margin:      0 0 24px;
+}
+
+/* base-url pill */
+.dg-baseurl {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           14px;
+  background:    var(--dg-deep);
+  border:        1px solid var(--dg-amber-line);
+  border-radius: var(--dg-r);
+  padding:       10px 16px;
+}
+
+.dg-baseurl__key {
+  font-size:      9px;
+  letter-spacing: 2px;
+  color:          var(--dg-slate-dim);
+}
+
+.dg-baseurl__val {
+  font-size:      13px;
+  color:          var(--dg-amber);
+  letter-spacing: 0.3px;
+  word-break:     break-all;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LAYOUT — sidebar + content
+════════════════════════════════════════════════════════════════ */
+.dg-layout {
+  display:               grid;
+  grid-template-columns: 210px 1fr;
+  gap:                   48px;
+  align-items:           start;
+}
+
+/* ── sidebar nav (scroll-spy) ─────────────────────────────────── */
+.dg-nav {
+  position:       sticky;
+  top:            90px;
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+  max-height:     calc(100vh - 130px);
+  overflow-y:     auto;
+  padding-right:  4px;
+}
+
+.dg-nav__link {
+  position:      relative;
+  background:    transparent;
+  border:        none;
+  text-align:    left;
+  font-family:   var(--dg-display);
+  font-size:     13px;
+  font-weight:   500;
+  color:         var(--dg-slate);
+  padding:       8px 12px 8px 16px;
+  border-radius: 8px;
+  cursor:        pointer;
+  transition:    color var(--dg-ease), background var(--dg-ease);
+  white-space:   nowrap;
+}
+
+.dg-nav__link:hover {
+  color:      var(--dg-white);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dg-nav__link--active {
+  color:      var(--dg-amber);
+  background: var(--dg-amber-dim);
+}
+
+.dg-nav__link--active::before {
+  content:       "";
+  position:      absolute;
+  left:          4px;
+  top:           8px;
+  bottom:        8px;
+  width:         3px;
+  border-radius: 3px;
+  background:    var(--dg-amber);
+}
+
+/* ── content column ───────────────────────────────────────────── */
+.dg-content { min-width: 0; }
+
+.dg-section {
+  margin-bottom:     60px;
+  scroll-margin-top: 100px;         /* anchor jumps land below the header */
+}
+.dg-section:last-child { margin-bottom: 0; }
+
+.dg-section p {
+  color:  var(--dg-off-white);
+  margin: 0 0 14px;
+}
+
+.dg-h2 {
+  font-family:    var(--dg-display);
+  font-size:      22px;
+  font-weight:    700;
+  letter-spacing: -0.3px;
+  margin:         0 0 18px;
+}
+
+.dg-h2::after {
+  content:       "";
+  display:       block;
+  width:         42px;
+  height:        3px;
+  border-radius: 3px;
+  background:    var(--dg-amber);
+  margin-top:    10px;
+}
+
+.dg-h3 {
+  font-family: var(--dg-display);
+  font-size:   15px;
+  font-weight: 600;
+  color:       var(--dg-white);
+  margin:      26px 0 10px;
+}
+
+/* inline code */
+.dg-content code {
+  background:    rgba(255, 255, 255, 0.05);
+  border:        1px solid var(--dg-border-s);
+  border-radius: 5px;
+  padding:       1px 7px;
+  font-size:     12px;
+  color:         var(--dg-off-white);
+  word-break:    break-word;
+}
+
+/* ── lists ────────────────────────────────────────────────────── */
+.dg-list {
+  margin:       0 0 14px;
+  padding-left: 22px;
+  color:        var(--dg-off-white);
+}
+
+.dg-list li {
+  margin-bottom: 10px;
+  line-height:   1.7;
+}
+
+.dg-list li::marker { color: var(--dg-amber); }
+
+.dg-list--num { list-style: decimal; }
+.dg-list--num li::marker {
+  font-family: var(--dg-mono);
+  font-size:   12px;
+  color:       var(--dg-amber);
+}
+
+.dg-list strong { color: var(--dg-white); }
+
+/* ════════════════════════════════════════════════════════════════
+   NOTICES
+════════════════════════════════════════════════════════════════ */
+.dg-notice {
+  border-radius: var(--dg-r);
+  padding:       14px 16px;
+  font-size:     13.5px;
+  line-height:   1.7;
+  color:         var(--dg-off-white);
+  margin:        18px 0;
+  border:        1px solid;
+  border-left-width: 3px;
+}
+
+.dg-notice strong { color: var(--dg-white); }
+
+.dg-notice--danger {
+  background:   var(--dg-red-dim);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+.dg-notice--danger strong { color: var(--dg-red); }
+
+.dg-notice--warn {
+  background:   var(--dg-yellow-dim);
+  border-color: rgba(234, 179, 8, 0.35);
+}
+.dg-notice--warn strong { color: var(--dg-yellow); }
+
+/* ════════════════════════════════════════════════════════════════
+   TABLES
+════════════════════════════════════════════════════════════════ */
+.dg-table {
+  width:           100%;
+  border-collapse: collapse;
+  margin:          14px 0 18px;
+  font-size:       13.5px;
+  background:      var(--dg-card);
+  border:          1px solid var(--dg-border);
+  border-radius:   var(--dg-r);
+  overflow:        hidden;
+}
+
+.dg-table th {
+  font-family:    var(--dg-mono);
+  font-size:      9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align:     left;
+  color:          var(--dg-slate-dim);
+  background:     var(--dg-deep);
+  padding:        11px 14px;
+  border-bottom:  1px solid var(--dg-border);
+}
+
+.dg-table td {
+  padding:       11px 14px;
+  border-bottom: 1px solid var(--dg-border-s);
+  color:         var(--dg-off-white);
+  vertical-align: top;
+  line-height:   1.6;
+}
+
+.dg-table tr:last-child td { border-bottom: none; }
+
+.dg-table td.dg-mono { font-size: 12.5px; }
+
+/* method badges */
+.dg-method {
+  display:        inline-block;
+  font-size:      10px;
+  font-weight:    700;
+  letter-spacing: 1px;
+  padding:        3px 9px;
+  border-radius:  5px;
+  border:         1px solid;
+}
+
+.dg-method--get {
+  color:        var(--dg-green);
+  border-color: rgba(34, 197, 94, 0.4);
+  background:   var(--dg-green-dim);
+}
+
+.dg-method--post {
+  color:        var(--dg-amber);
+  border-color: var(--dg-amber-line);
+  background:   var(--dg-amber-dim);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CODE BLOCKS
+════════════════════════════════════════════════════════════════ */
+.dg-codewrap {
+  position: relative;
+  margin:   14px 0 18px;
+}
+
+.dg-pre {
+  background:    var(--dg-deep);
+  border:        1px solid var(--dg-border);
+  border-radius: var(--dg-r);
+  padding:       16px 18px;
+  font-size:     12px;
+  line-height:   1.75;
+  color:         var(--dg-off-white);
+  overflow-x:    auto;
+  margin:        0;
+  white-space:   pre;
+  tab-size:      2;
+}
+
+.dg-copy {
+  position:        absolute;
+  top:             8px;
+  right:           8px;
+  width:           30px;
+  height:          30px;
+  border-radius:   7px;
+  border:          1px solid var(--dg-border);
+  background:      var(--dg-card);
+  color:           var(--dg-slate);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  opacity:         0.75;
+  transition:      opacity var(--dg-ease), color var(--dg-ease), border-color var(--dg-ease);
+}
+
+.dg-copy:hover {
+  opacity:      1;
+  color:        var(--dg-amber);
+  border-color: var(--dg-amber-line);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SIGNATURE — WHEN-TO-SEND PATTERN CARDS
+════════════════════════════════════════════════════════════════ */
+.dg-patterns {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   14px;
+  margin:                18px 0 6px;
+}
+
+.dg-pattern {
+  background:        var(--dg-card);
+  border:            1px solid var(--dg-border);
+  border-left-width: 3px;
+  border-radius:     var(--dg-r);
+  padding:           16px 18px;
+}
+
+.dg-pattern h4 {
+  font-family: var(--dg-display);
+  font-size:   15px;
+  font-weight: 600;
+  color:       var(--dg-white);
+  margin:      10px 0 6px;
+}
+
+.dg-pattern p {
+  font-size:   13px;
+  color:       var(--dg-slate);
+  line-height: 1.65;
+  margin:      0;
+}
+
+.dg-pattern p strong { color: var(--dg-off-white); }
+
+.dg-pattern__badge {
+  display:        inline-block;
+  font-size:      9px;
+  font-weight:    700;
+  letter-spacing: 1.5px;
+  padding:        4px 10px;
+  border-radius:  20px;
+  border:         1px solid;
+}
+
+/* tier colors */
+.dg-pattern--best  { border-left-color: var(--dg-green); }
+.dg-pattern--best .dg-pattern__badge {
+  color:        var(--dg-deep);
+  background:   var(--dg-green);
+  border-color: var(--dg-green);
+}
+
+.dg-pattern--good  { border-left-color: var(--dg-green); }
+.dg-pattern--good .dg-pattern__badge {
+  color:        var(--dg-green);
+  background:   var(--dg-green-dim);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.dg-pattern--min   { border-left-color: var(--dg-yellow); }
+.dg-pattern--min .dg-pattern__badge {
+  color:        var(--dg-yellow);
+  background:   var(--dg-yellow-dim);
+  border-color: rgba(234, 179, 8, 0.4);
+}
+
+.dg-pattern--never { border-left-color: var(--dg-red); }
+.dg-pattern--never .dg-pattern__badge {
+  color:        var(--dg-red);
+  background:   var(--dg-red-dim);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ── footer note ──────────────────────────────────────────────── */
+.dg-foot-note {
+  font-size:  13px;
+  color:      var(--dg-slate);
+  margin-top: 20px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .dg-layout { grid-template-columns: 1fr; gap: 28px; }
+
+  /* sidebar becomes a sticky horizontal pill row */
+  .dg-nav {
+    position:       sticky;
+    top:            64px;
+    z-index:        50;
+    flex-direction: row;
+    gap:            6px;
+    overflow-x:     auto;
+    overflow-y:     visible;
+    max-height:     none;
+    background:     var(--dg-navy);
+    padding:        10px 0;
+    border-bottom:  1px solid var(--dg-border-s);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .dg-nav::-webkit-scrollbar { display: none; }
+
+  .dg-nav__link {
+    flex-shrink:   0;
+    border:        1px solid var(--dg-border);
+    border-radius: 20px;
+    padding:       7px 14px;
+    font-size:     12px;
+  }
+
+  .dg-nav__link--active {
+    border-color: var(--dg-amber-line);
+  }
+  .dg-nav__link--active::before { display: none; }
+}
+
+@media (max-width: 640px) {
+  .dg-patterns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .dg-root { padding: 32px 0 72px; }
+
+  .dg-container { padding: 0 18px; }
+
+  .dg-baseurl {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            4px;
+  }
+
+  .dg-table th,
+  .dg-table td { padding: 9px 10px; font-size: 12.5px; }
+  .dg-table td.dg-mono { font-size: 11.5px; word-break: break-word; }
+
+  .dg-pre { font-size: 11px; padding: 14px; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .dg-nav__link,
+  .dg-copy,
+  .dg-link { transition: none; }
+
+  html { scroll-behavior: auto; }
+}
+
+/* ── focus visible ────────────────────────────────────────────── */
+.dg-nav__link:focus-visible,
+.dg-copy:focus-visible,
+.dg-link:focus-visible {
+  outline:        2px solid var(--dg-amber);
+  outline-offset: 3px;
+  border-radius:  6px;
+}

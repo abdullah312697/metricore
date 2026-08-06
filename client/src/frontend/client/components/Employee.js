@@ -1,534 +1,680 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import profie from '../../../images/profile/male.png';
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import CallIcon from '@mui/icons-material/Call';
-import { useEffect, useRef } from 'react';
-import {Altaxios} from '../../Altaxios';
-import { useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
-import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import CloseIcon from '@mui/icons-material/Close';
-import LiveChats from './LiveChats';
-import { useAuth } from '../../../context/AuthContext';
+import { useState, useEffect, useRef, useMemo } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ArrowBackIcon        from "@mui/icons-material/ArrowBack";
+import EmailOutlinedIcon    from "@mui/icons-material/EmailOutlined";
+import CallIcon             from "@mui/icons-material/Call";
+import EditIcon             from "@mui/icons-material/Edit";
+import AddAPhotoIcon        from "@mui/icons-material/AddAPhoto";
+import VisibilityIcon       from "@mui/icons-material/Visibility";
+import VisibilityOffIcon    from "@mui/icons-material/VisibilityOff";
+import LiveChats            from "./LiveChats";
+import ConfirmDialog        from "./ConfirmDialog";
+import profileFallback      from "../../../images/profile/male.png";
+import { Altaxios }         from "../../Altaxios";
+import { useAuth }          from "../../../context/AuthContext";
+import "../../../style/Employee.css";
+import EmailComposer from "./EmailComposer";
 
-function Employee() {
-    const { employeeId } = useParams();
-    const [employeeData,setEmployeeData] = useState({});
-    const [isEditon, setIsEditon] = useState(false);
-    const [isFullData,setIsFullData] = useState(true);
-    const [emplyeeProfile,setEmplyeeProfile] = useState(null);
-    const [previewNewImage,setPreviewNewImage] = useState("");
-    const [porfileBtnEnable,setProfileBtnEnable] = useState(true);
-    const [isPorfielEnable,setIsProfileEnable] = useState(false);
-    const [isOpend,setIsOpend] = useState(false);
-    const [isUserScroll,setIsUserScroll] = useState(true);
-    const {updateEmployee, updateProfile, user} = useAuth();
-      const [emplyeeAddDataNew,setEmployeeDataNew] = useState({
-        YemplyeeName:"",
-        YemplyeePhone:"",
-        YemplyeeEmail:"",
-        YemplyeeLeaving:"",
-        EmplyeeSellary:"",
-        EmplyeeJoinDate:"",
-        EmplyeeRoal:"",
-        employeePosition:"",
-        FirstSelarry:"",
-        lsatPaid:"",
-        TotalSeavings:"",
-        employeeAccessPassword:"",
-        EmployeeProfileStatus: ""
-  });
-  const [resMessage,setResMessage] = useState("");
-  const [resMsgStyle,setResMsgStyle] = useState({});
-    const [resMessageinDelete,setResMessageinDelete] = useState("");
-  const [resMsgStyleinDelete,setResMsgStyleinDelete] = useState({});
-    const [resMessageinPass,setResMessageinPass] = useState("");
-  const [resMsgStyleinPass,setResMsgStyleinPass] = useState({});
-  const [isOpenPassword,setIsOpenPassword] = useState(false);
-    const isPopUpPassword = useRef(null);
-    const goback = useNavigate();
-  const mainStaus = (status) => {    
-    if(status === "Suspended"){
-      return 0
-    }else if(status === "Warned"){
-      return 1
-    }else if(status === "Blocked"){
-      return 2
-    }else if(status === "Cancel"){
-      return 3
-    }
-  };
-  const EmployeeStatus = ["Active", "Suspended", "Warned", "Blocked", "Cancel"];
-  const ActiveStauts = EmployeeStatus[0];
-  const activeIndex = useRef(0);
-  useEffect(() => {
-const indexVal = mainStaus(employeeData?.EmployeeProfileStatus ?? ActiveStauts);
-    activeIndex.current = indexVal ?? 0;
-    const totalHeight = Mainheight * activeIndex.current;
-    listRef.current.scrollTop = totalHeight;
-},[employeeData, EmployeeStatus.length,ActiveStauts]);
 
-  const [selectedStatus, setSelectedStatus] = useState(EmployeeStatus[activeIndex.current]);
-  const listRef = useRef(null);
-  const Mainheight = 30;
-  const repeatCount = 5;
-  const loopedStatuses = Array(repeatCount).fill(EmployeeStatus).flat();
-  
-  useEffect(() => {
-  if (!employeeId) return;
-  const ac = new AbortController();
-  (async () => {
-    try {
-      const res = await Altaxios.get(
-        `/newemplyee/getSingleEmployee/${encodeURIComponent(employeeId)}`,
-        { signal: ac.signal, timeout: 15000 }
-      );
-      const EmplyeeData = res.data?.employee;
-      setEmployeeData(EmplyeeData);
-      setEmployeeDataNew({
-        YemplyeeName: EmplyeeData.YemplyeeName,
-        YemplyeePhone: EmplyeeData.YemplyeePhone,
-        YemplyeeEmail: EmplyeeData.YemplyeeEmail,
-        YemplyeeLeaving: EmplyeeData.YemplyeeLeaving,
-        EmplyeeSellary: EmplyeeData.EmplyeeSellary,
-        EmplyeeJoinDate: EmplyeeData.EmplyeeJoinDate,
-        EmplyeeRoal: EmplyeeData.EmplyeeRoal,
-        employeePosition: EmplyeeData.employeePosition,
-        FirstSelarry: EmplyeeData.FirstSelarry,
-        lsatPaid: EmplyeeData.lsatPaid,
-        TotalSeavings: EmplyeeData.TotalSeavings,
-        employeeAccessPassword: EmplyeeData.employeeAccessPassword,
-        EmployeeProfileStatus: EmplyeeData.EmployeeProfileStatus
-      })
+const MANAGER_ROLES = ["Owner", "Admin"];
 
-    } catch (err) {
-      // Ignore abort/cancel errors
-      if (ac.signal.aborted) return;
-      if (Altaxios.isAxiosError?.(err)) {
-        const msg =
-          err.response?.data?.message ||
-          err.response?.statusText ||
-          err.message ||
-          "Request failed";
-        console.error(msg);
-      } else {
-        console.error("Something went wrong!", err);
-      }
-    }
-  })();
+// Which draft fields each mode may edit
+const EDITABLE_BY_MODE = {
+  manager: [
+    "YemplyeeName", "YemplyeePhone", "YemplyeeEmail", "YemplyeeLeaving",
+    "employeePosition", "EmplyeeRoal", "EmplyeeJoinDate",
+    "FirstSelarry", "EmplyeeSellary", "lsatPaid", "TotalSeavings",
+  ],
+  self: ["YemplyeeName", "YemplyeePhone", "YemplyeeLeaving"],
+  peer: [],
+};
 
-  return () => ac.abort();
-}, [employeeId]);
+// Info sections — visibility + editability are data, not JSX
+const SECTIONS = [
+  {
+    title: "Contact",
+    visibleTo: ["manager", "self", "peer"],
+    fields: [
+      { key: "YemplyeeEmail",   label: "Email",    type: "text", visibleTo: ["manager", "self", "peer"] },
+      { key: "YemplyeePhone",   label: "Phone",    type: "text", visibleTo: ["manager", "self"] },
+      { key: "YemplyeeLeaving", label: "Address",  type: "text", visibleTo: ["manager", "self"] },
+    ],
+  },
+  {
+    title: "Employment",
+    visibleTo: ["manager", "self", "peer"],
+    fields: [
+      { key: "employeePosition", label: "Position",  type: "text", visibleTo: ["manager", "self", "peer"] },
+      { key: "EmplyeeRoal",      label: "Role",      type: "text", visibleTo: ["manager", "self", "peer"] },
+      { key: "EmplyeeJoinDate",  label: "Join date", type: "date", visibleTo: ["manager", "self", "peer"] },
+    ],
+  },
+  {
+    title: "Compensation",
+    visibleTo: ["manager", "self"],   // hidden from peers entirely
+    fields: [
+      { key: "FirstSelarry",  label: "First salary",   type: "text", visibleTo: ["manager", "self"] },
+      { key: "EmplyeeSellary",label: "Current salary", type: "text", visibleTo: ["manager", "self"] },
+      { key: "lsatPaid",      label: "Last paid",      type: "text", visibleTo: ["manager", "self"] },
+      { key: "TotalSeavings", label: "Savings",        type: "text", visibleTo: ["manager", "self"] },
+    ],
+  },
+];
 
-  useEffect(() => {
-    const isCheckPopup = (event) => {
-      if(isPopUpPassword.current && !isPopUpPassword.current.contains(event.target)){
-        setIsOpenPassword(false);
-      }
-    };
-    if(isOpenPassword){
-      document.addEventListener("mousedown", isCheckPopup);
-    }
-    return () => {
-      document.removeEventListener("mousedown", isCheckPopup);
-    };
-  },[isOpenPassword]);
+// Status pills — color worn by the avatar ring (the signature)
+const STATUSES = [
+  { value: "Active",    color: "#22c55e" },
+  { value: "Suspended", color: "#ffb100" },
+  { value: "Warned",    color: "#eab308" },
+  { value: "Blocked",   color: "#ef4444" },
+  { value: "Cancel",    color: "#8899aa" },
+];
 
-//   useEffect(() => {
-//   const EmptyResult = Object.values(emplyeeAddDataNew).some(v => v == null || (typeof v === "string" && v.trim() === ""));
-//   setIsFullData(EmptyResult);
-// }, [emplyeeAddDataNew]);
+const statusColor = (status) =>
+  STATUSES.find((s) => s.value === status)?.color || "#8899aa";
 
-    const handleScroll = () => {
-      const indexVal = mainStaus(employeeData?.EmployeeProfileStatus ?? ActiveStauts);
-      const scrollHeight = listRef.current.scrollTop;
-      const index = Math.round(scrollHeight / Mainheight) % EmployeeStatus.length;
-    const totalHeight = Mainheight * EmployeeStatus.length;
-        activeIndex.current = index;
-        setSelectedStatus(EmployeeStatus[index]);  
-    if(indexVal !== activeIndex.current){
-      setIsUserScroll(false)
-    }else{
-      setIsUserScroll(true)
-    }
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT
+═══════════════════════════════════════════════════════════════ */
+export default function Employee() {
+  const { employeeId, companyName } = useParams();
+  const navigate = useNavigate();
+  const { user, updateEmployee, updateProfile } = useAuth();
 
-if (scrollHeight < totalHeight) {
-      listRef.current.scrollTop = scrollHeight + totalHeight * 2;
-    } else if (scrollHeight > totalHeight * 3) {
-      listRef.current.scrollTop = scrollHeight - totalHeight * 2;
-    }
+  // ── Viewer identity → mode ──────────────────────────────────────
+  const viewerId   = user?.employeeId || user?._id;          // 👈 adjust to your AuthContext key
+  const viewerRole = user?.EmplyeeRoal || user?.role || "";  // 👈 adjust to your AuthContext key
+  const isSelf     = String(viewerId || "") === String(employeeId);
+  const isManager  = MANAGER_ROLES.includes(viewerRole);
+  const mode       = isManager ? "manager" : isSelf ? "self" : "peer";
+
+  const editableKeys = EDITABLE_BY_MODE[mode];
+  const canEditData  = editableKeys.length > 0;
+  const canChangePhoto = mode === "manager" || mode === "self";
+  const [currentPass, setCurrentPass] = useState("");
+  // ── Server data ─────────────────────────────────────────────────
+  const [employeeData, setEmployeeData] = useState(null);
+  const [loading,   setLoading]   = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  // ── Edit state ──────────────────────────────────────────────────
+  const [editing, setEditing] = useState(false);
+  const [draft,   setDraft]   = useState({});
+  const [saving,  setSaving]  = useState(false);
+  const [saveMsg, setSaveMsg] = useState(null); // { text, ok }
+
+  // ── Photo state ─────────────────────────────────────────────────
+  const fileRef = useRef(null);
+  const [photoFile,      setPhotoFile]      = useState(null);
+  const [photoPreview,   setPhotoPreview]   = useState("");
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoMsg,       setPhotoMsg]       = useState("");
+
+  // ── Manager action state ────────────────────────────────────────
+  const [selectedStatus, setSelectedStatus] = useState("Active");
+  const [statusSaving,   setStatusSaving]   = useState(false);
+  const [statusMsg,      setStatusMsg]      = useState(null);
+
+  const [passOpen,   setPassOpen]   = useState(false);
+  const [passValue,  setPassValue]  = useState("");
+  const [passShow,   setPassShow]   = useState(false);
+  const [passSaving, setPassSaving] = useState(false);
+  const [passMsg,    setPassMsg]    = useState(null);
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting,      setDeleting]      = useState(false);
+  const [deleteError,   setDeleteError]   = useState("");
+  const [emailOpen, setEmailOpen] = useState(false);
+  // ── Flash helper ────────────────────────────────────────────────
+  const flash = (setter, text, ok) => {
+    setter({ text, ok });
+    setTimeout(() => setter(null), 3000);
   };
 
-    //preview photos  start
-const uploadReviewPhotos = (e) => {
-  let files = e.currentTarget.files[0];
-  if(files){
-    setEmplyeeProfile(files);
-  function readAndPreview(file) {
-    if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
-      const reader = new FileReader();
-      reader.addEventListener(
-        "load",
-        () => {
-            setPreviewNewImage(reader.result);
-            setProfileBtnEnable(false);
-        },
-        false,
-      );
-      reader.readAsDataURL(file);
-    }
-  }
-  readAndPreview(files);
-  }
-}
-//preview photos  end
+  // ── Fetch employee ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!employeeId) return;
+    const ac = new AbortController();
+    setLoading(true);
+    (async () => {
+      try {
+        const res = await Altaxios.get(
+          `/newemplyee/getSingleEmployee/${encodeURIComponent(employeeId)}`,
+          { signal: ac.signal, timeout: 15000 }
+        );
+        const emp = res.data?.employee;
+        setEmployeeData(emp);
+        setSelectedStatus(emp?.EmployeeProfileStatus || "Active");
+      } catch (err) {
+        if (ac.signal.aborted) return;
+        setLoadError(err.response?.data?.message || "Failed to load employee");
+      } finally {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, [employeeId]);
 
-    const setEmplyeeData = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setEmployeeDataNew({
-      ...emplyeeAddDataNew,
-      [name] : value
+  // ── Enter / leave edit mode ─────────────────────────────────────
+  const startEdit = () => {
+    const initial = {};
+    editableKeys.forEach((k) => { initial[k] = employeeData?.[k] ?? ""; });
+    setDraft(initial);
+    setEditing(true);
+  };
+
+  const cancelEdit = () => { setEditing(false); setDraft({}); };
+
+  const isDirty = useMemo(
+    () => editableKeys.some((k) => (draft[k] ?? "") !== (employeeData?.[k] ?? "")),
+    [draft, employeeData, editableKeys]
+  );
+
+  // ── Save edited fields — sends ONLY changed, allowed keys ───────
+  const handleSave = async () => {
+    const changed = {};
+    editableKeys.forEach((k) => {
+      if ((draft[k] ?? "") !== (employeeData?.[k] ?? "")) changed[k] = draft[k];
     });
-    setIsFullData(false)
-  };
+    if (!Object.keys(changed).length) { setEditing(false); return; }
 
-
-
-  const AddnewEmplyee = async() => {
-    try{
-    setIsFullData(true);
-    const adEmplyees = await updateEmployee(employeeId, emplyeeAddDataNew);
-
-      if(adEmplyees.status === 200){
-        setResMessageinDelete(adEmplyees.data.message);
-        const newEmployee = adEmplyees.data.data;
-        setResMsgStyleinDelete({color:"green",opacity:1,marginTop:"15px",marginBottom:'10px'});
-        setEmployeeDataNew({
-            YemplyeeName: newEmployee.YemplyeeName,
-            YemplyeePhone: newEmployee.YemplyeePhone,
-            YemplyeeEmail: newEmployee.YemplyeeEmail,
-            YemplyeeLeaving: newEmployee.YemplyeeLeaving,
-            EmplyeeSellary: newEmployee.EmplyeeSellary,
-            EmplyeeJoinDate: newEmployee.EmplyeeJoinDate,
-            EmplyeeRoal: newEmployee.EmplyeeRoal,
-            employeePosition: newEmployee.employeePosition,
-            FirstSelarry: newEmployee.FirstSelarry,
-            lsatPaid: newEmployee.lsatPaid,
-            TotalSeavings: newEmployee.TotalSeavings,
-            employeeAccessPassword: newEmployee.employeeAccessPassword,
-            EmployeeProfileStatus: newEmployee.EmployeeProfileStatus
-        });
-        setEmployeeData((prevData) => {
-          return{
-            ...prevData,
-            YemplyeeName: newEmployee.YemplyeeName
-          }
-        });
-      setTimeout(() => {
-          setResMsgStyleinDelete({opacity:0,marginTop:"0px",marginBottom:'0px'});
-      },3000);
-     }
-    }catch(error){
-      if(error.response){
-      setResMessageinDelete(error.response.data.message);
-      setResMsgStyleinDelete({color:"red",opacity:1,marginTop:"15px",marginBottom:'10px'})
-      setTimeout(() => {
-          setResMsgStyleinDelete({opacity:0,marginTop:"0px",marginBottom:'0px'})
-      },3000);
-      setIsFullData(false);
-      }else{
-        setResMessageinDelete("Something went wrong!");
-        console.log(error);
-      setTimeout(() => {
-          setResMsgStyleinDelete({opacity:0,marginTop:"0px",marginBottom:'0px'})
-      },3000);
-      setIsFullData(false);
+    setSaving(true);
+    try {
+      const res = await updateEmployee(employeeId, changed);
+      if (res.status === 200) {
+        setEmployeeData((prev) => ({ ...prev, ...(res.data?.data || changed) }));
+        flash(setSaveMsg, res.data?.message || "Profile updated", true);
+        setEditing(false);
       }
+    } catch (err) {
+      flash(setSaveMsg, err.response?.data?.message || "Failed to update profile", false);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const ChangeProfilePic = async() => {
-    setProfileBtnEnable(true);
-    try{
-    const EmploeeData = new FormData();
-    EmploeeData.append("files",emplyeeProfile);
-    EmploeeData.append("CloudeId",employeeData?.CloudinaryPublicId);
-    const ChangeProfile = await updateProfile(employeeId, EmploeeData);
-      if(ChangeProfile.status === 200){
-        setResMessage(ChangeProfile.data.message);
-        const newEmployee = ChangeProfile.data.data;
-        setEmployeeDataNew({
-          ...emplyeeAddDataNew,
-          EmplyeeProfile: newEmployee.EmplyeeProfile,
-          CloudinaryPublicId: newEmployee.CloudinaryPublicId,
-        });
-        setEmployeeData({
-          ...employeeData,
-          EmplyeeProfile: newEmployee.EmplyeeProfile,
-          CloudinaryPublicId: newEmployee.CloudinaryPublicId,
-        });
-        setEmplyeeProfile(null);
-        setPreviewNewImage("");
-     }
-    }catch(error){
-      console.log(error);
+  // ── Photo handlers ──────────────────────────────────────────────
+  const pickPhoto = (e) => {
+    const f = e.currentTarget.files[0];
+    if (!f) return;
+    if (!/\.(jpe?g|png|gif|webp)$/i.test(f.name)) {
+      setPhotoMsg("Please choose a JPG, PNG, GIF or WEBP image");
+      return;
     }
+    setPhotoMsg("");
+    setPhotoFile(f);
+    setPhotoPreview(URL.createObjectURL(f));
   };
-  
-  const updateEmployeePassword = async() => {
-    try{
-      const updatPass = await Altaxios.put(`/newemplyee/updateEmployeePassword/${encodeURIComponent(employeeId)}`,{employeeAccessPassword:emplyeeAddDataNew?.employeeAccessPassword});
-      if(updatPass.status === 200){
-        setEmployeeDataNew({...emplyeeAddDataNew,employeeAccessPassword:updatPass.data.data});
-          setResMessageinPass(updatPass.data.message);
-          setResMsgStyleinPass({color:"green",opacity:1,fontSize:'10px',marginBottom:'5px'})
-          setTimeout(() => {
-            setResMsgStyleinPass({opacity:0})
-          },3000);
+
+  const cancelPhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview("");
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const savePhoto = async () => {
+    if (!photoFile) return;
+    setPhotoUploading(true);
+    setPhotoMsg("");
+    try {
+      const fd = new FormData();
+      fd.append("files",   photoFile);                          // 👈 keys your backend expects
+      fd.append("CloudeId", employeeData?.CloudinaryPublicId);  //    (unchanged from old page)
+      const res = await updateProfile(employeeId, fd);
+      if (res.status === 200) {
+        const upd = res.data.data;
+        setEmployeeData((prev) => ({
+          ...prev,
+          EmplyeeProfile:     upd.EmplyeeProfile,
+          CloudinaryPublicId: upd.CloudinaryPublicId,
+        }));
+        cancelPhoto();
       }
-    }catch(error){
-      if(error.response){
-      setResMessageinPass(error.response.data.message);
-      setResMsgStyleinPass({color:"red",opacity:1,marginBottom:"5px",fontSize:'10px'})
-      setTimeout(() => {
-          setResMsgStyleinPass({opacity:0})
-      },3000);
-      }else{
-        setResMessageinPass("Something went wrong!");
-        setResMsgStyleinPass({color:"red",opacity:1,marginBottom:"5px",fontSize:'10px'})
-        console.log(error);
-      setTimeout(() => {
-          setResMsgStyleinPass({opacity:0,marginTop:"0px"})
-      },3000);
-      }
-      
+    } catch (err) {
+      setPhotoMsg(err.response?.data?.message || "Failed to update photo");
+    } finally {
+      setPhotoUploading(false);
     }
   };
 
-  const DeleteEmployyProfile = async() => {
-    try{
-      const updatPass = await Altaxios.delete(`/newemplyee/deleteEmployee/${encodeURIComponent(employeeId)}`,{
-        withCredentials: true,
-      });
-      if(updatPass.status === 200){
-            if(updatPass.status === 200){
-            goback("/");
-            setIsOpend(false);
-          }
+  // ── Manager: status ─────────────────────────────────────────────
+  const saveStatus = async () => {
+    setStatusSaving(true);
+    try {
+      const res = await Altaxios.put(
+        `/newemplyee/updateEmployeeStatus/${encodeURIComponent(employeeId)}`,
+        { EmployeeProfileStatus: selectedStatus }
+      );
+      if (res.status === 200) {
+        setEmployeeData((prev) => ({ ...prev, EmployeeProfileStatus: selectedStatus }));
+        flash(setStatusMsg, res.data?.message || "Status updated", true);
       }
-    }catch(error){
-      console.log(error);
+    } catch (err) {
+      flash(setStatusMsg, err.response?.data?.message || "Failed to update status", false);
+    } finally {
+      setStatusSaving(false);
     }
   };
-    const PredeltePopup = () => {
-      setIsOpend(true)
-    };
 
-    const cencelPopup = () => {
-        setIsOpend(false)
+  // ── Password (manager sets · self changes own) ─────────────────
+  const savePassword = async () => {
+    if (!passValue.trim()) {
+      flash(setPassMsg, "Password cannot be empty", false);
+      return;
     }
-
-
-  const updateEmployeeStatus = async() => {
-    try{
-      const updatPass = await Altaxios.put(`/newemplyee/updateEmployeeStatus/${encodeURIComponent(employeeId)}`,{EmployeeProfileStatus:selectedStatus});
-      if(updatPass.status === 200){
-        setEmployeeDataNew({...emplyeeAddDataNew,EmployeeProfileStatus:updatPass.data.data});
-          setResMessage(updatPass.data.message);
-          setResMsgStyle({color:"#00fff2",opacity:1,maringTop:'5px',textAlign:'left'})
-          setTimeout(() => {
-            setResMsgStyle({opacity:0,textAlign:'left'})
-          },3000);
+    setPassSaving(true);
+    try {
+      const body = { employeeAccessPassword: passValue };
+if (mode === "self") body.currentPassword = currentPass;
+    const res = await Altaxios.put(
+        `/newemplyee/updateEmployeePassword/${encodeURIComponent(employeeId)}`,
+        body
+      );
+      if (res.status === 200) {
+        flash(setPassMsg, res.data?.message || "Password updated", true);
+        setPassValue("");
+        setPassOpen(false);
       }
-    }catch(error){
-      if(error.response){
-      setResMessage(error.response.data.message);
-      setResMsgStyle({color:"red",opacity:1,marginTop:'5px',textAlign:'left'})
-      setTimeout(() => {
-          setResMsgStyle({opacity:0,textAlign:'left'})
-      },3000);
-      }else{
-        setResMessage("Something went wrong!");
-        setResMsgStyle({color:"red",opacity:1,marginTop:'5px',textAlign:'left'})
-        console.log(error);
-      setTimeout(() => {
-          setResMsgStyle({opacity:0,textAlign:'left'})
-      },3000);
-      }
-      
+    } catch (err) {
+      flash(setPassMsg, err.response?.data?.message || "Failed to update password", false);
+    } finally {
+      setPassSaving(false);
     }
   };
+
+  // ── Manager: delete ─────────────────────────────────────────────
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await Altaxios.delete(
+        `/newemplyee/deleteEmployee/${encodeURIComponent(employeeId)}`,
+        { withCredentials: true }
+      );
+      navigate(`/company/${companyName || user?.companyName}`, { replace: true });
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || "Failed to delete employee");
+      setDeleting(false);
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════════════════════════════ */
+  if (loading) {
+    return (
+      <div className="ep-root">
+        <div className="ep-loading ep-mono">LOADING PROFILE…</div>
+      </div>
+    );
+  }
+
+  if (loadError || !employeeData) {
+    return (
+      <div className="ep-root">
+        <div className="ep-load-error">
+          <p>{loadError || "Employee not found."}</p>
+          <Link to={`/company/${companyName || user?.companyName}`} className="ep-btn ep-btn--ghost">
+            ← Back to dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const status    = employeeData.EmployeeProfileStatus || "Active";
+  const ringColor = statusColor(status);
+  const showStatusBadge = mode !== "peer"; // status is sensitive — hidden from peers
+
   return (
-    <div className='ProductPageMain'>
-        <Link to={`/company/${user?.companyName}`} className='arrowback_a'><ArrowBackIcon className='arrowbackIcon'/></Link>
-    {/* delete pre popup <>*/}
-      <div className='preDeletebtnContainer' style={{display:`${!isOpend ? 'none' : 'block'}`,left:'455px'}}>
-    <div className="preDeletePopup">
-        <h6>Are you sure to Delete!?</h6>
-        <div className='deleteornotbutton'>
-            <button className='nextnotsupportbtn' onClick={cencelPopup}>No</button>
-            <button className='nextsupportbtn' onClick={DeleteEmployyProfile}>Yes</button>
-        </div>
-    </div>
-    </div>
-  {/* delete pre popup </>*/}
+    <div className="ep-root">
+      <div className="ep-container">
 
-        <div className='EmployeeMainPage'>
-            <div className='EmployeeMainInner'>
-            <div className='EmployeeProfielSection'>
-                <div className='EmployeeProfieName'>
-                  <div className='EmployeeImageContianer'>
-                    <AddAPhotoIcon onClick={() => setIsProfileEnable(!isPorfielEnable)}/>
-                    <img src={employeeData?.EmplyeeProfile ?? profie} alt="employee profiel"/>
-                    <h2>{employeeData?.YemplyeeName ?? "Employee name"}</h2>
-                  </div>
-                    <div className='EmployeeProfileChange' style={{display:`${!isPorfielEnable ? 'none' : 'block' }`}}>
-                      <CloseIcon onClick={() => {setIsProfileEnable(!isPorfielEnable); setPreviewNewImage(""); setProfileBtnEnable(true);}}/>
-                      <div className='ImageChangeContainer'>
-                        <div className='EmployeePorfileChaneCard'>
-                          <img src={employeeData?.EmplyeeProfile} alt="user profile"/>
-                        </div>
-                        <div className='EmployeePorfileChaneCard' style={{display:`${previewNewImage !== "" ? 'block' : 'none'}`}}>
-                          <img src={previewNewImage} alt="review profile"/>
-                        </div>
-                        <div className='EmployeePorfileChaneCard'>
-                          <label className='inputbuttonforEmployee'>
-                            <input type='file' onChange={uploadReviewPhotos}/>
-                            <AddPhotoAlternateIcon/>
-                          </label>
-                        </div>
-                      </div>
-                      <div className='ImageChangeAction'>
-                        <button onClick={ChangeProfilePic} disabled={porfileBtnEnable}>Change photo</button>
-                      </div>
-                    </div>
-                </div>
-                <div className='ConnectonType'>
-                    <div className='connectionButton'><EmailOutlinedIcon style={{color:'#ffb100'}}/></div>
-                    <div className='connectionButton'><LiveChats employeeData={employeeData}/></div>
-                    {/* <ChatIcon style={{color:'#00fff2de'}}/> */}
-                    <div className='connectionButton'><CallIcon style={{color:'#48ff00'}}/></div>
-                </div>
-            </div>
-            <div className='EmployeeInformation'>
-                <div className='EmployeePorfileEdit' onClick={() => !isEditon ? (setIsEditon(true), setIsFullData(true)) : setIsEditon(false)}>Edit profie <EditIcon style={{fontSize:'17px'}}/></div>
-                <div className='EmployeeInformationInner'>
-                    <div className='EmployeeData'>
-                        <span><b>Name: </b></span><span>{employeeData?.YemplyeeName ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Email: </b></span><span>{employeeData?.YemplyeeEmail ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Phone: </b></span><span>{employeeData?.YemplyeePhone ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Position: </b></span><span>{employeeData?.employeePosition ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Address: </b></span><span>{employeeData?.YemplyeeLeaving ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Join date: </b></span><span>{employeeData?.EmplyeeJoinDate ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Employee Roal: </b></span><span>{employeeData?.EmplyeeRoal ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>First Sellary: </b></span><span>{employeeData?.FirstSelarry ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Current Sellary: </b></span><span>{employeeData?.EmplyeeSellary ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>Last Sellary Paid: </b></span><span>{employeeData?.lsatPaid ?? ""}</span>
-                    </div>
-                    <div className='EmployeeData'>
-                        <span><b>savings: </b></span><span>{employeeData?.TotalSeavings ?? ""}</span>
-                    </div>
-                </div>
-                <div className='EmployeeInformatinConainer' style={{display:`${!isEditon ? "none" : "block"} `}}>
-                <div className='EmployeeInfomationEdit'>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Name: </b></span><input type="text" name="YemplyeeName" value={emplyeeAddDataNew?.YemplyeeName ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Email: </b></span><input type="text" name="YemplyeeEmail" value={emplyeeAddDataNew?.YemplyeeEmail ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Phone: </b></span><input type="text" name="YemplyeePhone" value={emplyeeAddDataNew?.YemplyeePhone ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Position: </b></span><input type="text" name="employeePosition" value={emplyeeAddDataNew?.employeePosition ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Address: </b></span><input type="text" name="YemplyeeLeaving" value={emplyeeAddDataNew?.YemplyeeLeaving ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Join date: </b></span><input type="date" name="EmplyeeJoinDate" value={emplyeeAddDataNew?.EmplyeeJoinDate ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Employee Roal: </b></span><input type="text" name="EmplyeeRoal" value={emplyeeAddDataNew?.EmplyeeRoal ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>First Sellary: </b></span><input type="text" name="FirstSelarry" value={emplyeeAddDataNew?.FirstSelarry ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Current Sellary: </b></span><input type="text" name="EmplyeeSellary" value={emplyeeAddDataNew?.EmplyeeSellary ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>Last Sellary Paid: </b></span><input type="text" name="lsatPaid" value={emplyeeAddDataNew?.lsatPaid ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                    <div className='EmployeeDataEdit'>
-                        <span><b>savings: </b></span><input type="text" name="TotalSeavings" value={emplyeeAddDataNew?.TotalSeavings ?? ""} onChange={setEmplyeeData}/>
-                    </div>
-                </div>
-                    <div className='showErrorOrSuccess' style={resMsgStyleinDelete}>{resMessageinDelete}</div>
-                    <div className='EmployeeDataUpdateButton'>
-                        <button style={{color:'#bb8600'}} disabled={isFullData} onClick={AddnewEmplyee}>Update</button>
-                        <button style={{color:'rgb(0 255 245)'}} onClick={() => {setIsEditon(false)}}>Cancel</button>
-                    </div>
-            </div>
-            </div>
-            <div className='EmployeeActions'>
-                <h2>Take Action</h2>
-                <div className='setPasswordContainer' style={{display:`${!isOpenPassword ? 'none' : 'block'}`}} ref={isPopUpPassword}>
-                  <h2>Set/update password</h2>
-                  <div className='setpasswordInner'>
-                    <label htmlFor='employeeAccessPassword'>set/update password</label>
-                    <input type="text" value={emplyeeAddDataNew?.employeeAccessPassword ?? ""} onChange={(e) => {setEmployeeDataNew({...emplyeeAddDataNew,[e.target.name]:e.target.value})}} placeholder='password...' name="employeeAccessPassword" id="employeeAccessPassword"/>
-                    <div className='showErrorOrSuccess' style={resMsgStyleinPass}>{resMessageinPass}</div>
-                    <button onClick={updateEmployeePassword}>Submit</button>
-                  </div>
-                </div>
-                <div className='ActionButtonMain'>
-                    <button style={{color:"#00ff66",borderColor:"#00ff66"}} onClick={() => setIsOpenPassword((prev) => !prev)}>Set Password</button>
-                    <div className='userStatusScrollingMain'>
-                      <div className='previewStatusContainer'>
-                        <div className='previewStatusInner'>
-                            <div className='satausMainContainer'  ref={listRef} onScroll={handleScroll}>
-                              {loopedStatuses.map((status,index) => (
-                                <div className={`StausInnerText ${
-              (index % EmployeeStatus.length) === activeIndex.current ? "activeStatus" : ""
-            }`} key={index} data-value={status}>{status}</div>
-                              ))}
-                            </div>
-                            <div className='StatusCenterLabel'></div>
-                        </div>
-                        <button onClick={updateEmployeeStatus} disabled={isUserScroll}>Update</button>
-                      </div>
-                        <div className='showErrorOrSuccess' style={resMsgStyle}>{resMessage}</div>
-                      </div>
-                    <button style={{color:"#ff0000",borderColor:"#ff0000"}} onClick={PredeltePopup}>Delete Profiel</button>
-                </div>
-            </div>
+        {/* ── Top bar ───────────────────────────────────────────── */}
+        <div className="ep-topbar">
+          <Link to={`/company/${companyName || user?.companyName}`} className="ep-back" aria-label="Back">
+            <ArrowBackIcon style={{ fontSize: 22 }} />
+          </Link>
+          <span className={`ep-mode-chip ep-mono ep-mode-chip--${mode}`}>
+            {mode === "manager" ? "Manager view" : mode === "self" ? "Your profile" : "Team member"}
+          </span>
         </div>
+
+        <div className="ep-grid">
+
+          {/* ══ LEFT — identity card ══════════════════════════════ */}
+          <aside className="ep-identity">
+
+            {/* Avatar — ring wears the status color */}
+            <div className="ep-avatar-wrap">
+              <div
+                className="ep-avatar"
+                style={showStatusBadge ? { borderColor: ringColor, boxShadow: `0 0 0 4px ${ringColor}22` } : {}}
+              >
+                <img
+                  src={photoPreview || employeeData.EmplyeeProfile || profileFallback}
+                  alt={employeeData.YemplyeeName || "Employee"}
+                />
+                {canChangePhoto && !photoUploading && (
+                  <button
+                    className="ep-avatar__change"
+                    onClick={() => fileRef.current?.click()}
+                    aria-label="Change photo"
+                  >
+                    <AddAPhotoIcon style={{ fontSize: 18 }} />
+                  </button>
+                )}
+                {photoUploading && (
+                  <span className="ep-avatar__busy"><span className="ep-spinner" /></span>
+                )}
+              </div>
+
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="ep-file-hidden"
+                onChange={pickPhoto}
+              />
+            </div>
+
+            {/* Pending photo confirm */}
+            {photoFile && !photoUploading && (
+              <div className="ep-photo-pending">
+                <button className="ep-btn ep-btn--ghost ep-btn--sm" onClick={cancelPhoto}>Cancel</button>
+                <button className="ep-btn ep-btn--primary ep-btn--sm" onClick={savePhoto}>Save photo</button>
+              </div>
+            )}
+            {photoMsg && <p className="ep-flash ep-flash--err">{photoMsg}</p>}
+
+            {/* Name — editable inline when in edit mode */}
+            {editing && editableKeys.includes("YemplyeeName") ? (
+              <input
+                className="ep-input ep-name-input"
+                value={draft.YemplyeeName ?? ""}
+                onChange={(e) => setDraft((p) => ({ ...p, YemplyeeName: e.target.value }))}
+                placeholder="Employee name"
+              />
+            ) : (
+              <h1 className="ep-name">{employeeData.YemplyeeName || "Employee"}</h1>
+            )}
+
+            <p className="ep-position">{employeeData.employeePosition || "—"}</p>
+
+            {showStatusBadge && (
+              <span className="ep-status-badge ep-mono" style={{ color: ringColor, borderColor: `${ringColor}55`, background: `${ringColor}14` }}>
+                ● {status}
+              </span>
+            )}
+
+            {/* Contact icons — only when viewing SOMEONE ELSE */}
+            {!isSelf && (
+              <div className="ep-contact">
+                <div
+                  className="ep-contact__btn"
+                  title="Send email"
+                  aria-label="Send email"
+                >
+                  <EmailOutlinedIcon  onClick={() => setEmailOpen(true)} style={{ fontSize: 20, color: "#ffb100" }} />
+                </div>
+                    <LiveChats employeeData={employeeData} />
+
+                <a
+                  href={employeeData.YemplyeePhone ? `tel:${employeeData.YemplyeePhone}` : undefined}
+                  className={`ep-contact__btn ${!employeeData.YemplyeePhone ? "ep-contact__btn--disabled" : ""}`}
+                  title="Call"
+                  aria-label="Call"
+                >
+                  <CallIcon style={{ fontSize: 20, color: "#48ff00" }} />
+                </a>
+              </div>
+            )}
+
+          </aside>
+
+          {/* ══ RIGHT — info sections ═════════════════════════════ */}
+          <main className="ep-main">
+
+            {/* Edit controls */}
+            {canEditData && (
+              <div className="ep-edit-row">
+                {saveMsg && (
+                  <span className={`ep-flash ${saveMsg.ok ? "ep-flash--ok" : "ep-flash--err"}`}>
+                    {saveMsg.text}
+                  </span>
+                )}
+                {!editing ? (
+                  <button className="ep-btn ep-btn--ghost ep-btn--sm" onClick={startEdit}>
+                    <EditIcon style={{ fontSize: 16 }} /> Edit profile
+                  </button>
+                ) : (
+                  <div className="ep-edit-actions">
+                    <button className="ep-btn ep-btn--ghost ep-btn--sm" onClick={cancelEdit} disabled={saving}>
+                      Cancel
+                    </button>
+                    <button className="ep-btn ep-btn--primary ep-btn--sm" onClick={handleSave} disabled={saving || !isDirty}>
+                      {saving && <span className="ep-spinner ep-spinner--dark" />}
+                      Save changes
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Data sections — rendered from config */}
+            {SECTIONS.filter((s) => s.visibleTo.includes(mode)).map((section) => {
+              const fields = section.fields.filter((f) => f.visibleTo.includes(mode));
+              if (!fields.length) return null;
+              return (
+                <section className="ep-card" key={section.title}>
+                  <h2 className="ep-card__heading">{section.title}</h2>
+                  <div className="ep-fields">
+                    {fields.map((f) => {
+                      const editable = editing && editableKeys.includes(f.key);
+                      return (
+                        <div className="ep-field" key={f.key}>
+                          <span className="ep-field__label ep-mono">{f.label}</span>
+                          {editable ? (
+                            <input
+                              type={f.type}
+                              className="ep-input"
+                              value={draft[f.key] ?? ""}
+                              onChange={(e) =>
+                                setDraft((p) => ({ ...p, [f.key]: e.target.value }))
+                              }
+                            />
+                          ) : (
+                            <span className="ep-field__value">
+                              {employeeData[f.key] || <span className="ep-empty">—</span>}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+
+            {/* ── Self: change own password ──────────────────────── */}
+            {mode === "self" && (
+              <section className="ep-card">
+                <h2 className="ep-card__heading">Security</h2>
+                {!passOpen ? (
+                  <button className="ep-btn ep-btn--ghost ep-btn--sm" onClick={() => setPassOpen(true)}>
+                    Change my password
+                  </button>
+                ) : (
+                  <PasswordForm
+                    value={passValue} setValue={setPassValue}
+                    show={passShow}   setShow={setPassShow}
+                    saving={passSaving} msg={passMsg}
+                    onSave={savePassword}
+                    mode={mode}
+                    currentPass={currentPass}
+                    setCurrentPass={setCurrentPass}
+                    onCancel={() => { setPassOpen(false); setPassValue(""); }}
+                  />
+                )}
+                {!passOpen && passMsg && (
+                  <span className={`ep-flash ${passMsg.ok ? "ep-flash--ok" : "ep-flash--err"}`}>{passMsg.text}</span>
+                )}
+              </section>
+            )}
+
+            {/* ── Manager actions ────────────────────────────────── */}
+            {mode === "manager" && (
+              <section className="ep-card ep-card--actions">
+                <h2 className="ep-card__heading">Manage employee</h2>
+
+                {/* Status pills */}
+                <div className="ep-action-block">
+                  <span className="ep-action-label ep-mono">Profile status</span>
+                  <div className="ep-status-pills">
+                    {STATUSES.map((s) => (
+                      <button
+                        key={s.value}
+                        className={`ep-status-pill ${selectedStatus === s.value ? "ep-status-pill--active" : ""}`}
+                        style={selectedStatus === s.value
+                          ? { color: s.color, borderColor: `${s.color}66`, background: `${s.color}14` }
+                          : {}}
+                        onClick={() => setSelectedStatus(s.value)}
+                      >
+                        <span className="ep-status-pill__dot" style={{ background: s.color }} />
+                        {s.value}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="ep-action-foot">
+                    {statusMsg && (
+                      <span className={`ep-flash ${statusMsg.ok ? "ep-flash--ok" : "ep-flash--err"}`}>{statusMsg.text}</span>
+                    )}
+                    <button
+                      className="ep-btn ep-btn--primary ep-btn--sm"
+                      onClick={saveStatus}
+                      disabled={statusSaving || selectedStatus === status}
+                    >
+                      {statusSaving && <span className="ep-spinner ep-spinner--dark" />}
+                      Update status
+                    </button>
+                  </div>
+                </div>
+
+                <div className="ep-divider" />
+
+                {/* Set password */}
+                <div className="ep-action-block">
+                  <span className="ep-action-label ep-mono">Access password</span>
+                  {!passOpen ? (
+                    <button className="ep-btn ep-btn--ghost ep-btn--sm" onClick={() => setPassOpen(true)}>
+                      Set / update password
+                    </button>
+                  ) : (
+                    <PasswordForm
+                      value={passValue} setValue={setPassValue}
+                      show={passShow}   setShow={setPassShow}
+                      saving={passSaving} msg={passMsg}
+                      onSave={savePassword}
+                      mode={mode}
+                      currentPass={currentPass}
+                      setCurrentPass={setCurrentPass}
+                      onCancel={() => { setPassOpen(false); setPassValue(""); }}
+                    />
+                  )}
+                  {!passOpen && passMsg && (
+                    <span className={`ep-flash ${passMsg.ok ? "ep-flash--ok" : "ep-flash--err"}`}>{passMsg.text}</span>
+                  )}
+                </div>
+
+                <div className="ep-divider" />
+
+                {/* Danger zone — self-deletion blocked in UI */}
+                {!isSelf && (
+                  <div className="ep-danger">
+                    <div>
+                      <h4 className="ep-danger__title">Delete this employee</h4>
+                      <p className="ep-danger__desc">
+                        Removes the profile and revokes their access permanently.
+                      </p>
+                    </div>
+                    <button className="ep-danger__btn" onClick={() => { setDeleteError(""); setConfirmDelete(true); }}>
+                      Delete profile
+                    </button>
+                  </div>
+                )}
+              </section>
+            )}
+
+<EmailComposer
+  open={emailOpen}
+  onClose={() => setEmailOpen(false)}
+  recipients={[{ _id: employeeData._id, name: employeeData.YemplyeeName }]}
+/>
+          </main>
         </div>
+      </div>
+
+      {/* ── Delete confirmation — the reusable dialog ───────────── */}
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete this employee?"
+        message={`"${employeeData.YemplyeeName || "This employee"}" will lose all access immediately and their profile will be permanently removed.`}
+        error={deleteError}
+        confirmLabel="Delete employee"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
-  )
+  );
 }
 
-export default Employee
+/* ── Small shared password form (manager + self reuse it) ───────── */
+function PasswordForm({ mode, currentPass, setCurrentPass, value, setValue, show, setShow, saving, msg, onSave, onCancel }) {
+  return (
+    <div className="ep-pass-form">
+      <div className="ep-pass-input-wrap">
+        <input
+          type={show ? "text" : "password"}
+          className="ep-input"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="New password…"
+          autoComplete="new-password"
+        />
+          {mode === "self" && (
+            <input
+              type="password"
+              className="ep-input"
+              placeholder="Current password…"
+              autoComplete="current-password"
+              value={currentPass}
+              onChange={(e) => setCurrentPass(e.target.value)}
+            />
+          )}
+        <button
+          type="button"
+          className="ep-pass-toggle"
+          onClick={() => setShow((p) => !p)}
+          aria-label={show ? "Hide password" : "Show password"}
+        >
+          {show ? <VisibilityOffIcon style={{ fontSize: 17 }} /> : <VisibilityIcon style={{ fontSize: 17 }} />}
+        </button>
+      </div>
+
+      {msg && (
+        <span className={`ep-flash ${msg.ok ? "ep-flash--ok" : "ep-flash--err"}`}>{msg.text}</span>
+      )}
+
+      <div className="ep-pass-actions">
+        <button className="ep-btn ep-btn--ghost ep-btn--sm" onClick={onCancel} disabled={saving}>
+          Cancel
+        </button>
+        <button className="ep-btn ep-btn--primary ep-btn--sm" onClick={onSave} disabled={saving}>
+          {saving && <span className="ep-spinner ep-spinner--dark" />}
+          Save password
+        </button>
+      </div>
+    </div>
+  );
+}

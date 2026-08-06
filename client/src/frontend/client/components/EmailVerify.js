@@ -78,11 +78,8 @@ const EmailVerify = () => {
       updateCheckEmptyState();
 
       // Generate random 6 digit code
-      const code = Math.floor(100000 + Math.random() * 900000);
 
-      const res = await Altaxios.put("/users/updateVfCode", {
-        verifyCode: code,
-      });
+      const res = await Altaxios.put("/users/updateVfCode");
 
       if (res.status === 200) {
         setErrMsg(res.data.message);

@@ -1,0 +1,382 @@
+/* EmployeeList.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body) · IBM Plex Mono (count/salary)
+   Prefix : el- (employee list)
+
+   BUILT FOR A FIXED-SIZE PARENT:
+     .MainContainerChunk { width:600px; height:300px; overflow:hidden; }
+
+   Three stacked regions inside it:
+     .el-topbar  — fixed height, never scrolls
+     .el-head    — fixed column labels, never scrolls
+     .el-scroll  — flex:1, THE ONLY scrolling region (holds .el-row)
+
+   .el-root is height:100% + flex column, so .el-scroll absorbs the
+   leftover height automatically — if the parent grows to 400px or
+   600px, the scroll area grows with it. No hardcoded row-area height.
+
+   Columns come from ONE shared grid template (--el-cols) used by both
+   .el-head and .el-row, so labels always line up with cells. Widths
+   are tuned to fit 600px; they degrade by dropping columns below.     */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --el-navy:       #011626;
+  --el-card:       #071e30;
+  --el-deep:       #040f1a;
+  --el-amber:      #ffb100;
+  --el-amber-dim:  rgba(255, 177, 0, 0.10);
+  --el-amber-line: rgba(255, 177, 0, 0.28);
+  --el-amber-glow: rgba(255, 177, 0, 0.22);
+  --el-white:      #ffffff;
+  --el-off-white:  #dde6ee;
+  --el-slate:      #8899aa;
+  --el-slate-dim:  #4d6070;
+  --el-border:     rgba(255, 255, 255, 0.08);
+  --el-border-s:   rgba(255, 255, 255, 0.04);
+  --el-green:      #22c55e;
+
+  --el-display: 'Space Grotesk', sans-serif;
+  --el-body:    'Inter', sans-serif;
+  --el-mono:    'IBM Plex Mono', monospace;
+
+  --el-r:    9px;
+  --el-ease: 0.16s ease;
+  --el-padx: 14px;   /* horizontal padding, shared by all three regions */
+
+  /* shared column template — head + rows use THIS so they align.
+     Sized for a 600px parent: 36+44+90+70+58 fixed = 298px,
+     + 6 gaps x 8px = 48, leaves ~226px for name/role fr columns. */
+  --el-cols: 36px 44px 1.25fr 1fr 90px 70px 58px;
+}
+
+/* ── shell — fills the fixed parent ───────────────────────────── */
+.el-root {
+  height:         100%;
+  display:        flex;
+  flex-direction: column;
+  min-height:     0;              /* lets the scroll child shrink properly */
+  font-family:    var(--el-body);
+  color:          var(--el-white);
+  box-sizing:     border-box;
+}
+
+.el-mono { font-family: var(--el-mono); }
+
+/* ══ REGION 1 — top bar (fixed) ═══════════════════════════════ */
+.el-topbar {
+  flex-shrink:     0;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             10px;
+  padding:         11px var(--el-padx);
+  border-bottom:   1px solid var(--el-border-s);
+  box-sizing:      border-box;
+}
+
+.el-topbar__left {
+  display:     flex;
+  align-items: center;
+  gap:         9px;
+  min-width:   0;
+}
+
+.el-title {
+  font-family:    var(--el-display);
+  font-size:      16px;
+  font-weight:    700;
+  letter-spacing: -0.2px;
+  margin:         0;
+  white-space:    nowrap;
+}
+
+.el-count {
+  font-size:     11px;
+  color:         var(--el-amber);
+  background:    var(--el-amber-dim);
+  border:        1px solid var(--el-amber-line);
+  border-radius: 20px;
+  padding:       1px 9px;
+}
+
+.el-topbar__actions {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  flex-shrink: 0;
+}
+
+.el-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             6px;
+  font-family:     var(--el-display);
+  font-weight:     600;
+  font-size:       12.5px;
+  border-radius:   var(--el-r);
+  padding:         7px 13px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:      background var(--el-ease), color var(--el-ease),
+                   border-color var(--el-ease), transform var(--el-ease);
+}
+
+.el-btn--add { background: var(--el-amber); color: var(--el-deep); }
+.el-btn--add:hover { background: #ffc933; transform: translateY(-1px); }
+
+.el-btn--email {
+  background:   var(--el-amber-dim);
+  border-color: var(--el-amber-line);
+  color:        var(--el-amber);
+}
+.el-btn--email:hover { background: rgba(255, 177, 0, 0.18); }
+
+/* ══ REGION 2 — column header (fixed) ═════════════════════════ */
+.el-head {
+  flex-shrink:           0;
+  display:               grid;
+  grid-template-columns: var(--el-cols);
+  align-items:           center;
+  gap:                   8px;
+  padding:               0 var(--el-padx);
+  height:                34px;
+  background:            var(--el-deep);
+  border-top:            1px solid var(--el-border-s);
+  border-bottom:         1px solid var(--el-border);
+  box-sizing:            border-box;
+
+  /* reserve the scrollbar's width so header columns stay aligned
+     with rows once the list overflows */
+  scrollbar-gutter:      stable;
+}
+
+.el-head span {
+  font-family:    var(--el-mono);
+  font-size:      8.5px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color:          var(--el-slate-dim);
+  white-space:    nowrap;
+}
+
+/* ══ REGION 3 — THE SCROLL AREA (only this scrolls) ═══════════ */
+.el-scroll {
+  flex:       1;
+  min-height: 0;              /* critical: allows overflow inside flex */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* thin branded scrollbar */
+.el-scroll::-webkit-scrollbar        { width: 7px; }
+.el-scroll::-webkit-scrollbar-track  { background: transparent; }
+.el-scroll::-webkit-scrollbar-thumb  {
+  background:    rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+.el-scroll::-webkit-scrollbar-thumb:hover { background: var(--el-amber-line); }
+.el-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+
+/* ── employee row ─────────────────────────────────────────────── */
+.el-row {
+  display:               grid;
+  grid-template-columns: var(--el-cols);
+  align-items:           center;
+  gap:                   8px;
+  padding:               0 var(--el-padx);
+  min-height:            54px;
+  border-bottom:         1px solid var(--el-border-s);
+  cursor:                pointer;
+  box-sizing:            border-box;
+  transition:            background var(--el-ease);
+}
+.el-row:last-child { border-bottom: none; }
+.el-row:hover      { background: rgba(255, 255, 255, 0.03); }
+
+.el-row--selected        { background: var(--el-amber-dim); }
+.el-row--selected:hover  { background: rgba(255, 177, 0, 0.15); }
+
+/* ── custom checkbox ──────────────────────────────────────────── */
+.el-check {
+  display:     flex;
+  align-items: center;
+  cursor:      pointer;
+}
+.el-check input {
+  position: absolute;
+  opacity:  0;
+  width:    0;
+  height:   0;
+}
+.el-check__box {
+  width:           17px;
+  height:          17px;
+  border-radius:   5px;
+  border:          1.5px solid var(--el-border);
+  background:      var(--el-deep);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      background var(--el-ease), border-color var(--el-ease);
+}
+.el-check:hover .el-check__box { border-color: var(--el-amber-line); }
+.el-check input:checked + .el-check__box {
+  background:   var(--el-amber);
+  border-color: var(--el-amber);
+}
+.el-check input:checked + .el-check__box::after {
+  content:      "";
+  width:        4px;
+  height:       8px;
+  border:       solid var(--el-deep);
+  border-width: 0 2px 2px 0;
+  transform:    rotate(45deg) translate(-1px, -1px);
+}
+.el-check input:focus-visible + .el-check__box {
+  outline:        2px solid var(--el-amber);
+  outline-offset: 2px;
+}
+
+/* ── cells ────────────────────────────────────────────────────── */
+.el-col-profile { display: flex; align-items: center; }
+
+.el-avatar {
+  width:         36px;
+  height:        36px;
+  border-radius: 7px;
+  object-fit:    cover;
+  border:        1px solid var(--el-border);
+  background:    var(--el-deep);
+  display:       block;
+}
+
+.el-col-name {
+  font-family:   var(--el-display);
+  font-size:     13.5px;
+  font-weight:   500;
+  color:         var(--el-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  min-width:     0;
+}
+
+.el-col-role { min-width: 0; }
+.el-role-pill {
+  display:       inline-block;
+  max-width:     100%;
+  font-size:     10.5px;
+  font-weight:   500;
+  color:         var(--el-off-white);
+  background:    var(--el-deep);
+  border:        1px solid var(--el-border);
+  border-radius: 20px;
+  padding:       3px 10px;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  box-sizing:    border-box;
+}
+
+.el-status {
+  display:     inline-flex;
+  align-items: center;
+  gap:         5px;
+  font-size:   11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.el-status__dot {
+  width:         6px;
+  height:        6px;
+  border-radius: 50%;
+  flex-shrink:   0;
+}
+.el-status--on       { color: var(--el-green); }
+.el-status--on  .el-status__dot {
+  background: var(--el-green);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+}
+.el-status--off      { color: var(--el-slate-dim); }
+.el-status--off .el-status__dot { background: var(--el-slate-dim); }
+
+.el-col-salary {
+  font-size:     12px;
+  color:         var(--el-off-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.el-col-action { display: flex; justify-content: flex-end; }
+.el-view {
+  font-family:     var(--el-display);
+  font-size:       11.5px;
+  font-weight:     600;
+  color:           var(--el-amber);
+  text-decoration: none;
+  border:          1px solid var(--el-amber-line);
+  border-radius:   7px;
+  padding:         5px 11px;
+  white-space:     nowrap;
+  transition:      background var(--el-ease);
+}
+.el-view:hover { background: var(--el-amber-dim); }
+
+/* ── empty state — fills the scroll region ────────────────────── */
+.el-scroll--empty {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  overflow:        hidden;
+}
+
+.el-empty {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             8px;
+  padding:         26px 34px;
+  border:          1.5px dashed var(--el-border);
+  border-radius:   12px;
+  text-decoration: none;
+  transition:      border-color var(--el-ease), background var(--el-ease);
+}
+.el-empty:hover {
+  border-color: var(--el-amber-line);
+  background:   var(--el-amber-dim);
+}
+.el-empty h4 {
+  font-family: var(--el-display);
+  font-size:   13.5px;
+  font-weight: 600;
+  color:       var(--el-off-white);
+  margin:      0;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — if the parent ever shrinks, drop lower-priority
+   columns rather than letting the grid overflow horizontally.
+   (Uses width breakpoints; adjust if your parent stays fixed.)
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  :root { --el-cols: 34px 42px 1.3fr 1fr 58px; }
+  .el-col-status,
+  .el-col-salary { display: none; }
+}
+
+@media (max-width: 430px) {
+  :root { --el-cols: 32px 40px 1fr 56px; }
+  .el-col-role { display: none; }
+  .el-title    { font-size: 15px; }
+  .el-btn      { padding: 6px 10px; font-size: 11.5px; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .el-btn, .el-row, .el-check__box, .el-view, .el-empty { transition: none; }
+  .el-btn--add:hover { transform: none; }
+}

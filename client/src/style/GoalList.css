@@ -1,0 +1,386 @@
+/* view.css — goals card (View.jsx)
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (headings/buttons) · Inter (body) · IBM Plex Mono (amount/pct)
+   Prefix : gl- (goal list)
+
+   Third sibling of EmployeeList.css / ProductList.css — same
+   three-region skeleton (.gl-topbar fixed, .gl-head fixed,
+   .gl-scroll the only scrolling region).
+
+   FIXES IN THIS VERSION:
+   1. Amount can no longer overlap the View button. Grid cells don't
+      clip overflow by default, so a long nowrap amount painted over
+      the action column. .gl-col-amount is now its own left-right
+      scroll area with the scrollbar HIDDEN — long values scroll
+      inside the cell instead of spilling out.
+   2. Sparkline↔percentage gap tightened: the chart wrapper no longer
+      flex-grows to fill the column (that stretch WAS the big space).
+      Chart renders at natural width, pct sits 5px after it.
+   3. Cell typography is scoped under .gl-row so the header labels
+      (which share the same column classNames) keep their small
+      uppercase style instead of inheriting cell font sizes.          */
+
+/* ── tokens ──────────────────────────────────────────────────── */
+:root {
+  --gl-navy:       #011626;
+  --gl-card:       #071e30;
+  --gl-deep:       #040f1a;
+  --gl-amber:      #ffb100;
+  --gl-amber-dim:  rgba(255, 177, 0, 0.10);
+  --gl-amber-line: rgba(255, 177, 0, 0.28);
+  --gl-white:      #ffffff;
+  --gl-off-white:  #dde6ee;
+  --gl-slate:      #8899aa;
+  --gl-slate-dim:  #4d6070;
+  --gl-border:     rgba(255, 255, 255, 0.08);
+  --gl-border-s:   rgba(255, 255, 255, 0.04);
+
+  --gl-display: 'Space Grotesk', sans-serif;
+  --gl-body:    'Inter', sans-serif;
+  --gl-mono:    'IBM Plex Mono', monospace;
+
+  --gl-r:    9px;
+  --gl-ease: 0.16s ease;
+  --gl-padx: 14px;
+
+  /* name | sparkline | amount | actions */
+  --gl-cols: 1.15fr 1.5fr 92px 84px;
+}
+
+/* ── shell — fills the fixed parent ───────────────────────────── */
+.gl-root {
+  height:         100%;
+  display:        flex;
+  flex-direction: column;
+  min-height:     0;
+  font-family:    var(--gl-body);
+  color:          var(--gl-white);
+  box-sizing:     border-box;
+}
+
+.gl-mono { font-family: var(--gl-mono); }
+
+.gl-dash {
+  color:     var(--gl-slate-dim);
+  font-size: 11px;
+}
+
+/* ══ REGION 1 — top bar (fixed) ═══════════════════════════════ */
+.gl-topbar {
+  flex-shrink:     0;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             10px;
+  padding:         11px var(--gl-padx);
+  border-bottom:   1px solid var(--gl-border-s);
+  box-sizing:      border-box;
+}
+
+.gl-topbar__left {
+  display:     flex;
+  align-items: center;
+  gap:         9px;
+  min-width:   0;
+}
+
+.gl-title {
+  font-family:    var(--gl-display);
+  font-size:      16px;
+  font-weight:    700;
+  letter-spacing: -0.2px;
+  margin:         0;
+  white-space:    nowrap;
+}
+
+.gl-count {
+  font-size:     11px;
+  color:         var(--gl-amber);
+  background:    var(--gl-amber-dim);
+  border:        1px solid var(--gl-amber-line);
+  border-radius: 20px;
+  padding:       1px 9px;
+}
+
+.gl-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             6px;
+  font-family:     var(--gl-display);
+  font-weight:     600;
+  font-size:       12.5px;
+  border-radius:   var(--gl-r);
+  padding:         7px 13px;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  text-decoration: none;
+  white-space:     nowrap;
+  flex-shrink:     0;
+  transition:      background var(--gl-ease), transform var(--gl-ease);
+}
+.gl-btn--add { background: var(--gl-amber); color: var(--gl-deep); }
+.gl-btn--add:hover { background: #ffc933; transform: translateY(-1px); }
+
+/* ══ REGION 2 — column header (fixed) ═════════════════════════ */
+.gl-head {
+  flex-shrink:           0;
+  display:               grid;
+  grid-template-columns: var(--gl-cols);
+  align-items:           center;
+  gap:                   10px;
+  padding:               0 var(--gl-padx);
+  height:                34px;
+  background:            var(--gl-deep);
+  border-top:            1px solid var(--gl-border-s);
+  border-bottom:         1px solid var(--gl-border);
+  box-sizing:            border-box;
+  scrollbar-gutter:      stable;
+}
+
+.gl-head span {
+  font-family:    var(--gl-mono);
+  font-size:      8.5px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color:          var(--gl-slate-dim);
+  white-space:    nowrap;
+}
+.gl-head .gl-col-amount { text-align: right; }   /* label matches cell */
+
+/* ══ REGION 3 — THE SCROLL AREA (only this scrolls) ═══════════ */
+.gl-scroll {
+  flex:       1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.gl-scroll::-webkit-scrollbar       { width: 7px; }
+.gl-scroll::-webkit-scrollbar-track { background: transparent; }
+.gl-scroll::-webkit-scrollbar-thumb {
+  background:    rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+.gl-scroll::-webkit-scrollbar-thumb:hover { background: var(--gl-amber-line); }
+.gl-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+
+/* ── goal row ─────────────────────────────────────────────────── */
+.gl-row {
+  display:               grid;
+  grid-template-columns: var(--gl-cols);
+  align-items:           center;
+  gap:                   10px;
+  padding:               0 var(--gl-padx);
+  min-height:            56px;
+  border-bottom:         1px solid var(--gl-border-s);
+  box-sizing:            border-box;
+  transition:            background var(--gl-ease);
+}
+.gl-row:last-child { border-bottom: none; }
+.gl-row:hover      { background: rgba(255, 255, 255, 0.03); }
+
+/* ── cells (scoped under .gl-row so head labels stay uniform) ── */
+.gl-row .gl-col-name {
+  font-family:   var(--gl-display);
+  font-size:     13.5px;
+  font-weight:   500;
+  color:         var(--gl-white);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  min-width:     0;
+}
+
+/* sparkline cell — chart at NATURAL width, pct hugs it (5px gap) */
+.gl-row .gl-col-progress {
+  min-width: 0;
+  overflow:  hidden;           /* a wide chart can never spill out */
+}
+
+.gl-spark {
+  display:     flex;
+  align-items: center;
+  gap:         5px;            /* was 8px + a flex-grown void */
+  min-width:   0;
+}
+
+.gl-spark__chart {
+  flex:        0 1 auto;       /* natural width — no more stretching */
+  min-width:   0;
+  overflow:    hidden;
+  display:     flex;
+  align-items: center;
+}
+.gl-spark__chart svg {
+  display:   block;
+  max-width: 100%;             /* shrink if the column is tight… */
+  height:    auto;             /* …never stretch beyond natural size */
+}
+
+.gl-spark__meta {
+  display:     flex;
+  align-items: center;
+  gap:         3px;
+  flex-shrink: 0;
+  font-size:   11px;
+  font-weight: 600;
+}
+.gl-spark__arrow { font-size: 9px; }
+
+/* pending / upcoming goal */
+.gl-upcoming {
+  font-family:    var(--gl-body);
+  font-size:      10.5px;
+  font-weight:    500;
+  color:          #f59e0b;
+  background:     rgba(245, 158, 11, 0.10);
+  border:         1px solid rgba(245, 158, 11, 0.30);
+  border-radius:  20px;
+  padding:        3px 10px;
+  white-space:    nowrap;
+}
+
+/* loading shimmer for a spark cell */
+.gl-spark-skeleton {
+  height:        18px;
+  width:         100%;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.09) 37%,
+    rgba(255,255,255,0.04) 63%
+  );
+  background-size: 400% 100%;
+  animation:       gl-shimmer 1.4s ease infinite;
+}
+@keyframes gl-shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ── AMOUNT — its own hidden-scrollbar left-right scroll area ──
+   Long values (e.g. $1,250,000,000) scroll INSIDE the cell instead
+   of painting over the View button. Scrollbar invisible on all
+   engines; content still right-aligned when it fits.               */
+.gl-row .gl-col-amount {
+  display:      block;
+  min-width:    0;
+  overflow-x:   auto;
+  overflow-y:   hidden;
+  white-space:  nowrap;
+  text-align:   right;
+  font-size:    13px;
+  font-weight:  500;
+  color:        var(--gl-off-white);
+
+  scrollbar-width:    none;   /* Firefox  */
+  -ms-overflow-style: none;   /* old Edge */
+}
+.gl-row .gl-col-amount::-webkit-scrollbar {
+  display: none;              /* Chrome / Safari */
+  width:   0;
+  height:  0;
+}
+
+.gl-currency {
+  color:        var(--gl-amber);
+  font-size:    11px;
+  margin-right: 1px;
+}
+
+/* actions — View button + Edit icon */
+.gl-row .gl-col-action {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             6px;
+}
+
+.gl-view {
+  font-family:     var(--gl-display);
+  font-size:       11.5px;
+  font-weight:     600;
+  color:           var(--gl-amber);
+  text-decoration: none;
+  border:          1px solid var(--gl-amber-line);
+  border-radius:   7px;
+  padding:         5px 10px;
+  white-space:     nowrap;
+  transition:      background var(--gl-ease);
+}
+.gl-view:hover { background: var(--gl-amber-dim); }
+
+.gl-edit {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           26px;
+  height:          26px;
+  border-radius:   7px;
+  color:           var(--gl-slate);
+  text-decoration: none;
+  flex-shrink:     0;
+  transition:      background var(--gl-ease), color var(--gl-ease);
+}
+.gl-edit:hover { background: rgba(255,255,255,0.06); color: var(--gl-white); }
+
+/* ── loading / empty states ───────────────────────────────────── */
+.gl-scroll--empty {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  overflow:        hidden;
+}
+
+.gl-loading {
+  font-size:      11px;
+  letter-spacing: 2.5px;
+  color:          var(--gl-slate-dim);
+}
+
+.gl-empty {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             8px;
+  padding:         26px 34px;
+  border:          1.5px dashed var(--gl-border);
+  border-radius:   12px;
+  text-decoration: none;
+  transition:      border-color var(--gl-ease), background var(--gl-ease);
+}
+.gl-empty:hover {
+  border-color: var(--gl-amber-line);
+  background:   var(--gl-amber-dim);
+}
+.gl-empty h4 {
+  font-family: var(--gl-display);
+  font-size:   13.5px;
+  font-weight: 600;
+  color:       var(--gl-off-white);
+  margin:      0;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — collapse the sparkline first, then tighten
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  :root { --gl-cols: 1.3fr 1fr 84px 78px; }
+  .gl-spark__chart { display: none; }   /* keep the % and arrow */
+}
+
+@media (max-width: 430px) {
+  :root { --gl-cols: 1.4fr 74px 70px; }
+  .gl-col-progress { display: none; }
+  .gl-title { font-size: 15px; }
+  .gl-btn   { padding: 6px 10px; font-size: 11.5px; }
+  .gl-view  { padding: 5px 8px; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .gl-btn, .gl-row, .gl-view, .gl-edit, .gl-empty { transition: none; }
+  .gl-btn--add:hover { transform: none; }
+  .gl-spark-skeleton { animation: none; }
+}

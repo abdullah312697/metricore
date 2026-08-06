@@ -615,7 +615,7 @@
       position: relative;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-around;
     }
     .setTargetButton>button{
       background: transparent;
@@ -1165,4 +1165,71 @@
   pointer-events: none;
   color: #ccc9;
   background: #301717;
+}
+.spark-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+ 
+.spark-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+ 
+.spark-pct {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+  line-height: 1;
+}
+ 
+.spark-status {
+  font-size: 9px;
+  line-height: 1;
+}
+ 
+.spark-nodata {
+  font-size: 10px;
+  color: #444;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  border: 1px dashed #222;
+  border-radius: 4px;
+}
+ 
+.spark-nodata--pending {
+  color: #f59e0b;
+  border-color: #78450a;
+}
+ 
+.spark-placeholder {
+  height: 35px;
+  width: 100%;
+  background: #ffffff06;
+  border-radius: 4px;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+ 
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.7; }
+}
+ 
+.vg-loading {
+  padding: 40px;
+  text-align: center;
+  color: #444;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
 }
