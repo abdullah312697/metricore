@@ -2,6 +2,7 @@
   base = "client"
   command = "CI=false npm run build"
   publish = "build"
+  ignore = "git diff --quiet HEAD^ HEAD -- ../client/"
 
 [[redirects]]
   from = "/*"
