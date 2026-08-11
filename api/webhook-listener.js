@@ -11,7 +11,7 @@ const execAsync = promisify(exec);
 // Read secret from application.json
 let secret;
 try {
-    const config = JSON.parse(fs.readFileSync('/var/www/nothun/config/application.json', 'utf8'));
+    const config = JSON.parse(fs.readFileSync('/var/www/metricore/config/application.json', 'utf8'));
     secret = config.secret;
     console.log('Secret loaded successfully.');
 } catch (error) {
@@ -41,7 +41,7 @@ app.post('/hooks/deploy-webhook', verifyGitHubSignature, async (req, res) => {
     try {
         console.log('Received webhook payload:', JSON.stringify(req.body, null, 2));
 
-        const { stdout, stderr } = await execAsync('/var/www/nothun/deploy.sh');
+        const { stdout, stderr } = await execAsync('/var/www/metricore/deploy.sh');
         
         if (stderr) {
             console.error('Error during deployment:', stderr);

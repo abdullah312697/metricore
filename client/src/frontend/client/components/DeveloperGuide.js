@@ -221,7 +221,7 @@ export default function DeveloperGuide() {
       "adCost": 35.50
     },
     {
-      "name": "Nothun Tote bag",
+      "name": "Tote bag",
       "soldQuantity": 12,
       "buyingCost": 4.25
     }

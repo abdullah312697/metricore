@@ -79,15 +79,12 @@ const apiV1Limiter = rateLimit({
 // ✅ CORS Configuration
 // =========================
 const allowedOrigins = [
-  "https://motricore.netlify.app",
-  "https://www.motricore.netlify.app",
+  "http://localhost:3000",
   "https://metricore.app",
   "https://www.metricore.app",
-  "https://192.168.8.103:3000",
-  "https://10.21.177.23:3000",
-  "http://10.21.177.23:3000",
-  "https://localhost:3000",
+  "https://motricore.netlify.app",
 ];
+
 
 const useCors =   cors({
     origin: function (origin, callback) {
@@ -175,7 +172,7 @@ initSocket(server, allowedOrigins);
 // ✅ Web Push Configuration
 // =========================
 webpush.setVapidDetails(
-  "mailto:nothun.nt@gmail.com",
+  "mailto:nut-metricore.app",
   process.env.VAPID_PUBLIC_KEY,
   process.env.VAPID_PRIVATE_KEY
 );

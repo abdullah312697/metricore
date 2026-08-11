@@ -1,7 +1,7 @@
 #!/bin/bash
 #last version
 # Define the project directory
-PROJECT_DIR="/var/www/nothun"
+PROJECT_DIR="/var/www/metricore"
 
 # Log file
 LOGFILE="$PROJECT_DIR/deploy.log"
@@ -54,7 +54,7 @@ log() {
   log "Deployment complete at $(date)"
 
   # Send email notification
-  echo "Deployment completed successfully on $(date)" | mail -s "Nothun Deploy Successfully!" kamil.ksa25@gmail.com
+  echo "Deployment completed successfully on $(date)" | mail -s "MetriCore Deploy Successfully!" kamil.ksa25@gmail.com
 
   log "Deployment script completed successfully"
 } | tee -a $LOGFILE

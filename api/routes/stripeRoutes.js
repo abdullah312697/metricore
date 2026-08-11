@@ -132,7 +132,7 @@ router.post("/create-checkout-session", async (req, res) => {
       await company.save();
     }
 
-    const base = process.env.FRONTEND_URL || "http://localhost:3000";
+    const base = process.env.FRONTEND_URL || "https://metricore.app";
 
     const session = await stripe.checkout.sessions.create({
       mode:     "subscription",
@@ -167,7 +167,7 @@ router.post("/create-portal-session", async (req, res) => {
       return res.status(400).json({ message: "No billing account yet — choose a plan first." });
     }
 
-    const base = process.env.FRONTEND_URL || "http://localhost:3000";
+    const base = process.env.FRONTEND_URL || "https://metricore.app";
     const session = await stripe.billingPortal.sessions.create({
       customer:   company.stripeCustomerId,
       return_url: `${base}/billing-return?status=portal`,

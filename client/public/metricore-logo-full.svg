@@ -1,0 +1,17 @@
+<svg width="900" height="240" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- MetriCore full logo — icon + wordmark (for DARK backgrounds / your navy site) -->
+  <rect x="20" y="40" width="160" height="160" rx="36" fill="#011626"/>
+  <g fill="#ffb100" transform="translate(20,40) scale(0.3125)">
+    <rect x="128" y="256" width="46" height="128" rx="12"/>
+    <rect x="196" y="196" width="46" height="188" rx="12"/>
+    <rect x="270" y="196" width="46" height="188" rx="12"/>
+    <rect x="338" y="256" width="46" height="128" rx="12"/>
+  </g>
+  <path d="M 67 202 L 88 187 L 111 187 L 133 202"
+        fill="none" stroke="#ffb100" stroke-width="9.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="212" y="152" font-family="DejaVu Sans, Verdana, sans-serif"
+        font-size="82" font-weight="bold" letter-spacing="-3">
+    <tspan fill="#ffffff">Metri</tspan><tspan fill="#ffb100">Core</tspan>
+  </text>
+</svg>

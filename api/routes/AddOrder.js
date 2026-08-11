@@ -24,19 +24,19 @@ router.post("/addNewOrder", async(req,res) => {
                     port:587,
                     secure:false,
                     auth: {
-                        user : "nothun.ecommerce@gmail.com",
+                        user : "metricore.ecommerce@gmail.com",
                         pass : "ugbsamafjwcfkerp"
                     }
                 });
 
                 const mailOptions = {
-                    from: "nothun.ecommerce@gmail.com",
+                    from: "metricore.ecommerce@gmail.com",
                     to: savedData.email,
                     subject: "Order Information",
                     html: `
                     <div style="background-color:#011627; max-width:100%; height:auto; padding:30px 0; border-radius:10px; font-family: sans-serif;">
                         <div style="width:100%; height:60px; border-bottom:1px solid #ccc6; text-align:center; color:#ff9900;">
-                            <h1 style="color:#ff9900; margin: 0;">NOTHUN</h1>
+                            <h1 style="color:#ff9900; margin: 0;">metricore</h1>
                         </div>
                         <div style="width: 100%; padding: 40px; color: #ccc9;">
                             <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ccc6;">

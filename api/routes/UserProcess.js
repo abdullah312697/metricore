@@ -428,8 +428,8 @@ router.put("/updateVfCode", async (req, res) => {
       return res.status(400).json({ message: "This email is already verified." });
  
 const mail = await sendVerificationCode(company.companyEmail, vfCode);
-if (!mail.ok)
-  return res.status(500).json({ message: "Failed to resend verification code!" });
+if (!mail.ok)return res.status(500).json({ message: "Failed to resend verification code!" });
+
 return res.status(200).json({ message: "Verification code resent!" });
 
 } catch (err) {

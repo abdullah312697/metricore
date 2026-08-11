@@ -1,3 +1,16 @@
 # https://www.robotstxt.org/robotstxt.html
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Keep private application areas out of search results
+Disallow: /admin
+Disallow: /company/
+Disallow: /login
+Disallow: /register
+Disallow: /verify
+Disallow: /reset-password
+Disallow: /billing
+
+# Sitemap
+Sitemap: https://metricore.app/sitemap.xml

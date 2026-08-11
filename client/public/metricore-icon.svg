@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- MetriCore icon — square app/favicon mark
+       Concept: an "M" built from rising bars (metrics + growth).
+       Navy #011626 rounded tile, amber #ffb100 mark. -->
+  <rect width="512" height="512" rx="112" fill="#011626"/>
+
+  <!-- The "M" as four rising bars — reads as a letter AND a growth chart -->
+  <g fill="#ffb100">
+    <rect x="128" y="256" width="46" height="128" rx="12"/>
+    <rect x="196" y="196" width="46" height="188" rx="12"/>
+    <rect x="270" y="196" width="46" height="188" rx="12"/>
+    <rect x="338" y="256" width="46" height="128" rx="12"/>
+  </g>
+  <!-- The peak connector that closes the M shape -->
+  <path d="M 151 200 L 219 152 L 293 152 L 361 200"
+        fill="none" stroke="#ffb100" stroke-width="30"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
