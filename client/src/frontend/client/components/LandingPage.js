@@ -36,48 +36,6 @@ const useCounter = (target, duration = 1800, active = false) => {
 };
 
 // ════════════════════════════════════════════════════════════════
-// NAV
-// ════════════════════════════════════════════════════════════════
-// const Nav = () => {
-//   const [scrolled, setScrolled] = useState(false);
-//   const [menuOpen, setMenuOpen] = useState(false);
-
-//   useEffect(() => {
-//     const onScroll = () => setScrolled(window.scrollY > 40);
-//     window.addEventListener("scroll", onScroll);
-//     return () => window.removeEventListener("scroll", onScroll);
-//   }, []);
-
-//   return (
-//     <nav className={`lp-nav ${scrolled ? "lp-nav--scrolled" : ""}`}>
-//       <div className="lp-nav__inner">
-//         <div className="lp-nav__logo">
-//           <span className="lp-logo__mark">M</span>
-//           <span className="lp-logo__name">MetriCore</span>
-//         </div>
-
-//         <ul className={`lp-nav__links ${menuOpen ? "lp-nav__links--open" : ""}`}>
-//           {["Features","How It Works","Pricing","FAQ"].map(l => (
-//             <li key={l}>
-//               <a href={`#${l.replace(/\s/g,"").toLowerCase()}`} onClick={() => setMenuOpen(false)}>{l}</a>
-//             </li>
-//           ))}
-//         </ul>
-
-//         <div className="lp-nav__actions">
-//           <a href="/login"  className="lp-nav__login">Log in</a>
-//           <a href="/signup" className="lp-btn lp-btn--sm">Start Free</a>
-//         </div>
-
-//         <button className="lp-nav__burger" onClick={() => setMenuOpen(p => !p)} aria-label="Menu">
-//           <span /><span /><span />
-//         </button>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// ════════════════════════════════════════════════════════════════
 // HERO
 // ════════════════════════════════════════════════════════════════
 const DashboardMockup = () => (
@@ -163,7 +121,7 @@ const Hero = () => (
           start growing.
         </p>
         <div className="lp-hero__ctas">
-          <a href="/signup" className="lp-btn lp-btn--lg">Start Free — No Card Needed</a>
+          <a href="/register" className="lp-btn lp-btn--lg">Start Free — No Card Needed</a>
           <a href="#howitworks" className="lp-btn lp-btn--ghost lp-btn--lg">See How It Works</a>
         </div>
         <p className="lp-hero__footnote">Free 14-day trial · Cancel anytime · Setup in under 10 minutes</p>
@@ -518,7 +476,7 @@ const Pricing = () => {
                 ))}
               </ul>
               <a
-                href="/signup"
+                href="/register"
                 className={`lp-btn lp-btn--block ${plan.highlight ? "" : "lp-btn--outline"}`}
               >
                 {plan.cta}
@@ -670,7 +628,7 @@ const FinalCTA = () => {
         <p className="lp-finalcta__sub">
           Free for 14 days. No card required. Takes 10 minutes to set up.
         </p>
-        <a href="/signup" className="lp-btn lp-btn--lg lp-btn--light">
+        <a href="/register" className="lp-btn lp-btn--lg lp-btn--light">
           Create Free Account
         </a>
       </div>

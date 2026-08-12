@@ -4,6 +4,7 @@ import VisibilityOutlinedIcon    from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import { useAuth } from "../../../context/AuthContext";
 import "../../../style/Login.css";
+import logo from '../../../images/logo/metricore-icon-transparent.svg';
 
 const EMAIL_RE =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -71,7 +72,7 @@ export default function Login() {
         <div className="lg-side__grid" />
 
         <Link to="/" className="lg-brand">
-          <span className="lg-brand__mark">M</span>
+          <img src={logo} alt="metricore logo" className="lg-brand__mark"/>
           <span className="lg-brand__name">MetriCore</span>
         </Link>
 

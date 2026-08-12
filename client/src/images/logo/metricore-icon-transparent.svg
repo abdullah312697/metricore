@@ -1,6 +1,5 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- MetriCore icon — "M" from rising bars + peak cap. Navy tile, amber mark. -->
-  <rect width="512" height="512" rx="112" fill="#011626"/>
+  <!-- MetriCore icon — amber mark only, transparent background -->
   <g fill="#ffb100">
     <rect x="128" y="256" width="46" height="128" rx="12"/>
     <rect x="196" y="196" width="46" height="188" rx="12"/>

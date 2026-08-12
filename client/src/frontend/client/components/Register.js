@@ -4,6 +4,7 @@ import VisibilityOutlinedIcon    from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import { useAuth } from "../../../context/AuthContext";
 import "../../../style/Register.css";
+import logo from '../../../images/logo/metricore-icon-transparent.svg';
 
 /* ── Option data ─────────────────────────────────────────────────
    Industry values are IDENTICAL strings to your old <select> so
@@ -162,7 +163,7 @@ export default function Register() {
         <div className="rg-side__grid" />
 
         <Link to="/" className="rg-brand">
-          <span className="rg-brand__mark">M</span>
+          <img src={logo} alt="metricore logo" className="rg-brand__mark"/>
           <span className="rg-brand__name">MetriCore</span>
         </Link>
 
@@ -228,7 +229,7 @@ export default function Register() {
                   type="text"
                   autoComplete="organization"
                   className={`rg-input ${errors.companyName ? "rg-input--error" : ""}`}
-                  placeholder="e.g. King Data Ltd"
+                  placeholder="e.g. MetriCore Ltd"
                   value={form.companyName}
                   onChange={handleChange}
                   maxLength={80}

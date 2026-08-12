@@ -104,23 +104,15 @@
   z-index:         1;
   display:         flex;
   align-items:     center;
-  gap:             10px;
   text-decoration: none;
   width:           fit-content;
 }
 
 .rg-brand__mark {
-  width:           36px;
-  height:          36px;
-  background:      var(--rg-amber);
-  color:           var(--rg-deep);
-  border-radius:   9px;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  font-family:     var(--rg-display);
-  font-weight:     700;
-  font-size:       17px;
+    width: 50px;
+    height: 58px;
+    margin-top: -7px;
+    object-fit: cover;
 }
 
 .rg-brand__name {

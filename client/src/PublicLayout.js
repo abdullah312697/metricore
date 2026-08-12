@@ -2,6 +2,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./style/PublicLayout.css";
+import logo from './images/logo/metricore-icon-transparent.svg';
 
 const PublicLayout = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -24,21 +25,20 @@ const PublicLayout = () => {
       {/* ── Shared Header ──────────────────────────── */}
       <header className={`pl-header ${scrolled ? "pl-header--scrolled" : ""}`}>
         <div className="pl-header__inner">
-          <Link to="/" className="pl-logo">
-            <span className="pl-logo__mark">M</span>
-            <span className="pl-logo__name">MetriCore</span>
-          </Link>
-
+        <Link to="/" className="pl-logo">
+          <img src={logo} alt="MetriCore Logo" className="pl-logo__mark" />
+          <span className="pl-logo__name">MetriCore</span>
+        </Link>
           <nav className="pl-nav">
-            <Link to="/#features">Features</Link>
-            <Link to="/#pricing">Pricing</Link>
+            <a href="/#features">Features</a>
+            <a href="/#pricing">Pricing</a>
             <Link to="/about">About</Link>
             <Link to="/contact">Contact</Link>
           </nav>
 
           <div className="pl-header__actions">
             <Link to="/login"  className="pl-login">Log in</Link>
-            <Link to="/signup" className="pl-btn">Start Free</Link>
+            <Link to="/register" className="pl-btn">Start Free</Link>
           </div>
         </div>
       </header>
@@ -53,7 +53,7 @@ const PublicLayout = () => {
         <div className="pl-footer__inner">
           <div className="pl-footer__brand">
             <Link to="/" className="pl-logo">
-              <span className="pl-logo__mark">M</span>
+              <img src={logo} alt="MetriCore Logo" className="pl-logo__mark" />
               <span className="pl-logo__name">MetriCore</span>
             </Link>
             <p>Every cost tracked. Every goal met.</p>
@@ -68,6 +68,12 @@ const PublicLayout = () => {
               <div key={col.heading} className="pl-footer__col">
                 <h4>{col.heading}</h4>
                 {col.links.map(([label, href]) => (
+                  label === 'Features' ? (
+                    <a href={href}>{label}</a>
+                  ) :
+                  label === 'Pricing' ? (
+                    <a href={href}>{label}</a>
+                  ) :
                   <Link key={label} to={href}>{label}</Link>
                 ))}
               </div>

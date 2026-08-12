@@ -89,31 +89,16 @@
 
 /* ── Logo ─────────────────────────────────────────────────────── */
 .pl-logo {
-  display:         flex;
-  align-items:     center;
-  gap:             9px;
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  flex-shrink:     0;
-  user-select:     none;
 }
 
 .pl-logo__mark {
-  width:           34px;
-  height:          34px;
-  background:      var(--pl-amber);
-  color:           var(--pl-deep);
-  border-radius:   9px;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  font-family:     var(--pl-display);
-  font-weight:     700;
-  font-size:       17px;
-  flex-shrink:     0;
-  transition:      box-shadow var(--pl-ease);
-}
-.pl-logo:hover .pl-logo__mark {
-  box-shadow: 0 0 0 3px var(--pl-amber-dim);
+    width: 50px;
+    height: 58px;
+    margin-top: -7px;
+    object-fit: cover;
 }
 
 .pl-logo__name {
@@ -366,6 +351,9 @@
   flex-direction: column;
   gap:            14px;
 }
+.pl-footer__brand>p{
+  font-size: 15px;
+}
 
 .pl-footer__tagline {
   font-size:   14px;
@@ -439,6 +427,12 @@
 /* ── Footer bottom bar ────────────────────────────────────────── */
 .pl-footer__bottom {
   border-top: 1px solid var(--pl-border);
+}
+.pl-footer__bottom>span{
+  display: block;
+  text-align: center;
+  font-size: 10px;
+  color: #FFFFFF;
 }
 
 .pl-footer__bottom-inner {

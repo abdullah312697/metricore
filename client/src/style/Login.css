@@ -102,23 +102,16 @@
   z-index:         1;
   display:         flex;
   align-items:     center;
-  gap:             10px;
   text-decoration: none;
   width:           fit-content;
 }
 
+
 .lg-brand__mark {
-  width:           36px;
-  height:          36px;
-  background:      var(--lg-amber);
-  color:           var(--lg-deep);
-  border-radius:   9px;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  font-family:     var(--lg-display);
-  font-weight:     700;
-  font-size:       17px;
+    width: 50px;
+    height: 58px;
+    margin-top: -7px;
+    object-fit: cover;
 }
 
 .lg-brand__name {
