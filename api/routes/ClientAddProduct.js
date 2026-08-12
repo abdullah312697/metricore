@@ -6,7 +6,8 @@ import ClientProduct from "../models/ClientProduct.js";
 import{decryptUserData} from '../verifyuser.js';
 import { deleteResorce } from '../cloudinaryDelete.js';
 import {generatePublicId} from '../reuseableFn.js';
-import { limitFor } from "../config/plans.js";   // + Companies import if not present
+import { limitFor } from "../config/plans.js";
+import Companies from '../models/Companies.js'
 
 
 router.post("/addNewProduct", async (req, res) => {
