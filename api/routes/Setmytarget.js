@@ -7,7 +7,8 @@ import ClientProduct from '../models/ClientProduct.js';
 import ProductsCost from '../models/ProductCost.js';
 import { parse, isValid, differenceInDays } from "date-fns";
 import ExtraFieldConfig     from "../models/ExtraFieldConfig.js";
-import { limitFor } from "../config/plans.js";   // + Companies import if not present
+import { limitFor } from "../config/plans.js";
+import Companies from '../models/Companies.js'
 
 const parseGoalDate = (raw) => {
   if (!raw) return null;
