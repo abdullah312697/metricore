@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Altaxios } from "../../Altaxios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../../../context/AuthContext';
+import "../../../style/emailverify.css";   // 👈 adjust path to match your other pages
 
 const EmailVerify = () => {
   const [msgStyle, setMsgStyle] = useState({});
@@ -129,7 +130,15 @@ const EmailVerify = () => {
   return (
     <div className="contactContainerMain">
       <div className="contactinnerMain">
+        <div className="ev-badge">
+          <span className="ev-badge__icon">✉</span>
+        </div>
+
+        <span className="ev-eyebrow">Email verification</span>
         <h2 className="emailVerifyheadding">Verify Your Email Address</h2>
+        <p className="ev-subtext">
+          Enter the 6-digit code we sent to your email to continue.
+        </p>
 
         <div className="verifyEmail">
           {[...Array(6)].map((_, i) => (
@@ -146,22 +155,11 @@ const EmailVerify = () => {
           ))}
         </div>
 
+        <div className="showMsg" style={msgStyle}>
+          {errMsg}
+        </div>
+
         <div className="resendVfcode">
-          <input
-            type="button"
-            className="verifyEmailRsbtn"
-            value="Resend"
-            onClick={reSendCode}
-            disabled={isResend}
-          />
-          <span className="isResendCountDown">
-            {isResend ? `${countdown}s` : ""}
-          </span>
-
-          <div className="showMsg" style={msgStyle}>
-            {errMsg}
-          </div>
-
           <input
             type="button"
             className="verifyEmailVfbtn"
@@ -169,6 +167,20 @@ const EmailVerify = () => {
             disabled={isCheckEmpty}
             onClick={getAllWithCode}
           />
+
+          <div className="ev-resend-row">
+            <span className="ev-resend-label">Didn't get the code?</span>
+            <input
+              type="button"
+              className="verifyEmailRsbtn"
+              value="Resend"
+              onClick={reSendCode}
+              disabled={isResend}
+            />
+            <span className="isResendCountDown">
+              {isResend ? `${countdown}s` : ""}
+            </span>
+          </div>
         </div>
       </div>
     </div>

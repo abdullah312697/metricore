@@ -137,12 +137,12 @@ const Hero = () => (
 // ════════════════════════════════════════════════════════════════
 // STATS TICKER
 // ════════════════════════════════════════════════════════════════
-const STATS = [
-  { value: 2800,  suffix: "+", label: "Business Goals Tracked"   },
-  { value: 14500, suffix: "+", label: "Products Monitored"       },
-  { value: 98,    suffix: "%", label: "Customer Satisfaction"    },
-  { value: 42,    suffix: "M", label: "Revenue Processed ($)"    },
-];
+// const STATS = [
+//   { value: 2800,  suffix: "+", label: "Business Goals Tracked"   },
+//   { value: 14500, suffix: "+", label: "Products Monitored"       },
+//   { value: 98,    suffix: "%", label: "Customer Satisfaction"    },
+//   { value: 42,    suffix: "M", label: "Revenue Processed ($)"    },
+// ];
 
 const StatsItem = ({ stat, index, visible }) => {
   const count = useCounter(
@@ -165,24 +165,24 @@ const StatsItem = ({ stat, index, visible }) => {
   );
 };
 
-const StatsTicker = () => {
-  const [ref, visible] = useReveal(0.3);
+// const StatsTicker = () => {
+//   const [ref, visible] = useReveal(0.3);
 
-  return (
-    <section className="lp-stats" ref={ref}>
-      <div className="lp-container lp-stats__inner">
-        {STATS.map((stat, index) => (
-          <StatsItem
-            key={stat.label}
-            stat={stat}
-            index={index}
-            visible={visible}
-          />
-        ))}
-      </div>
-    </section>
-  );
-};
+//   return (
+//     <section className="lp-stats" ref={ref}>
+//       <div className="lp-container lp-stats__inner">
+//         {STATS.map((stat, index) => (
+//           <StatsItem
+//             key={stat.label}
+//             stat={stat}
+//             index={index}
+//             visible={visible}
+//           />
+//         ))}
+//       </div>
+//     </section>
+//   );
+// };
 // ════════════════════════════════════════════════════════════════
 // PAIN POINTS
 // ════════════════════════════════════════════════════════════════
@@ -368,6 +368,7 @@ const PLANS = [
     name:     "Starter",
     price:    19,
     period:   "month",
+    url:'/register',
     desc:     "Perfect for solo operators and small product lines.",
     features: [
       "3 active goals",
@@ -384,6 +385,7 @@ const PLANS = [
     name:     "Growth",
     price:    49,
     period:   "month",
+    url:'/register',
     desc:     "The most popular plan for growing businesses.",
     badge:    "Most Popular",
     features: [
@@ -402,6 +404,7 @@ const PLANS = [
     name:     "Scale",
     price:    99,
     period:   "month",
+    url:'/contact',
     desc:     "For established businesses with multiple teams.",
     features: [
       "Unlimited goals",
@@ -476,7 +479,7 @@ const Pricing = () => {
                 ))}
               </ul>
               <a
-                href="/register"
+                href={plan.url}
                 className={`lp-btn lp-btn--block ${plan.highlight ? "" : "lp-btn--outline"}`}
               >
                 {plan.cta}
@@ -516,35 +519,35 @@ const TESTIMONIALS = [
   },
 ];
 
-const Testimonials = () => {
-  const [ref, visible] = useReveal();
-  return (
-    <section className="lp-testimonials">
-      <div className="lp-container">
-        <div className="lp-section-header" ref={ref}>
-          <span className="lp-eyebrow">Real Businesses</span>
-          <h2 className="lp-section-title">
-            Used by operators who need <span className="lp-accent">real numbers</span>
-          </h2>
-        </div>
-        <div className={`lp-testimonials__grid ${visible ? "lp-reveal" : ""}`}>
-          {TESTIMONIALS.map((t, i) => (
-            <div className="lp-testimonial" key={t.name} style={{ animationDelay: `${i * 120}ms` }}>
-              <p className="lp-testimonial__quote">"{t.quote}"</p>
-              <div className="lp-testimonial__author">
-                <div className="lp-testimonial__avatar">{t.avatar}</div>
-                <div>
-                  <div className="lp-testimonial__name">{t.name}</div>
-                  <div className="lp-testimonial__role">{t.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+// const Testimonials = () => {
+//   const [ref, visible] = useReveal();
+//   return (
+//     <section className="lp-testimonials">
+//       <div className="lp-container">
+//         <div className="lp-section-header" ref={ref}>
+//           <span className="lp-eyebrow">Real Businesses</span>
+//           <h2 className="lp-section-title">
+//             Used by operators who need <span className="lp-accent">real numbers</span>
+//           </h2>
+//         </div>
+//         <div className={`lp-testimonials__grid ${visible ? "lp-reveal" : ""}`}>
+//           {TESTIMONIALS.map((t, i) => (
+//             <div className="lp-testimonial" key={t.name} style={{ animationDelay: `${i * 120}ms` }}>
+//               <p className="lp-testimonial__quote">"{t.quote}"</p>
+//               <div className="lp-testimonial__author">
+//                 <div className="lp-testimonial__avatar">{t.avatar}</div>
+//                 <div>
+//                   <div className="lp-testimonial__name">{t.name}</div>
+//                   <div className="lp-testimonial__role">{t.role}</div>
+//                 </div>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
 
 // ════════════════════════════════════════════════════════════════
 // FAQ
@@ -644,12 +647,12 @@ export default function LandingPage() {
     <div className="lp-root">
       <main>
         <Hero />
-        <StatsTicker />
+        {/* <StatsTicker /> */}
         <PainPoints />
         <Features />
         <HowItWorks />
         <Pricing />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <FAQ />
         <FinalCTA />
       </main>

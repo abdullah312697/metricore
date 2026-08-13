@@ -1,0 +1,310 @@
+/* emailverify.css — Email verification page (6-digit code entry)
+   Brand : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type  : Space Grotesk (heading) · Inter (body) · IBM Plex Mono (code)
+
+   Dedicated stylesheet for EmailVerify.js. Targets the page's existing
+   class names + a few ev- helpers. No JS/text changed. The inline
+   msgStyle (opacity/color) on .showMsg is JS-driven; this file only
+   styles its box.
+
+   NOTE: several rules use higher specificity / !important to override
+   any global styles your app already puts on shared class names like
+   .verifyEmail, .resendVfcode, .vfInput, and the button classes.       */
+
+:root {
+  --ev-navy:       #011626;
+  --ev-card:       #071e30;
+  --ev-deep:       #040f1a;
+  --ev-amber:      #ffb100;
+  --ev-amber-dim:  rgba(255, 177, 0, 0.10);
+  --ev-amber-line: rgba(255, 177, 0, 0.28);
+  --ev-white:      #ffffff;
+  --ev-off-white:  #dde6ee;
+  --ev-slate:      #8899aa;
+  --ev-slate-dim:  #4d6070;
+  --ev-border:     rgba(255, 255, 255, 0.08);
+
+  --ev-display: 'Space Grotesk', sans-serif;
+  --ev-body:    'Inter', sans-serif;
+  --ev-mono:    'IBM Plex Mono', monospace;
+
+  --ev-ease: 0.16s ease;
+}
+
+/* ── page shell (centered card on navy) ──────────────────────── */
+.contactContainerMain {
+  min-height:      100vh;
+  width:           100%;
+  box-sizing:      border-box;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  background:      var(--ev-navy);
+  padding:         24px;
+  font-family:     var(--ev-body);
+  position:        relative;
+  overflow:        hidden;
+}
+.contactContainerMain::before {
+  content:        "";
+  position:       absolute;
+  inset:          0;
+  background-image:
+    linear-gradient(rgba(255,177,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,177,0,0.02) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+
+/* ── the card ────────────────────────────────────────────────── */
+.contactinnerMain {
+  position:      relative;
+  z-index:       1;
+  width:         100%;
+  max-width:     440px;
+  box-sizing:    border-box;
+  background:    var(--ev-card);
+  border:        1px solid var(--ev-border);
+  border-radius: 18px;
+  padding:       40px 36px 34px;
+  text-align:    center;
+  box-shadow:    0 24px 70px rgba(0, 0, 0, 0.5);
+}
+/* amber top-edge accent (intentional brand touch) */
+.contactinnerMain::before {
+  content:       "";
+  position:      absolute;
+  top:           0;
+  left:          28px;
+  right:         28px;
+  height:        3px;
+  background:    var(--ev-amber);
+  border-radius: 0 0 3px 3px;
+}
+
+/* ── envelope badge ──────────────────────────────────────────── */
+.ev-badge {
+  width:           64px;
+  height:          64px;
+  margin:          0 auto 20px;
+  border-radius:   16px;
+  background:      var(--ev-amber-dim);
+  border:          1px solid var(--ev-amber-line);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+.ev-badge__icon { font-size: 26px; line-height: 1; color: var(--ev-amber); }
+
+/* ── eyebrow / heading / subtext ─────────────────────────────── */
+.ev-eyebrow {
+  display:        block;
+  font-family:    var(--ev-mono);
+  font-size:      10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color:          var(--ev-amber);
+  margin-bottom:  10px;
+}
+.emailVerifyheadding {
+  font-family:    var(--ev-display);
+  font-size:      24px;
+  font-weight:    700;
+  letter-spacing: -0.4px;
+  color:          var(--ev-white);
+  margin:         0 0 8px;
+  text-align:     center;
+}
+.ev-subtext {
+  font-size:   13.5px;
+  color:       var(--ev-slate);
+  line-height: 1.6;
+  margin:      0 0 26px;
+}
+
+/* ── the 6 code inputs ───────────────────────────────────────────
+   FIX: kill any global border/background/box that shared styles may
+   put on .verifyEmail — it must be a plain flex row, no box.        */
+.contactinnerMain .verifyEmail {
+  display:         flex !important;
+  gap:             9px;
+  justify-content: center;
+  align-items:     center;
+  margin:          0 0 6px !important;
+  padding:         0 !important;
+  border:          none !important;
+  background:      transparent !important;
+  box-shadow:      none !important;
+  border-radius:   0 !important;
+}
+
+.contactinnerMain .vfInput {
+  width:         48px !important;
+  height:        58px !important;
+  box-sizing:    border-box;
+  text-align:    center;
+  font-family:   var(--ev-mono);
+  font-size:     24px;
+  font-weight:   600;
+  color:         var(--ev-white);
+  background:    var(--ev-deep);
+  border:        1.5px solid var(--ev-border);
+  border-radius: 11px;
+  outline:       none;
+  transition:    border-color var(--ev-ease), background var(--ev-ease), transform var(--ev-ease);
+  -webkit-appearance: none;
+  margin:        0;
+}
+.contactinnerMain .vfInput::placeholder { color: var(--ev-slate-dim); font-weight: 400; }
+.contactinnerMain .vfInput:hover { border-color: rgba(255, 255, 255, 0.18); }
+.contactinnerMain .vfInput:focus {
+  border-color: var(--ev-amber);
+  background:   rgba(255, 177, 0, 0.05);
+  transform:    translateY(-2px);
+  box-shadow:   0 6px 16px rgba(255, 177, 0, 0.10);
+}
+.contactinnerMain .vfInput::-webkit-outer-spin-button,
+.contactinnerMain .vfInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.contactinnerMain .vfInput[type="number"] { -moz-appearance: textfield; }
+
+/* ── status message (JS toggles opacity/color inline) ────────── */
+.contactinnerMain .showMsg {
+  min-height:  18px;
+  font-family: var(--ev-body);
+  font-size:   13px;
+  font-weight: 500;
+  text-align:  center;
+  margin:      12px 0 18px;
+  transition:  opacity 0.3s ease;
+}
+
+/* ── actions column ──────────────────────────────────────────── */
+.contactinnerMain .resendVfcode {
+  display:        flex !important;
+  flex-direction: column;
+  align-items:    center;
+  justify-content: center;
+  gap:            16px;
+  margin:         0 !important;
+  padding:        0 !important;
+  border:         none !important;
+  background:     transparent !important;
+}
+
+/* PRIMARY — Verify button  (FIX: readable disabled state) */
+.contactinnerMain .verifyEmailVfbtn {
+  width:         100%;
+  display:       block;
+  font-family:   var(--ev-display);
+  font-size:     15px;
+  font-weight:   700;
+  color:         #040f1a !important;      /* dark text on amber */
+  background:    var(--ev-amber);
+  border:        none;
+  border-radius: 11px;
+  padding:       14px;
+  cursor:        pointer;
+  text-align:    center;
+  transition:    background var(--ev-ease), transform var(--ev-ease);
+  -webkit-appearance: none;
+  appearance:    none;
+}
+.contactinnerMain .verifyEmailVfbtn:hover:not(:disabled) { background: #ffc21f; transform: translateY(-1px); }
+.contactinnerMain .verifyEmailVfbtn:active:not(:disabled) { transform: translateY(0); }
+/* FIX: disabled no longer washes out the label — dim the amber a
+   little and use a muted-but-readable dark text instead of opacity */
+.contactinnerMain .verifyEmailVfbtn:disabled {
+  background: rgba(255, 177, 0, 0.35);
+  color:      rgba(4, 15, 26, 0.55) !important;
+  cursor:     not-allowed;
+  transform:  none;
+}
+
+/* resend row — centered, single line: label · Resend · countdown */
+.contactinnerMain .ev-resend-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             10px;
+  flex-wrap:       wrap;
+  width:           100%;
+}
+.ev-resend-label { font-size: 13px; color: var(--ev-slate); }
+
+/* SECONDARY — Resend button (quiet, centered label) */
+.contactinnerMain .verifyEmailRsbtn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--ev-display);
+  font-size:       13px;
+  font-weight:     600;
+  color:           var(--ev-amber) !important;
+  background:      transparent;
+  border:          1px solid var(--ev-amber-line);
+  border-radius:   8px;
+  padding:         7px 16px;
+  cursor:          pointer;
+  text-align:      center;
+  line-height:     1;
+  transition:      background var(--ev-ease), opacity var(--ev-ease);
+  -webkit-appearance: none;
+  appearance:      none;
+}
+.contactinnerMain .verifyEmailRsbtn:hover:not(:disabled) { background: var(--ev-amber-dim); }
+.contactinnerMain .verifyEmailRsbtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* countdown — small amber pill sitting to the RIGHT of Resend.
+   FIX: force it inline in the row (no absolute/float), so it never
+   lands on the Verify button. Collapses to nothing when empty. */
+.contactinnerMain .isResendCountDown {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content: center;
+  position:      static !important;
+  float:         none !important;
+  font-family:   var(--ev-mono);
+  font-size:     12px;
+  font-weight:   600;
+  color:         var(--ev-amber);
+  background:    var(--ev-amber-dim);
+  border:        1px solid var(--ev-amber-line);
+  border-radius: 6px;
+  padding:       3px 8px;
+  line-height:   1;
+  min-width:     0;
+  text-align:    center;
+}
+/* when empty, no pill box (avoids an empty amber chip) */
+.contactinnerMain .isResendCountDown:empty {
+  display:    none;
+  padding:    0;
+  border:     none;
+  background: transparent;
+}
+
+/* ── responsive ──────────────────────────────────────────────── */
+@media (max-width: 460px) {
+  .contactinnerMain { padding: 32px 22px 28px; }
+  .contactinnerMain .verifyEmail { gap: 6px; }
+  .contactinnerMain .vfInput { width: 44px !important; height: 54px !important; font-size: 21px; }
+  .emailVerifyheadding { font-size: 21px; }
+}
+@media (max-width: 340px) {
+  .contactinnerMain .vfInput { width: 38px !important; height: 48px !important; font-size: 18px; }
+}
+
+/* ── reduced motion / focus ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .contactinnerMain .vfInput,
+  .contactinnerMain .verifyEmailVfbtn,
+  .contactinnerMain .verifyEmailRsbtn { transition: none; }
+  .contactinnerMain .vfInput:focus,
+  .contactinnerMain .verifyEmailVfbtn:hover { transform: none; }
+}
+.contactinnerMain .verifyEmailVfbtn:focus-visible,
+.contactinnerMain .verifyEmailRsbtn:focus-visible,
+.contactinnerMain .vfInput:focus-visible {
+  outline:        2px solid var(--ev-amber);
+  outline-offset: 2px;
+}
