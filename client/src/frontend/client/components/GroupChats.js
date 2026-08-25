@@ -32,7 +32,6 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 
 function GroupChats() {
-  const [isPopup, setIsPopup] = useState(false);
   const [minimized, setMinimized] = useState(true);
   const [inputMessage, setInputMessage] = useState('');
   const [conversation, setConversation] = useState(null);
@@ -40,7 +39,6 @@ function GroupChats() {
   // const [isPhone, setIsPhone] = useState(false);
   const [previewFiles,setPreviewFiles] = useState([]);
   const fileInputRef = useRef();
-  const [lastMessage, setLastMessage] = useState([]);
   const innerRef = useRef(null);
   const [isTypingStart,setIsTypingStart] = useState(false);
   const popupTimerRef = useRef(null);
@@ -212,10 +210,7 @@ useEffect(() => {
       });
 
       // popup logic (your existing)
-      setLastMessage((prev) => [...prev, msg?.content]);
-      setIsPopup(true);
       clearTimeout(popupTimerRef.current);
-      popupTimerRef.current = setTimeout(() => setIsPopup(false), 5000);
     }
   });
   return () => {
@@ -683,10 +678,10 @@ useEffect(() => {
                       </div>
                     )}
                     <div className='gruopNameAndLogo'>
-                        {conversation?.avatar !== "" ? (
-                          <img src={conversation?.avatar} alt="groupIcon"/>
-                        ) : (
+                        {!conversation?.avatar ? (
                           <GroupsIcon className="liveConversationAvater" />
+                        ) : (
+                          <img src={conversation?.avatar} alt="groupIcon"/>
                         )}
                       <h3>{conversation?.title ?? "Company"}</h3>
                       </div>

@@ -392,7 +392,7 @@ router.post("/verifyCode", async (req, res) => {
       employeeName: employee.YemplyeeName,
       employeeRoal: employee.EmplyeeRoal,
       employeeProfile: employee.EmplyeeProfile,
-      isVerify: company.isVerify,
+      isVerify: true,
     };
 
     return res.status(200).json({

@@ -48,10 +48,9 @@ export default function Login() {
     setServerError("");
     try {
       const user = await login(form.email.trim(), form.password);
-
       // Navigate straight into the guarded area — RequireOnboarded
       // decides between the wizard and the dashboard from here.
-      navigate(`/company/${user.companyName}`);
+      navigate(`/company/${user?.data?.companyName}`);
     } catch (error) {
       setServerError(
         error?.response?.data?.message ||

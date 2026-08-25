@@ -3,10 +3,12 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./style/PublicLayout.css";
 import logo from './images/logo/metricore-icon-transparent.svg';
+import {useAuth} from './context/AuthContext';
 
 const PublicLayout = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const {user} = useAuth();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
@@ -37,8 +39,14 @@ const PublicLayout = () => {
           </nav>
 
           <div className="pl-header__actions">
+            {user ? (
+            <Link to={`/company/${user.companyName}`} className="pl-btn">Go to Dashboard</Link>
+            ) : (
+            <>
             <Link to="/login"  className="pl-login">Log in</Link>
             <Link to="/register" className="pl-btn">Start Free</Link>
+            </>
+            )}
           </div>
         </div>
       </header>
@@ -64,15 +72,15 @@ const PublicLayout = () => {
               { heading: "Product",  links: [["Features","/#features"],["Pricing","/#pricing"],["Changelog","/changelog"]] },
               { heading: "Company",  links: [["About","/about"],["Blog","/blog"],["Contact","/contact"],["Docs","/docs"]]                  },
               { heading: "Legal",    links: [["Privacy","/privacy"],["Terms","/terms"],["Status","/status"],["Developer-Guide","/developers"]]              },
-            ].map(col => (
+            ].map((col) => (
               <div key={col.heading} className="pl-footer__col">
                 <h4>{col.heading}</h4>
                 {col.links.map(([label, href]) => (
                   label === 'Features' ? (
-                    <a href={href}>{label}</a>
+                    <a href={href} key={label}>{label}</a>
                   ) :
                   label === 'Pricing' ? (
-                    <a href={href}>{label}</a>
+                    <a href={href} key={label}>{label}</a>
                   ) :
                   <Link key={label} to={href}>{label}</Link>
                 ))}

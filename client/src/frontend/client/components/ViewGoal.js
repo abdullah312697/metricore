@@ -464,23 +464,15 @@ const handleDeleteExtraField = async () => {
         <ChangeDate currentViewGoal={viewGoal} AddStepnOpen={setIsOpenExtraField} setDateRange={setDateRange} filterdate={setFilterDate} deffirentInDays={setDeffirent} isClicked={setIsAddingExtraField} progressState={percentage}/>
       </div>
       <div className="viewGoalsMiancontainer">
-        <div className="viewGoalHeaderPart">
-          <h3 style={{width:'100%',textAlign:'center',fontSize:'16px',color:'#ffbc00'}}>Calculated Data Report <span style={{color:'#ccc'}}>(</span> {RefineFilterDate(filterDate)} <span style={{color:'#ccc'}}>)</span></h3>
-           <button onClick={() => setShowManager(true)} style={{
-            background: 'transparent',
-            cursor: 'pointer',
-            border: '1px solid #ccc3',
-            borderRadius: '5px',
-            padding: '8px',
-            width: '172px',
-            fontSize: '13px',
-            fontWeight: 'bold',
-            color: '#ffb700'
-    }}>
-              ⚙ Manage Fields ({visibleFields.size})
+      <div className="viewGoalHeaderPart">
+          <h3>
+            Calculated Data Report <span>(</span> {RefineFilterDate(filterDate)} <span>)</span>
+          </h3>
+          <button onClick={() => setShowManager(true)}>
+            ⚙ Manage Fields ({visibleFields.size})
           </button>
         </div>
-        {
+    {
       <div className="deleteConfirmOverlay" style={{display: `${isOpneDelete ? 'flex' : 'none'}`}}>
       <div className="deleteConfirmBox">
         <h3 className="deleteConfirmTitle">Delete Confirmation</h3>

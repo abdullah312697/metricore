@@ -4,6 +4,7 @@ import Loading   from "./frontend/client/components/Spinner";
 import AuthGuard from "./routes/AuthGuard";
 import { AdminAuthProvider } from "./frontend/deshbord/Admin/AdminAuthContext";
 import { useAuth } from "./context/AuthContext";
+import GuestGuard from './routes/GuestGuard';
 
 import {
   RequireAuth,
@@ -91,15 +92,22 @@ const AdminContact = lazy(() => import("./frontend/deshbord/Admin/AdminContact")
 /* ═══════════════════════════════════════════════════════════════
    APP
 ═══════════════════════════════════════════════════════════════ */
+
+function BillingReturn() {
+  const { user, loading } = useAuth();
+  if (loading) return <Loading />;
+  if (!user) return <Navigate to="/login" replace />;   // session gone → login
+  return <Navigate to={`/company/${user.companyName}/billing`} replace />;
+};
+
 function App() {
-  const {user} = useAuth();
-  
+
   return (
     <div className="mainContainer">
       <div className="ComponentsPr">
         <Suspense fallback={<Loading />}>
           <Routes>
-            <Route path="/billing-return" element={<Navigate to={`/company/${user?.companyName}/billing`} replace />} />
+            <Route path="/billing-return" element={<BillingReturn />} />
             {/* ══ PUBLIC — marketing pages, shared header/footer ══ */}
             <Route path="/" element={<PublicLayout />}>
               <Route index            element={<MainPage />}      />
@@ -116,9 +124,9 @@ function App() {
                 Same URLs as before (/register, /login, /verifyemail).
                 If you want the marketing header back on these, move
                 them inside the PublicLayout block above. */}
-            <Route path="/register"    element={<Register />}    />
+            <Route path="/register"    element={<GuestGuard><Register /></GuestGuard>}    />
             <Route path="/verifyemail" element={<EmailVerify />} />
-            <Route path="/login"       element={<Login />}       />
+            <Route path="/login"       element={<GuestGuard><Login /></GuestGuard>}       />
             <Route path="/forgot-password"        element={<ForgotPassword />} />
             <Route path="/reset-password/:token"  element={<ResetPassword />} />
 

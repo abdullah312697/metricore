@@ -109,7 +109,8 @@ const EmailVerify = () => {
 
       setTimeout(() => {
         if(isVerifyRes?.data?.AccessData?.isVerify === true){
-          navigate(`/company/${user?.companyName ?? "fortune"}`);
+           const name = isVerifyRes.data.AccessData.companyName;   // ← from response, fresh
+            navigate(`/company/${name}`);
         }
         setMsgStyle({ opacity: 0 });
       }, 3000);

@@ -319,7 +319,7 @@
 }
 
 /* date selection section<> */
-  .cashFlowDateSelectionMain{
+  /* .cashFlowDateSelectionMain{
     width: 100%;
     height: auto;
     box-sizing: border-box;
@@ -327,7 +327,7 @@
     margin-bottom: 30px;
     border: 1px solid #ccc3;
     border-radius: 10px;
-    }
+    } */
     .viewGoalAddSetpPopup{
       width: 100%;
     height: 100%;
@@ -364,7 +364,7 @@
         border: 1px solid rgb(190 16 128);
       }
 
-    .ChangGoalTopPart{
+    /* .ChangGoalTopPart{
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -384,8 +384,8 @@
       font-weight: bold;
       cursor: pointer;
       color: #0cf3e7;
-    }
-  .cashFlowDateChange{
+    } */
+  /* .cashFlowDateChange{
     padding: 20px;
     border: 1px solid #ccc3;
     border-radius: 10px;
@@ -394,12 +394,12 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    }
-  .cashFlow__dateOne{
+    } */
+  /* .cashFlow__dateOne{
     width: 170px;
     text-align: left;
-    }
-  .cashFlow__dateTwo{
+    } */
+  /* .cashFlow__dateTwo{
     width: 400px;
     display: flex;
     align-items: flex-start;
@@ -410,16 +410,16 @@
   .cashFlow__dateThree{
     width: 210px;
     text-align: right;
-}
+} */
 
-  .cashFlow__dateOne>h4,
+  /* .cashFlow__dateOne>h4,
   .cashFlow__dateTwo>h4,
   .cashFlow__dateThree>h4{
     color: #ffd400;
     font-size: 13px;
     margin-bottom: 15px;
-  }
-  .cashFlow__dateTwo>span{
+  } */
+  /* .cashFlow__dateTwo>span{
     position: absolute;
     top: 17px;
     font-size: 10px;
@@ -428,8 +428,8 @@
     transform: translateX(-50%);
     text-align: left;
     width: 44px;
-  }
-  .cashFlowDateSection{
+  } */
+  /* .cashFlowDateSection{
     background: transparent;
     color: #00fff2;
     width: 135px;
@@ -439,7 +439,7 @@
     height: 30px;
     border-radius: 5px;
     cursor: pointer;
-    appearance: none; /* Hides the default arrow in most browsers */
+    appearance: none; 
     -webkit-appearance: none;
     -moz-appearance: none;
   }
@@ -456,8 +456,8 @@
     }
   .cashFlowDateSection>option:hover {
     background-color: #e9ecef;
-}
-  .cashFlowProgressbar{
+} */
+  /* .cashFlowProgressbar{
     width: 400px;
     height: 10px;
     background: #ccc6;
@@ -473,26 +473,26 @@
   }
   .cashFlowTargetCount{
     color: rgb(0 145 255);
-  }
-  .targetFinterOptions{
+  } */
+  /* .targetFinterOptions{
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-  }
-  .userSelect_Calender{
+  } */
+  /* .userSelect_Calender{
     position: absolute;
     top: 46px;
     left: -19px;
     z-index: 10000;
-    }
-    .select_rangeStartEnd{
+    } */
+    /* .select_rangeStartEnd{
       display: flex;
       align-items: center;
       justify-content: flex-start;
       gap: 10px;
-    }
-    .select_rangeStartEnd>button{
+    } */
+    /* .select_rangeStartEnd>button{
         background: #011626;
         padding: 5px;
         border-radius: 5px;
@@ -504,20 +504,20 @@
         height: auto;
         text-align: center;
         cursor: pointer;
-    }
-    .userSelect_Calender_inner{
+    } */
+    /* .userSelect_Calender_inner{
       display: flex;
       align-items: center;
       justify-content: flex-start;
-    }
-  .targetFinterOptions>svg{
+    } */
+  /* .targetFinterOptions>svg{
     margin-left: -26px;
     font-size: 17px;
     margin-top: 2px;
     color: #ffffff;
     cursor: pointer;
     z-index: -1;
-  }
+  } */
 /* date selection section</> */
 
 /* set TArget style<> */
@@ -710,6 +710,103 @@
     justify-content: space-between;
     padding: 10px;
 }
+:root {
+  --vg-amber:      #ffb100;
+  --vg-amber-dim:  rgba(255, 177, 0, 0.10);
+  --vg-amber-line: rgba(255, 177, 0, 0.28);
+  --vg-slate:      #8899aa;
+  --vg-border:     rgba(255, 255, 255, 0.08);
+  --vg-display:    'Space Grotesk', sans-serif;
+  --vg-mono:       'IBM Plex Mono', monospace;
+}
+ 
+/* ── header row ──────────────────────────────────────────────── */
+.viewGoalHeaderPart {
+  width:           100%;
+  height:          auto;
+  box-sizing:      border-box;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  padding:         10px;
+}
+ 
+/* ── title (was inline on the h3) ────────────────────────────── */
+.viewGoalHeaderPart > h3 {
+  flex:           1;
+  min-width:      0;
+  text-align:     center;
+  font-family:    var(--vg-display);
+  font-size:      16px;
+  font-weight:    700;
+  color:          var(--vg-amber);
+  margin:         0;
+}
+/* the parenthesis + date accents (was inline span color #ccc) */
+.viewGoalHeaderPart > h3 span {
+  color: var(--vg-slate);
+}
+ 
+/* ── Manage Fields button (was inline on the button) ─────────── */
+.viewGoalHeaderPart > button {
+  flex-shrink:   0;
+  background:    var(--vg-amber-dim);
+  cursor:        pointer;
+  border:        1px solid var(--vg-amber-line);
+  border-radius: 8px;
+  padding:       8px 14px;
+  width:         172px;
+  font-family:   var(--vg-display);
+  font-size:     13px;
+  font-weight:   600;
+  color:         var(--vg-amber);
+  transition:    background 0.16s ease, transform 0.16s ease;
+}
+.viewGoalHeaderPart > button:hover  { background: rgba(255, 177, 0, 0.18); }
+.viewGoalHeaderPart > button:active { transform: translateY(1px); }
+ 
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+ 
+/* tablet — title stays centered, button shrinks a touch */
+@media (max-width: 720px) {
+  .viewGoalHeaderPart > h3     { font-size: 15px; }
+  .viewGoalHeaderPart > button { width: auto; min-width: 150px; }
+}
+ 
+/* mobile — stack: title on top (centered), button full-width below */
+@media (max-width: 560px) {
+  .viewGoalHeaderPart {
+    flex-direction: column;
+    align-items:    stretch;
+    gap:            12px;
+    padding:        12px 10px;
+  }
+  .viewGoalHeaderPart > h3 {
+    font-size: 15px;
+    order:     0;
+  }
+  .viewGoalHeaderPart > button {
+    width:      100%;
+    order:      1;
+    padding:    10px;
+    font-size:  13px;
+  }
+}
+ 
+/* very small phones */
+@media (max-width: 360px) {
+  .viewGoalHeaderPart > h3     { font-size: 14px; }
+  .viewGoalHeaderPart > button { font-size: 12px; }
+}
+ 
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .viewGoalHeaderPart > button { transition: none; }
+}
+
 .productMetricLength{
   position: absolute;
     top: 8px;
@@ -1039,7 +1136,6 @@
 .taskGoalInner:hover .extraFieldEditAndDelete{
   opacity: 1;
 }
-.lockUnlockInner{}
 .targetUnlock,.targetLock{
     position: absolute;
     top: 0px;

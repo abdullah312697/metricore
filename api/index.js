@@ -83,6 +83,8 @@ const allowedOrigins = [
   "https://metricore.app",
   "https://www.metricore.app",
   "https://motricore.netlify.app",
+  "http://10.243.52.23:3000",
+  "https://10.243.52.23:3000"
 ];
 
 

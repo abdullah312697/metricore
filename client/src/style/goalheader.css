@@ -1,0 +1,327 @@
+/* goalheader.css — Goal view header (date filter + progress + target)
+   Brand : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type  : Space Grotesk (headings) · Inter (body) · IBM Plex Mono (numbers)
+
+   Restyle of the goal header. JSX and all class names are UNCHANGED —
+   this stylesheet just re-skins the existing classes with brand colors
+   and adds responsive behavior for tablet/mobile.
+
+   Import it wherever this component lives, e.g.:
+     import "../../../style/goalheader.css";   // adjust path
+*/
+
+:root {
+  --gh-navy:       #011626;
+  --gh-card:       #071e30;
+  --gh-deep:       #040f1a;
+  --gh-amber:      #ffb100;
+  --gh-amber-dim:  rgba(255, 177, 0, 0.10);
+  --gh-amber-line: rgba(255, 177, 0, 0.28);
+  --gh-white:      #ffffff;
+  --gh-off:        #dde6ee;
+  --gh-slate:      #8899aa;
+  --gh-slate-dim:  #4d6070;
+  --gh-border:     rgba(255, 255, 255, 0.08);
+  --gh-green:      #22c55e;
+  --gh-blue:       #38bdf8;
+
+  --gh-display: 'Space Grotesk', sans-serif;
+  --gh-body:    'Inter', sans-serif;
+  --gh-mono:    'IBM Plex Mono', monospace;
+}
+
+/* ── outer container ─────────────────────────────────────────── */
+.cashFlowDateSelectionMain {
+  width:         100%;
+  height:        auto;
+  box-sizing:    border-box;
+  position:      relative;
+  margin-bottom: 30px;
+  border:        1px solid var(--gh-border);
+  border-radius: 14px;
+  background:    var(--gh-card);
+  font-family:   var(--gh-body);
+}
+
+/* ── top bar: back arrow · title · add-field button ──────────── */
+.ChangGoalTopPart {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  width:           100%;
+  box-sizing:      border-box;
+  padding:         18px 18px 0;
+}
+.ChangGoalTopPart > a {
+  display:     inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+.ChangGoalTopPart > h2 {
+  flex:           1;
+  font-family:    var(--gh-display);
+  font-size:      18px;
+  font-weight:    700;
+  letter-spacing: -0.3px;
+  color:          var(--gh-white);
+  margin:         0;
+  text-align:     left;
+  overflow:       hidden;
+  text-overflow:  ellipsis;
+  white-space:    nowrap;
+}
+.ChangGoalTopPart > button {
+  flex-shrink:   0;
+  background:    var(--gh-amber-dim);
+  border:        1px solid var(--gh-amber-line);
+  border-radius: 8px;
+  padding:       9px 14px;
+  font-family:   var(--gh-display);
+  font-size:     13px;
+  font-weight:   600;
+  cursor:        pointer;
+  color:         var(--gh-amber);
+  transition:    background 0.16s ease, transform 0.16s ease;
+}
+.ChangGoalTopPart > button:hover  { background: rgba(255,177,0,0.18); }
+.ChangGoalTopPart > button:active { transform: translateY(1px); }
+
+/* ── inner row: date filter · progress · target ─────────────── */
+.cashFlowDateChange {
+  padding:         22px;
+  border:          1px solid var(--gh-border);
+  border-radius:   12px;
+  margin:          18px;
+  box-sizing:      border-box;
+  background:      var(--gh-deep);
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  gap:             24px;
+}
+
+/* section headings (Select Date / Progress bar / Target) */
+.cashFlow__dateOne > h4,
+.cashFlow__dateTwo > h4,
+.cashFlow__dateThree > h4 {
+  font-family:    var(--gh-mono);
+  color:          var(--gh-amber);
+  font-size:      11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin:         0 0 14px;
+}
+
+/* ── block 1: date selection ─────────────────────────────────── */
+.cashFlow__dateOne {
+  width:      180px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.targetFinterOptions {
+  display:     flex;
+  align-items: center;
+  position:    relative;
+}
+.targetFinterOptions > svg {
+  margin-left: -26px;
+  font-size:   17px;
+  margin-top:  0;
+  color:       var(--gh-slate);
+  cursor:      pointer;
+  pointer-events: none;   /* let clicks pass to the select */
+}
+.cashFlowDateSection {
+  background:    var(--gh-card);
+  color:         var(--gh-amber);
+  width:         150px;
+  text-align:    left;
+  font-family:   var(--gh-body);
+  font-weight:   600;
+  font-size:     13px;
+  padding-left:  12px;
+  height:        38px;
+  border:        1px solid var(--gh-border);
+  border-radius: 8px;
+  cursor:        pointer;
+  appearance:        none;
+  -webkit-appearance: none;
+  -moz-appearance:    none;
+  transition:    border-color 0.16s ease;
+}
+.cashFlowDateSection:hover { border-color: rgba(255,255,255,0.18); }
+.cashFlowDateSection:focus {
+  outline:      none;
+  border-color: var(--gh-amber);
+}
+.cashFlowDateSection > option {
+  padding:          10px;
+  font-size:        13px;
+  font-weight:      600;
+  background-color: var(--gh-navy);
+  color:            var(--gh-amber);
+}
+
+/* custom date range popover */
+.userSelect_Calender {
+  position: absolute;
+  top:      46px;
+  left:     -19;
+  z-index:  10000;
+}
+.select_rangeStartEnd {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-start;
+  gap:             10px;
+}
+.select_rangeStartEnd > button {
+  background:    var(--gh-card);
+  padding:       8px;
+  border-radius: 8px;
+  border:        1px solid var(--gh-amber-line);
+  color:         var(--gh-amber);
+  font-family:   var(--gh-body);
+  font-size:     13px;
+  font-weight:   600;
+  width:         120px;
+  height:        auto;
+  text-align:    center;
+  cursor:        pointer;
+  transition:    background 0.16s ease;
+}
+.select_rangeStartEnd > button:hover { background: var(--gh-amber-dim); }
+.userSelect_Calender_inner {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: flex-start;
+  margin-top:      8px;
+}
+
+/* ── block 2: progress bar ───────────────────────────────────── */
+.cashFlow__dateTwo {
+  flex:           1;
+  min-width:      0;
+  display:        flex;
+  align-items:    flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  position:       relative;
+}
+.cashFlow__dateTwo > span {
+  position:      absolute;
+  top:           26px;
+  font-family:   var(--gh-mono);
+  font-size:     10px;
+  font-weight:   600;
+  color:         var(--gh-green);
+  transform:     translateX(-50%);
+  text-align:    left;
+  width:         44px;
+}
+.cashFlowProgressbar {
+  width:         100%;
+  height:        10px;
+  background:    rgba(255,255,255,0.08);
+  border-radius: 6px;
+  position:      relative;
+  box-sizing:    border-box;
+  overflow:      hidden;
+}
+.cashFlowProgressbarInner {
+  height:        100%;
+  background:    linear-gradient(90deg, var(--gh-amber), var(--gh-green));
+  border-radius: 6px;
+  transition:    width 0.4s ease;
+}
+
+/* ── block 3: target amount ──────────────────────────────────── */
+.cashFlow__dateThree {
+  width:       210px;
+  flex-shrink: 0;
+  text-align:  right;
+}
+.cashFlowTargetCount {
+  font-family:    var(--gh-mono);
+  font-size:      26px;
+  font-weight:    600;
+  letter-spacing: -0.5px;
+  color:          var(--gh-blue);
+  margin:         0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+
+/* tablet — let items wrap; progress bar takes a full-width row of its own */
+@media (max-width: 900px) {
+  .cashFlowDateChange { flex-wrap: wrap; gap: 22px; }
+  .cashFlow__dateOne  { width: 180px; }
+  .cashFlow__dateThree { flex: 1; min-width: 150px; }
+  /* progress bar becomes its own full-width row below the others */
+  .cashFlow__dateTwo  { flex-basis: 100%; width: 100%; order: 3; }
+}
+
+/* mobile — clean single column, no order tricks, everything full width */
+@media (max-width: 600px) {
+  .cashFlowDateSelectionMain { margin-bottom: 20px; }
+
+  .ChangGoalTopPart {
+    flex-wrap: wrap;
+    gap:       10px;
+    padding:   16px 14px 0;
+  }
+  .ChangGoalTopPart > h2 {
+    order:       3;
+    flex-basis:  100%;
+    white-space: normal;
+    font-size:   17px;
+  }
+  .ChangGoalTopPart > button { font-size: 12px; padding: 8px 12px; }
+
+  /* single column — reset ordering so blocks flow: date → progress → target */
+  .cashFlowDateChange {
+    flex-direction: column;
+    align-items:    stretch;
+    padding:        16px;
+    margin:         14px;
+    gap:            26px;
+  }
+  .cashFlow__dateOne,
+  .cashFlow__dateTwo,
+  .cashFlow__dateThree {
+    order:      initial;    /* undo tablet order:3 */
+    width:      100%;
+    flex-basis: auto;
+    text-align: left;
+  }
+
+  .cashFlowDateSection { width: 100%; }
+  .targetFinterOptions > svg { margin-left: -30px; }
+
+  /* custom range: stack the two date buttons full width */
+  .select_rangeStartEnd { flex-direction: column; align-items: stretch; }
+  .select_rangeStartEnd > button { width: 100%; }
+  .userSelect_Calender { left: 0; right: 0; }
+
+  /* progress %-label: keep it above the bar, clear of the heading */
+  .cashFlow__dateTwo > span { top: 28px; }
+
+  .cashFlowTargetCount { font-size: 24px; }
+}
+
+/* very small phones */
+@media (max-width: 360px) {
+  .cashFlowTargetCount { font-size: 21px; }
+  .cashFlowDateChange  { padding: 14px; margin: 12px; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .cashFlowProgressbarInner,
+  .ChangGoalTopPart > button,
+  .cashFlowDateSection,
+  .select_rangeStartEnd > button { transition: none; }
+}

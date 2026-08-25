@@ -2,13 +2,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
 import PersonOutlineIcon    from "@mui/icons-material/PersonOutline";
 import LogoutIcon           from "@mui/icons-material/Logout";
 import { useAuth }  from "./context/AuthContext";   // 👈 adjust path to your structure
 import { Altaxios } from "./frontend/Altaxios";     // 👈 adjust path to your structure
 import "./style/UserLayout.css";
 import WhatsNew from "./frontend/client/components/WhatsNew";   // adjust path
-
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 /* ═══════════════════════════════════════════════════════════════
    UserLayout — header + <Outlet /> + footer for /company/:companyName
    If your current UserLayout has other logic (socket init, providers,
@@ -119,6 +120,14 @@ export default function UserLayout() {
             <WhatsNew />
             {/* Company profile icon → settings page */}
             <Link
+              to={`${base}/billing`}
+              className="ul-icon-btn"
+              title="Billing & Plan"
+              aria-label="Billing & Plan"
+            >
+              <PaymentOutlinedIcon style={{ fontSize: 20 }} />
+            </Link>
+            <Link
               to={`${base}/settings`}
               className="ul-icon-btn"
               title="Company settings"
@@ -135,9 +144,16 @@ export default function UserLayout() {
                 aria-haspopup="menu"
                 aria-expanded={profileOpen}
                 aria-label="Your profile"
+                style={{borderRadius:'10px'}}
               >
-                <img src={employeeProfile} alt="employee profile" style={{width:'38px',height:'38px',borderRadius:'50%'}}/>
-                <span className="ul-avatar__presence" title="Online" />
+                  {!employeeProfile ? (
+                    <PersonOutlineRoundedIcon style={{color:'#8899aa'}}/>
+                  ) : (
+                    <>
+                      <img src={employeeProfile} alt="employee profile" style={{width:'38px',height:'38px',borderRadius:'50%'}}/>
+                      <span className="ul-avatar__presence" title="Online" />
+                    </>
+                  )}
               </button>
 
               {/* ── Dropdown panel ─────────────────────────────── */}
@@ -147,7 +163,12 @@ export default function UserLayout() {
                   {/* Identity block */}
                   <div className="ul-dropdown__identity">
                     {/* <span className="ul-dropdown__avatar">{employeeInitial}</span> */}
-                    <img src={employeeProfile} alt="employee profile" style={{width:'40px',height:'40px',borderRadius:'50%'}}/>
+                  {!employeeProfile ? (
+                    <PersonOutlineRoundedIcon style={{width:'40px',height:'40px',color:'#8899aa'}}/>
+                  ) : (
+                      <img src={employeeProfile} alt="employee profile" style={{width:'40px',height:'40px',borderRadius:'50%'}}/>
+                  )}
+
                     <div className="ul-dropdown__who">
                       <span className="ul-dropdown__name">{employeeLabel}</span>
                       <span className="ul-dropdown__company ul-mono">{displayCompany}</span>

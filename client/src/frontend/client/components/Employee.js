@@ -9,11 +9,11 @@ import VisibilityIcon       from "@mui/icons-material/Visibility";
 import VisibilityOffIcon    from "@mui/icons-material/VisibilityOff";
 import LiveChats            from "./LiveChats";
 import ConfirmDialog        from "./ConfirmDialog";
-import profileFallback      from "../../../images/profile/male.png";
 import { Altaxios }         from "../../Altaxios";
 import { useAuth }          from "../../../context/AuthContext";
 import "../../../style/Employee.css";
 import EmailComposer from "./EmailComposer";
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 
 
 const MANAGER_ROLES = ["Owner", "Admin"];
@@ -349,12 +349,18 @@ if (mode === "self") body.currentPassword = currentPass;
             <div className="ep-avatar-wrap">
               <div
                 className="ep-avatar"
-                style={showStatusBadge ? { borderColor: ringColor, boxShadow: `0 0 0 4px ${ringColor}22` } : {}}
+                style={showStatusBadge ? { borderColor: '#738495', boxShadow: `rgb(197 197 197 / 13%) 0px 0px 0px 4px` } : {}}
               >
-                <img
-                  src={photoPreview || employeeData.EmplyeeProfile || profileFallback}
-                  alt={employeeData.YemplyeeName || "Employee"}
-                />
+                {
+                  !photoPreview && !employeeData.EmplyeeProfile ? (
+                    <PersonOutlineRoundedIcon style={{width:'100%', height:'100%', color:'#637689'}}/>
+                  ) : (
+                    <img
+                      src={photoPreview || employeeData.EmplyeeProfile}
+                      alt={employeeData.YemplyeeName || "Employee"}
+                    />
+                  )
+                }
                 {canChangePhoto && !photoUploading && (
                   <button
                     className="ep-avatar__change"
