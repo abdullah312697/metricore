@@ -866,6 +866,95 @@ padding: 5px;
     font-weight: 500;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE STYLES — append to your existing CSS
+   For: .live_msg_and_salse (GroupChats + Today's Overview)
+
+   Your desktop CSS is unchanged. These media queries only kick in
+   on smaller screens. The two fixed 600px panels become fluid and
+   stack vertically so they fit tablets and phones.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── large screens: let the two panels share space fluidly ─────
+   (below the point where 600px + 600px + gap stops fitting)      */
+@media (max-width: 1280px) {
+  .live_message_main,
+  .live_salse_main {
+    width: 48%;          /* was fixed 600px → now share the row */
+  }
+}
+
+/* ── tablet / small laptop: stack the two panels vertically ──── */
+@media (max-width: 900px) {
+  .live_msg_and_salse {
+    flex-direction: column;
+    align-items:    stretch;   /* full-width children */
+    gap:            20px;
+    margin-top:     25px;
+    margin-bottom:  35px;
+  }
+  .live_message_main,
+  .live_salse_main {
+    width:  100%;              /* full width when stacked */
+    height: auto;             /* let content set height */
+  }
+  .live_message_main {
+    min-height: 130px;         /* keep the chat panel a sensible height */
+  }
+  .live_salse_main {
+    height: auto;
+  }
+  /* keep the 3 stat columns in a row, just fluid */
+  .live_salesContainerGroup {
+    width: 33.333%;            /* was fixed 200px → thirds */
+    flex: 1;
+  }
+}
+
+/* ── phone: stat columns stay in a row but tighten up ────────── */
+@media (max-width: 600px) {
+  .live_msg_and_salse { margin-top: 20px; margin-bottom: 28px; }
+
+  .live_sales_innerContainer {
+    /* keep as a row of 3; allow wrapping only if truly tiny */
+    flex-wrap: nowrap;
+  }
+  .live_salesContainerGroup {
+    width:   33.333%;
+    height:  92px;
+    padding: 6px 4px;
+    box-sizing: border-box;
+  }
+  .live_salesContainerGroup > h2 {
+    font-size:     22px;       /* was 32px → fits narrow columns */
+    margin-bottom: 6px;
+  }
+  .live_salesContainerGroup > h6 {
+    font-size:   9px;
+    text-align:  center;
+    line-height: 1.2;
+  }
+}
+
+/* ── very small phones: stack the 3 stats vertically ───────────
+   below ~380px, three columns get too cramped — stack them.     */
+@media (max-width: 380px) {
+  .live_sales_innerContainer {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+  .live_salesContainerGroup {
+    width:       100%;
+    height:      auto;
+    padding:     12px 8px;
+    border-left: none;                              /* remove side divider */
+    border-top:  1px solid #ccc3;                   /* divider between stacked rows */
+  }
+  .live_salesContainerGroup:first-child {
+    border-top: none;                               /* no divider above the first */
+  }
+  .live_salesContainerGroup > h2 { font-size: 24px; }
+}
 .gruopNameAndLogo{
     width: 250px;
     display: flex;
