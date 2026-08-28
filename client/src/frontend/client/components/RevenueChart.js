@@ -184,7 +184,6 @@ const needsRotation = chartPoints.length > 10;
       {/* header */}
       <div className="rc-header">
         <div>
-          <span className="rc-eyebrow">COMPANY OVERVIEW</span>
           <h3 className="rc-title">{metric.label} Performance</h3>
         </div>
 
