@@ -10,7 +10,7 @@ const INTENTS = [
     title:        "Product support",
     desc:         "Something isn't working as expected or you need help using a feature.",
     email:        "support@metricore.app",
-    responseTime: "Within 24 hours",
+    responseTime: "Within 1 business day",
     placeholder:  "Describe what's happening and which feature is involved. Steps to reproduce the issue help us a lot.",
     subject:      "Support request",
   },
@@ -19,8 +19,8 @@ const INTENTS = [
     icon:         "📊",
     title:        "Sales & pricing",
     desc:         "You want to understand which plan fits your business or need a custom quote.",
-    email:        "sales@metricore.app",
-    responseTime: "Within 4 hours",
+    email:        "support@metricore.app",
+    responseTime: "Within 1 business day",
     placeholder:  "Tell us about your business — how many products, how many goals, and roughly how many people would use the platform.",
     subject:      "Sales enquiry",
   },
@@ -29,8 +29,8 @@ const INTENTS = [
     icon:         "🔒",
     title:        "Security or bug",
     desc:         "You found a vulnerability, a data issue, or something behaving incorrectly.",
-    email:        "security@metricore.app",
-    responseTime: "Within 2 hours",
+    email:        "support@metricore.app",
+    responseTime: "Prioritised — as soon as possible",
     placeholder:  "Describe what you found. Include steps to reproduce if possible. Do not include real user data in this form.",
     subject:      "Security / bug report",
   },
@@ -39,7 +39,7 @@ const INTENTS = [
     icon:         "✉️",
     title:        "Something else",
     desc:         "Partnership, press, feedback, or anything that doesn't fit above.",
-    email:        "hello@metricore.app",
+    email:        "support@metricore.app",
     responseTime: "Within 2 business days",
     placeholder:  "Tell us what's on your mind. We read every message ourselves.",
     subject:      "",
@@ -54,13 +54,6 @@ const CHANNELS = [
     desc:  "Step-by-step guides for every feature.",
     link:  "/docs",
     cta:   "Browse docs",
-  },
-  {
-    icon:  "🔄",
-    title: "System status",
-    desc:  "Check if there is an active incident.",
-    link:  "/status",
-    cta:   "View status",
   },
   {
     icon:  "📋",
@@ -163,8 +156,8 @@ const handleSend = async () => {
             What brings<br />you here?
           </h1>
           <p className="ct-hero__sub">
-            Choose what you need — we'll make sure the right person
-            sees your message and gets back to you quickly.
+            Choose what you need so we can help faster — your message
+            comes straight to us, and we'll get back to you soon.
           </p>
         </div>
       </div>
@@ -401,13 +394,13 @@ const handleSend = async () => {
             </div>
           </div>
 
-          {/* Office hours note */}
+          {/* Response note */}
           <div className="ct-sidebar__hours">
-            <p className="ct-sidebar__hours-title ct-mono">Office hours</p>
+            <p className="ct-sidebar__hours-title ct-mono">How we reply</p>
             <p className="ct-sidebar__hours-text">
-              Our team is based in Dhaka (GMT+6). We monitor
-              support queues Mon–Sat, 9 AM – 9 PM. Security
-              reports are checked around the clock.
+              MetriCore is a small operation — your message comes
+              straight to us, and we usually reply within one
+              business day. Security and bug reports are prioritised.
             </p>
           </div>
 

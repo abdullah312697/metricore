@@ -2,6 +2,12 @@
 // THE single source of truth for plans, prices, limits and features.
 // The pricing page, the checkout, the webhook and every limit check
 // all read from here — change a number once, it changes everywhere.
+//
+// ⚠️ THIS FILE REPLACES YOUR EXISTING api/config/plans.js — it's the
+// same file with ONE addition: a `dataExport` block per plan (bottom
+// of each plan object) + three new helpers at the bottom of the file.
+// Nothing else changed; diff against your current copy if you want
+// to confirm before overwriting.
 
 const env = (k) => process.env[k] || "";
 
@@ -16,6 +22,8 @@ export const PLANS = {
       year:  () => env("STRIPE_PRICE_STARTER_ANNUAL"),
     },
     limits: { goals: 3,        products: 10,       employees: 5,        apiAccess: false },
+    // No CSV export on Starter — it's an upsell lever toward Growth.
+    dataExport: { enabled: false, historyMonths: 0, maxRangeMonths: 0 },
   },
   growth: {
     id: "growth",
@@ -27,6 +35,9 @@ export const PLANS = {
       year:  () => env("STRIPE_PRICE_GROWTH_ANNUAL"),
     },
     limits: { goals: 15,       products: Infinity, employees: 25,       apiAccess: false },
+    // Reachable history caps out at 6 months back; each export request
+    // can span up to 6 months (so on Growth that's "everything, in one go").
+    dataExport: { enabled: true, historyMonths: 6, maxRangeMonths: 6 },
   },
   scale: {
     id: "scale",
@@ -38,6 +49,10 @@ export const PLANS = {
       year:  () => env("STRIPE_PRICE_SCALE_ANNUAL"),
     },
     limits: { goals: Infinity, products: Infinity, employees: Infinity, apiAccess: true },
+    // Unlimited total history (never locked out of old data), but every
+    // single export request is still capped to a 6-month span so a file
+    // stays fast to generate — run multiple exports for a wider range.
+    dataExport: { enabled: true, historyMonths: Infinity, maxRangeMonths: 6 },
   },
 };
 
@@ -91,4 +106,32 @@ export const limitFor = (company, kind) => {
 export const hasApiAccess = (company) => {
   const planId = effectivePlanId(company);
   return Boolean(planId && PLANS[planId].limits.apiAccess);
+};
+
+/* ══════════════════════════════════════════════════════════════
+   DATA EXPORT — new helpers backing the CSV export feature.
+   Mirrors the limitFor()/hasApiAccess() pattern above so the
+   export route (and the frontend) both read from this one place.
+══════════════════════════════════════════════════════════════ */
+
+// The company's current dataExport rules. No plan (trial expired,
+// never subscribed) → export fully disabled.
+export const exportConfigFor = (company) => {
+  const planId = effectivePlanId(company);
+  if (!planId) return { enabled: false, historyMonths: 0, maxRangeMonths: 0 };
+  return PLANS[planId].dataExport;
+};
+
+export const canExportData = (company) => exportConfigFor(company).enabled === true;
+
+// Earliest date (inclusive, UTC midnight) this company is allowed to
+// export data from — null means no lower bound (full company history,
+// i.e. Scale).
+export const earliestExportDate = (company) => {
+  const { historyMonths } = exportConfigFor(company);
+  if (!Number.isFinite(historyMonths)) return null;
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCMonth(d.getUTCMonth() - historyMonths);
+  return d;
 };

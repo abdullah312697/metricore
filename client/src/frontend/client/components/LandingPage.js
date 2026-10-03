@@ -110,15 +110,15 @@ const Hero = () => (
     <div className="lp-hero__bg-grid" />
     <div className="lp-container lp-hero__inner">
       <div className="lp-hero__copy">
-        <div className="lp-hero__eyebrow">Business Analytics Platform</div>
+        <div className="lp-hero__eyebrow">Product Cost & Margin Tracking</div>
         <h1 className="lp-hero__headline">
           Every cost tracked.<br />
-          <span className="lp-accent">Every goal met.</span>
+          <span className="lp-accent">Every margin clear.</span>
         </h1>
         <p className="lp-hero__sub">
-          MetriCore gives your business a real-time lens on product costs,
-          daily revenue, and goal achievement — so you stop guessing and
-          start growing.
+          MetriCore gives product businesses a real-time lens on costs,
+          daily revenue, and goal progress — so you stop guessing your
+          margins and start growing them.
         </p>
         <div className="lp-hero__ctas">
           <a href="/register" className="lp-btn lp-btn--lg">Start Free — No Card Needed</a>
@@ -255,8 +255,8 @@ const FEATURES = [
   },
   {
     icon: "📈",
-    title: "Live Analytics Charts",
-    desc: "Revenue, profit, and quantity trends over any date range. Switch between daily, weekly, monthly and yearly views instantly.",
+    title: "Analytics & Charts",
+    desc: "See revenue, profit, and units sold across any date range, plus a live achievement chart for every goal. View by day, month, or a custom window.",
     tag: "Analytics",
   },
   {
@@ -267,8 +267,8 @@ const FEATURES = [
   },
   {
     icon: "👥",
-    title: "Employee Management",
-    desc: "Assign staff to goals and products. See who is online right now with real-time presence indicators across all sessions.",
+    title: "Team & Role-Based Access",
+    desc: "Add your team and control what each person can do — see financials, manage products and goals, or view only. See who's online right now with real-time presence across all sessions.",
     tag: "Team",
   },
   {
@@ -373,9 +373,11 @@ const PLANS = [
     features: [
       "3 active goals",
       "Up to 10 products",
-      "5 team members",
-      "30-day data history",
-      "Basic analytics",
+      "5 team members, role-based access",
+      "Per-product cost & margin tracking",
+      "Custom extra fields & formulas",
+      "Analytics dashboard & goal charts",
+      "API access",
       "Email support",
     ],
     cta:      "Start Free Trial",
@@ -389,12 +391,11 @@ const PLANS = [
     desc:     "The most popular plan for growing businesses.",
     badge:    "Most Popular",
     features: [
+      "Everything in Starter",
       "15 active goals",
       "Unlimited products",
       "25 team members",
-      "1-year data history",
-      "Full analytics + charts",
-      "Custom extra fields",
+      "CSV export — last 6 months",
       "Priority email support",
     ],
     cta:      "Start Free Trial",
@@ -407,14 +408,12 @@ const PLANS = [
     url:'/contact',
     desc:     "For established businesses with multiple teams.",
     features: [
+      "Everything in Growth",
       "Unlimited goals",
       "Unlimited products",
       "Unlimited team members",
-      "Full data history",
-      "Advanced analytics",
-      "Custom extra fields",
-      "API access",
-      "Dedicated support",
+      "CSV export — full history",
+      "Priority support",
     ],
     cta:      "Contact Sales",
     highlight: false,
@@ -496,60 +495,6 @@ const Pricing = () => {
 };
 
 // ════════════════════════════════════════════════════════════════
-// TESTIMONIALS
-// ════════════════════════════════════════════════════════════════
-const TESTIMONIALS = [
-  {
-    quote:  "Before MetriCore I had no idea which products were actually profitable after ads and delivery. Now I know within seconds.",
-    name:   "Rafiq Hassan",
-    role:   "E-commerce owner, Dhaka",
-    avatar: "RH",
-  },
-  {
-    quote:  "The custom fields feature is a game-changer. I added our VAT calculation once and it runs automatically across all products.",
-    name:   "Sarah Mitchell",
-    role:   "Operations Manager, Lagos",
-    avatar: "SM",
-  },
-  {
-    quote:  "We track 40+ products across 8 goals. The daily auto-record system means nothing falls through the cracks.",
-    name:   "Tanvir Ahmed",
-    role:   "Founder, Chittagong",
-    avatar: "TA",
-  },
-];
-
-// const Testimonials = () => {
-//   const [ref, visible] = useReveal();
-//   return (
-//     <section className="lp-testimonials">
-//       <div className="lp-container">
-//         <div className="lp-section-header" ref={ref}>
-//           <span className="lp-eyebrow">Real Businesses</span>
-//           <h2 className="lp-section-title">
-//             Used by operators who need <span className="lp-accent">real numbers</span>
-//           </h2>
-//         </div>
-//         <div className={`lp-testimonials__grid ${visible ? "lp-reveal" : ""}`}>
-//           {TESTIMONIALS.map((t, i) => (
-//             <div className="lp-testimonial" key={t.name} style={{ animationDelay: `${i * 120}ms` }}>
-//               <p className="lp-testimonial__quote">"{t.quote}"</p>
-//               <div className="lp-testimonial__author">
-//                 <div className="lp-testimonial__avatar">{t.avatar}</div>
-//                 <div>
-//                   <div className="lp-testimonial__name">{t.name}</div>
-//                   <div className="lp-testimonial__role">{t.role}</div>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// ════════════════════════════════════════════════════════════════
 // FAQ
 // ════════════════════════════════════════════════════════════════
 const FAQS = [
@@ -559,23 +504,23 @@ const FAQS = [
   },
   {
     q: "Can one product belong to multiple goals?",
-    a: "Yes. A product can be tracked under several goals simultaneously. Each goal maintains its own cost records independently — no data conflicts.",
+    a: "Yes. A product can be tracked under several goals at once. Its daily cost and sales records are stored per product, so the same product's numbers stay consistent across every goal it belongs to.",
   },
   {
     q: "What happens to my data if I cancel?",
-    a: "Your data is retained for 60 days after cancellation. You can export everything in CSV format at any time, even after cancelling.",
+    a: "Your data isn't deleted — it stays stored in your account. Access to the dashboard and CSV export pauses when your plan or trial ends and resumes the moment you re-subscribe, so we recommend exporting anything you need while your plan is active.",
   },
   {
     q: "How does the custom extra fields system work?",
     a: "You define a field name (e.g. 'Tax') and optionally a formula that calculates it from existing data (e.g. 10% of Sold Amount). It then appears on every product record automatically.",
   },
   {
-    q: "Is there a limit on how much historical data I can view?",
-    a: "Starter plans get 30 days of history. Growth plans get 1 year. Scale plans get full unlimited history from day one.",
+    q: "Can I export my data, and how far back?",
+    a: "You can view your full history in the dashboard on every plan. CSV export is available on Growth (the last 6 months) and Scale (full history, up to 6 months per file). Starter doesn't include CSV export.",
   },
   {
     q: "Can multiple employees use the same account?",
-    a: "Yes. Each plan includes a team member allowance. Employees log in with their own credentials and you can see who is online in real time.",
+    a: "Yes. Each plan includes a team member allowance (5 on Starter, 25 on Growth, unlimited on Scale). Employees log in with their own credentials, you control what each person can see and do with role-based access, and you can see who's online in real time.",
   },
 ];
 
@@ -652,7 +597,6 @@ export default function LandingPage() {
         <Features />
         <HowItWorks />
         <Pricing />
-        {/* <Testimonials /> */}
         <FAQ />
         <FinalCTA />
       </main>

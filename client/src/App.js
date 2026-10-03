@@ -139,56 +139,88 @@ function App() {
               </Route>
             </Route>
 
-            {/* ══ COMPANY AREA ══ */}
-            <Route path="/company/:companyName" element={<UserLayout />}>
+{/* ══ COMPANY AREA ══ */}
+<Route path="/company/:companyName" element={<UserLayout />}>
 
-              {/* ── Storefront — public customer pages ──────────
-                   (unchanged behavior; see DECISION POINT above) */}
-              <Route path="cart"                element={<Cart />}        />
-              <Route path="product/:productId"  element={<Product />}     />
-              <Route path="checkout"            element={<Checkout />}    />
-              <Route path="thanks"              element={<Thanks />}      />
-              <Route path="trackorder"          element={<TrackOrder />}  />
-              <Route path="cancelorder"         element={<CancelOrder />} />
-              <Route path="returnorder"         element={<ReturnOrder />} />
-              <Route path="addemployee"         element={<AddEmployee />} />
-              <Route path="support" element={<Support />} />
-              <Route path="billing" element={<Billing />} />
-              {/* ── Business tools — SECURED ─────────────────────
-                   Previously only the index route was guarded; every
-                   goal/product/employee page below was reachable
-                   without login. Now the whole block requires:
-                   1. RequireAuth      → logged in
-                   2. RequireOnboarded → company completed the wizard
-                   3. AuthGuard        → role check (index only,
-                      exactly as you had it) */}
-              <Route element={<RequireAuth />}>
-                <Route element={<RequireOnboarded />}>
-                  <Route
-                    index
-                    element={
-                      <AuthGuard allowedRoles={["Owner", "Admin"]}>
-                        <Main />
-                      </AuthGuard>
-                    }
-                  />
+  {/* ── Public storefront (customers, NOT employees) ─────────────
+       These are the buy-side pages. No employee-role guard — a
+       customer browsing/checking out is not a logged-in employee. */}
+  <Route path="cart"                element={<Cart />}        />
+  <Route path="product/:productId"  element={<Product />}     />
+  <Route path="checkout"            element={<Checkout />}    />
+  <Route path="thanks"              element={<Thanks />}      />
+  <Route path="trackorder"          element={<TrackOrder />}  />
+  <Route path="cancelorder"         element={<CancelOrder />} />
+  <Route path="returnorder"         element={<ReturnOrder />} />
+  <Route path="addemployee"         element={<AddEmployee />} />
+  <Route path="support"             element={<Support />} />
 
-                  <Route path="creategoal"                element={<SetTarget />}     />
-                  <Route path="viewgoal/:goalId"         element={<ViewGoal />}      />
-                  <Route path="updategoal/:goalId"       element={<EditGoal />}      />
-                  <Route path="theemployee/:employeeId"  element={<Employee />}      />
-                  <Route path="addproduct"               element={<AddProducts />}   />
-                  <Route path="viewproduct/:productId"   element={<ViewProduct />}   />
-                  <Route path="editproduct/:productId"   element={<EditProductCl />} />
-                  <Route path="settings"   element={<CompanyProfile />} />
+  {/* Billing — owner/finance only */}
+  <Route path="billing" element={
+    <AuthGuard requirePermission="manageBilling"><Billing /></AuthGuard>
+  } />
 
-                </Route>
-              </Route>
+  {/* ── Business tools — SECURED ─────────────────────────────────
+       1. RequireAuth      → logged in
+       2. RequireOnboarded → company completed the wizard
+       3. AuthGuard        → per-page permission (see each route) */}
+  <Route element={<RequireAuth />}>
+    <Route element={<RequireOnboarded />}>
 
-              {/* Unknown /company/:name/* paths */}
-              <Route path="*" element={<NotFound />} />
-            </Route>
+      {/* Dashboard (index).
+          ⚠️ Do NOT gate this with requirePermission="viewFinancials".
+          If you did, a staff member landing here would be redirected
+          to this same page → infinite loop. Instead, leave the route
+          open and hide the FINANCIAL widgets INSIDE <Main/> with
+          {can(user.employeeRoal, "viewFinancials") && <Charts/>}.
+          Every role can reach the dashboard; they just see different
+          things on it. */}
+      <Route index element={
+        <AuthGuard>
+          <Main />
+        </AuthGuard>
+      } />
 
+      {/* Goals */}
+      <Route path="creategoal" element={
+        <AuthGuard requirePermission="manageProducts"><SetTarget /></AuthGuard>
+      } />
+      <Route path="viewgoal/:goalId" element={
+        <AuthGuard requirePermission="viewFinancials"><ViewGoal /></AuthGuard>
+      } />
+      <Route path="updategoal/:goalId" element={
+        <AuthGuard requirePermission="manageProducts"><EditGoal /></AuthGuard>
+      } />
+
+      {/* Team */}
+      <Route path="theemployee/:employeeId" element={
+        <AuthGuard requirePermission="manageTeam"><Employee /></AuthGuard>
+      } />
+
+      {/* Products — creating/editing needs manageProducts;
+          viewing the catalog is open to all employees (matches the
+          backend read routes). */}
+      <Route path="addproduct" element={
+        <AuthGuard requirePermission="manageProducts"><AddProducts /></AuthGuard>
+      } />
+      <Route path="viewproduct/:productId" element={
+        <AuthGuard><ViewProduct /></AuthGuard>
+      } />
+      <Route path="editproduct/:productId" element={
+        <AuthGuard requirePermission="manageProducts"><EditProductCl /></AuthGuard>
+      } />
+
+      {/* Company settings */}
+      <Route path="settings" element={
+        <AuthGuard requirePermission="manageSettings"><CompanyProfile /></AuthGuard>
+      } />
+
+    </Route>
+  </Route>
+
+  {/* Unknown /company/:name/* paths */}
+  <Route path="*" element={<NotFound />} />
+</Route>
             {/* ══ LEGACY ADMIN DASHBOARD — unchanged ══
                 ⚠️ This has its own login (LoginDesh) but the child
                 routes are not route-guarded. If this dashboard is

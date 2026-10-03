@@ -59,6 +59,21 @@
   overflow-x:  hidden;
 }
 
+/* global wrap safety — long words / emails / URLs never overflow on mobile */
+.tp-root p,
+.tp-root a,
+.tp-root li,
+.tp-root td,
+.tp-root th,
+.tp-root h1,
+.tp-root h2,
+.tp-root h3,
+.tp-root dd,
+.tp-root dt {
+  overflow-wrap: anywhere;
+  word-break:    break-word;
+}
+
 /* ── container ────────────────────────────────────────────────── */
 .tp-container {
   max-width: 1140px;
@@ -669,6 +684,8 @@
 /* ════════════════════════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════════════════════════ */
+
+/* ── large tablet: narrow sidebar + gap ──────────────────────── */
 @media (max-width: 1024px) {
   :root {
     --tp-sidebar-w: 200px;
@@ -678,51 +695,96 @@
   .tp-deflist__row { grid-template-columns: 130px 1fr; }
 }
 
-@media (max-width: 800px) {
-  /* switch to mobile TOC */
+/* ── tablet: drop sidebar, show mobile TOC ───────────────────── */
+@media (max-width: 860px) {
   .tp-body {
     grid-template-columns: 1fr;
     gap:                   0;
     padding-top:           0;
   }
-  .tp-sidebar      { display: none; }
-  .tp-toc-mobile   { display: block; }
-  .tp-content      { padding-top: 32px; max-width: none; }
+  .tp-sidebar    { display: none; }
+  .tp-toc-mobile { display: block; }
+  .tp-content    { padding-top: 28px; max-width: none; width: 100%; }
 
-  /* hero */
-  .tp-hero         { padding: 56px 0 40px; }
-  .tp-hero__title  { font-size: clamp(30px, 7vw, 44px); }
+  .tp-hero        { padding: 56px 0 40px; }
+  .tp-hero__title { font-size: clamp(28px, 6vw, 44px); }
 
-  /* tables */
   .tp-table th,
-  .tp-table td     { padding: 10px 12px; }
+  .tp-table td    { padding: 10px 12px; }
 
-  /* contact 2-col → 1-col */
   .tp-contact-grid { grid-template-columns: 1fr; }
 
-  /* end rule stack */
-  .tp-end-rule     { flex-direction: column; align-items: flex-start; }
+  .tp-end-rule    { flex-direction: column; align-items: flex-start; }
 }
 
-@media (max-width: 540px) {
-  .tp-hero__meta   { flex-direction: column; align-items: flex-start; }
-  .tp-section      { padding: 36px 0; }
-  .tp-section__title { font-size: 18px; }
+/* ── phones: full single-column, tightened, no overflow ──────── */
+@media (max-width: 600px) {
+  .tp-container { padding: 0 18px; }
 
+  /* sticky mobile TOC sits at top on phones (no header-offset guess) */
+  .tp-toc-mobile         { top: 0; }
+  .tp-toc-mobile__btn    { padding: 13px 18px; }
+  .tp-toc-mobile__drawer { padding: 8px 18px 16px; max-height: 60vh; overflow-y: auto; }
+
+  /* hero */
+  .tp-hero        { padding: 44px 0 32px; }
+  .tp-hero__inner { gap: 14px; }
+  .tp-hero__title { font-size: clamp(26px, 8vw, 36px); line-height: 1.12; }
+  .tp-hero__sub   { font-size: 15px; }
+  .tp-hero__meta  { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .tp-meta-pill   { width: 100%; }
+
+  /* content */
+  .tp-content        { padding-top: 24px; }
+  .tp-section        { padding: 32px 0; }
+  .tp-section__title { font-size: 19px; margin-bottom: 18px; }
+  .tp-section__body  { gap: 16px; }
+  .tp-p              { font-size: 15px; line-height: 1.75; }
+
+  /* notices + lists trim */
+  .tp-notice        { padding: 14px 14px; gap: 12px; }
+  .tp-notice__text  { font-size: 14px; }
+  .tp-list__item,
+  .tp-numbered__item { font-size: 14px; }
+
+  /* DEFINITION LIST — the key overlap fix: stack term over definition,
+     so the fixed 160px column can't collide with the text */
   .tp-deflist__row { grid-template-columns: 1fr; }
   .tp-deflist__term {
-    border-right:  none;
-    border-bottom: 1px solid var(--tp-border-s);
-    padding-bottom: 6px;
+    border-right:   none;
+    border-bottom:  1px solid var(--tp-border-s);
+    padding:        12px 14px 6px;
   }
+  .tp-deflist__def { padding: 8px 14px 14px; }
 
-  .tp-table-wrap   { font-size: 13px; }
-  .tp-table th,
-  .tp-table td     { padding: 10px; }
+  /* tables: scroll inside wrapper, never break page width */
+  .tp-table-wrap { border-radius: var(--tp-r); -webkit-overflow-scrolling: touch; }
+  .tp-table      { font-size: 13px; }
+  .tp-table th   { padding: 10px 12px; }
+  .tp-table td   { padding: 12px 12px; }
+  .tp-table__plan,
+  .tp-table__price { white-space: normal; }
+
+  /* cards */
+  .tp-contact-card { padding: 18px; }
+
+  /* end rule links wrap */
+  .tp-end-rule__links { flex-wrap: wrap; gap: 14px 20px; }
 }
 
-@media (max-width: 400px) {
-  .tp-container { padding: 0 16px; }
+/* ── small phones ────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .tp-container      { padding: 0 14px; }
+  .tp-hero           { padding: 36px 0 28px; }
+  .tp-hero__title    { font-size: 24px; }
+  .tp-section__title { font-size: 18px; }
+  .tp-eyebrow        { letter-spacing: 2px; }
+
+  .tp-table    { font-size: 12px; }
+  .tp-table th { padding: 9px 10px; letter-spacing: 1px; }
+  .tp-table td { padding: 10px 10px; }
+
+  .tp-meta-pill { padding: 6px 12px; }
 }
 
 /* ── reduced motion ──────────────────────────────────────────── */

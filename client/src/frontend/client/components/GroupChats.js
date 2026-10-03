@@ -66,6 +66,8 @@ const [showEmoji, setShowEmoji] = useState(false);
 const pickerRef = useRef(null);
 const audioRef = useRef(null);
 const [isMutedState,setIsMutedState] = useState(false);
+const groupInfoView = useRef(null);
+const groupInfoButton = useRef(null);
 
 useEffect(()=>{
         const getAllEmployee = async () => {
@@ -262,11 +264,11 @@ useEffect(() => {
 
       return {
         ...prev,
-        participants: prev.participants.map((p) =>
-          p.employeeId === employeeId
-            ? { ...p, lastDeliveredMessageId }
-            : p
-        )
+      participants: prev.participants.map((p) =>
+        String(p.employeeId) === String(employeeId)
+          ? { ...p, lastDeliveredMessageId }
+          : p
+      )
       };
     });
 
@@ -281,10 +283,10 @@ useEffect(() => {
       return {
         ...prev,
         participants: prev.participants.map((p) =>
-          p.employeeId === employeeId
-            ? { ...p, lastReadMessageId: lastSeenMessageId }
-            : p
-        )
+            String(p.employeeId) === String(employeeId)
+              ? { ...p, lastReadMessageId: lastSeenMessageId }
+              : p
+          )
       };
     });
 
@@ -486,7 +488,7 @@ const truncateFileName = (name = "") => {
 // singel message <>
 const getOtherParticipants = () => {
   return conversation?.participants.filter(
-    p => p.employeeId !== user.employeeId
+    p => String(p.employeeId) !== String(user.employeeId)
   );
 };
 
@@ -576,9 +578,27 @@ useEffect(() => {
 }, [unreadMessages.length,tickerIndex]);
 
 const toggleGroupInfo = () => {
-  setIsGroupInfoOpen(!isGroupInfoOpen);
+  setIsGroupInfoOpen(prev => !prev);
 }
+useEffect(() => {
+    const handleClickOutside = (e) => {
+        const clickedInsideView =
+            groupInfoView.current?.contains(e.target);
 
+        const clickedInsideButton =
+            groupInfoButton.current?.contains(e.target);
+
+        if (!clickedInsideView && !clickedInsideButton) {
+            setIsGroupInfoOpen(false);
+        }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+        document.removeEventListener("click", handleClickOutside);
+    };
+}, []);
 const GroupDataUpdate = async () => {
   setIsChangeGroupInfo(false);
   const formData = new FormData();
@@ -658,17 +678,17 @@ useEffect(() => {
                         isMutedState ? (<VolumeUpIcon onClick={() => {pertiCipentIsmuteUpdate(false)}} className='isMutedIcon'/>) :
                         (<VolumeOffIcon onClick={() => {pertiCipentIsmuteUpdate(true)}} className='isMutedIcon'/>)
                       }
-                      {isAdmin && <InfoOutlinedIcon onClick={toggleGroupInfo} className='adminOnlybtnInfo'/>}
+                      {isAdmin && <InfoOutlinedIcon ref={groupInfoButton} onClick={toggleGroupInfo} className='adminOnlybtnInfo'/>}
                     </div>
                     {isGroupInfoOpen && (
-                      <div className='groupInformatinAndUpdate'>
+                      <div className='groupInformatinAndUpdate' ref={groupInfoView}>
                         <div className='changeGroupImage'>
                           <label>
                             <AddAPhotoIcon className='changeGroupImagesvgone'/>
                             <input type='file' onChange={handleGroupLogo}/>
                           </label>
                           {groupImagePreview !== "" ? (<img src={groupImagePreview} alt="group logo"/>) :
-                          (<GroupsIcon className='changeGroupImagesvgone changeGroupImagesvgtwo'/>) }
+                          (<GroupsIcon  className='changeGroupImagesvgone changeGroupImagesvgtwo'/>) }
                         </div>
                         <div className='changeGroupName'>
                           <input type='text' value={groupTitleName} name="title" onChange={(e) => {setGroupTitleName(e.target.value)}}/>
@@ -1047,15 +1067,7 @@ useEffect(() => {
                 />
 
               {showEmoji && (
-                <div style={{
-                  position: "absolute",
-                  bottom: "40px",
-                  right: "130px",
-                  zIndex: 1000,
-                  height:'280px',
-                  width:'245px',
-                  overflow:'hidden'
-                }} ref={pickerRef}>
+                <div  className="emojiPickerGroup" ref={pickerRef}>
                   <Picker
                       data={data}
                       onEmojiSelect={(emoji) => {

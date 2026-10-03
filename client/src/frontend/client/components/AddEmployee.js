@@ -6,22 +6,18 @@ import VisibilityOutlinedIcon    from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import { Altaxios } from "../../Altaxios";
 import "../../../style/AddEmployee.css";
+import { describeRole, roleTierInfo, assignableRolesFor } from "../../../utils/permissions";
+import { useAuth } from "../../../context/AuthContext";
 
-// Roles a manager may assign — "Owner" is intentionally excluded
-// (ownership comes only from company registration, and your backend
-// coerces any "Owner" attempt down to "Admin").
-const EMPLOYEE_ROLES = [
-  "Admin", "CEO", "Manager", "Supervisor", "HR", "Finance", "Accountant",
-  "Sales", "Marketing", "Engineer", "Technician", "Driver", "Worker",
-  "Support", "Guest",
-];
 
 const EMAIL_RE =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export default function AddEmployee() {
   const { companyName } = useParams();
-
+  const { user } = useAuth();
+  const allowedRoles = assignableRolesFor(user?.employeeRoal);
+  
   const [form, setForm] = useState({
     YemplyeeName:           "",
     YemplyeePhone:          "",
@@ -32,6 +28,11 @@ export default function AddEmployee() {
     EmplyeeRoal:            "Worker",
     employeeAccessPassword: "",
   });
+
+  useEffect(() => { 
+    if (allowedRoles.length && !allowedRoles.includes(form.EmplyeeRoal)) {
+       setForm((p) => ({ ...p, EmplyeeRoal: allowedRoles[allowedRoles.length - 1] })); 
+      } }, [form.EmplyeeRoal, allowedRoles]);
 
   const [imgFile,    setImgFile]    = useState(null);
   const [imgPreview, setImgPreview] = useState("");
@@ -100,7 +101,8 @@ export default function AddEmployee() {
       form.EmplyeeRoal,
     [form]
   );
-
+const roleGrants = describeRole(form.EmplyeeRoal);   // array of "can do" strings
+const roleTier   = roleTierInfo(form.EmplyeeRoal);   // { tier, label, description }
   // ── Submit ──────────────────────────────────────────────────────
   const handleSubmit = async () => {
     const errs = validate();
@@ -280,23 +282,38 @@ export default function AddEmployee() {
               />
             </div>
 
-            {/* Role pills */}
-            <div className="ae-field">
-              <label className="ae-label">Role</label>
-              <div className="ae-roles">
-                {EMPLOYEE_ROLES.map((r) => (
-                  <button
-                    type="button" key={r}
-                    className={`ae-role ${form.EmplyeeRoal === r ? "ae-role--on" : ""}`}
-                    onClick={() => setForm((p) => ({ ...p, EmplyeeRoal: r }))}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-              {errors.EmplyeeRoal && <span className="ae-error">{errors.EmplyeeRoal}</span>}
-            </div>
+{/* Role pills */}
+<div className="ae-field">
+  <label className="ae-label">Role</label>
+  <div className="ae-roles">
+    {allowedRoles.map((r) => (
+      <button
+        type="button" key={r}
+        className={`ae-role ${form.EmplyeeRoal === r ? "ae-role--on" : ""}`}
+        onClick={() => setForm((p) => ({ ...p, EmplyeeRoal: r }))}
+      >
+        {r}
+      </button>
+    ))}
+  </div>
+  {errors.EmplyeeRoal && <span className="ae-error">{errors.EmplyeeRoal}</span>}
 
+  {/* NEW — what this role can do (updates as you pick) */}
+  <div className="ae-role-summary">
+    <div className="ae-role-summary__head">
+      <span className="ae-role-summary__tier">{roleTier.label}</span>
+      <span className="ae-role-summary__desc">{roleTier.description}</span>
+    </div>
+    <ul className="ae-role-summary__list">
+      {roleGrants.map((g) => (
+        <li key={g} className="ae-role-summary__item">
+          <span className="ae-role-summary__check">✓</span>
+          {g}
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
             {serverError && <div className="ae-server-error" role="alert">{serverError}</div>}
 
             <button className="ae-btn ae-btn--primary" onClick={handleSubmit} disabled={!canSubmit || saving}>

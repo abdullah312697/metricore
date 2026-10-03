@@ -9,6 +9,7 @@ import "../../../style/Billing.css";
    monthly/annual toggle. Checkout + portal are Owner-only on the
    backend; everyone can view.
    Mirrors api/config/plans.js — change prices in BOTH places.
+   These feature lists also appear on LandingPage — keep them in sync.
 ═══════════════════════════════════════════════════════════════ */
 
 const PLANS_UI = [
@@ -19,8 +20,9 @@ const PLANS_UI = [
     annual: 182,
     tagline: "Perfect for solo operators and small product lines.",
     features: [
-      "3 active goals", "Up to 10 products", "5 team members",
-      "30-day data history", "Basic analytics", "Email support",
+      "3 active goals", "Up to 10 products", "5 team members, role-based access",
+      "Per-product cost & margin tracking", "Custom extra fields & formulas",
+      "Analytics dashboard & goal charts", "API access", "Email support",
     ],
   },
   {
@@ -31,9 +33,8 @@ const PLANS_UI = [
     popular: true,
     tagline: "The most popular plan for growing businesses.",
     features: [
-      "15 active goals", "Unlimited products", "25 team members",
-      "1-year data history", "Full analytics + charts",
-      "Custom extra fields", "Priority email support",
+      "Everything in Starter", "15 active goals", "Unlimited products",
+      "25 team members", "CSV export — last 6 months", "Priority email support",
     ],
   },
   {
@@ -43,9 +44,9 @@ const PLANS_UI = [
     annual: 950,
     tagline: "For established businesses with multiple teams.",
     features: [
-      "Unlimited goals", "Unlimited products", "Unlimited team members",
-      "Full data history", "Advanced analytics",
-      "Custom extra fields", "API access", "Dedicated support",
+      "Everything in Growth", "Unlimited goals", "Unlimited products",
+      "Unlimited team members", "CSV export — full history",
+      "Priority support",
     ],
   },
 ];

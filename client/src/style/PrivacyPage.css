@@ -49,6 +49,20 @@
   font-size:   16px;
   line-height: 1.7;
   min-height:  100vh;
+  overflow-x:  hidden;            /* never allow horizontal scroll on mobile */
+}
+
+/* global wrap safety — long words / emails / URLs never overflow */
+.pp-root p,
+.pp-root a,
+.pp-root li,
+.pp-root td,
+.pp-root th,
+.pp-root h1,
+.pp-root h2,
+.pp-root h3 {
+  overflow-wrap: anywhere;
+  word-break:    break-word;
 }
 
 /* ── container ────────────────────────────────────────────────── */
@@ -602,31 +616,33 @@
 /* ════════════════════════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════════════════════════ */
+
+/* ── large tablet: narrow the sidebar + gap ──────────────────── */
 @media (max-width: 1024px) {
   :root {
     --pp-sidebar-w: 200px;
     --pp-gap:       40px;
   }
-  .pp-contact-grid { grid-template-columns: 1fr; }
+  .pp-contact-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 800px) {
-  /* Hide sidebar, show mobile TOC */
+/* ── tablet / small laptop: drop the sidebar, show mobile TOC ── */
+@media (max-width: 860px) {
   .pp-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr;   /* single column — no more sidebar column */
     gap:                   0;
     padding-top:           0;
   }
 
-  .pp-sidebar      { display: none; }
-  .pp-toc-mobile   { display: block; }
+  .pp-sidebar    { display: none; }
+  .pp-toc-mobile { display: block; }
 
-  .pp-content      { padding-top: 32px; max-width: none; }
+  .pp-content    { padding-top: 28px; max-width: none; width: 100%; }
 
-  .pp-hero         { padding: 56px 0 40px; }
-  .pp-hero__title  { font-size: clamp(30px, 7vw, 44px); }
+  .pp-hero        { padding: 56px 0 40px; }
+  .pp-hero__title { font-size: clamp(28px, 6vw, 44px); }
 
-  .pp-rights-grid  { grid-template-columns: 1fr; }
+  .pp-rights-grid  { grid-template-columns: repeat(2, 1fr); }
   .pp-contact-grid { grid-template-columns: 1fr; }
 
   .pp-end-rule {
@@ -635,12 +651,78 @@
   }
 }
 
-@media (max-width: 540px) {
-  .pp-hero__meta   { flex-direction: column; align-items: flex-start; }
-  .pp-table-wrap   { border-radius: var(--pp-r); }
+/* ── phones: full single-column, tightened spacing, no overflow ── */
+@media (max-width: 600px) {
+  .pp-container { padding: 0 18px; }   /* less side padding on phones */
 
-  .pp-section      { padding: 36px 0; }
+  /* the sticky mobile-TOC sits at the very top on phones
+     (no fixed header offset assumption that pushes it off-screen) */
+  .pp-toc-mobile        { top: 0; }
+  .pp-toc-mobile__btn   { padding: 13px 18px; }
+  .pp-toc-mobile__drawer{ padding: 8px 18px 16px; }
+  /* cap the drawer height so a long TOC scrolls instead of covering the page */
+  .pp-toc-mobile__drawer{ max-height: 60vh; overflow-y: auto; }
+
+  /* hero */
+  .pp-hero         { padding: 44px 0 32px; }
+  .pp-hero__inner  { gap: 14px; }
+  .pp-hero__title  { font-size: clamp(26px, 8vw, 36px); line-height: 1.12; }
+  .pp-hero__sub    { font-size: 15px; }
+  .pp-hero__meta   { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .pp-meta-pill    { width: 100%; }   /* pills go full width, stack cleanly */
+
+  /* content spacing */
+  .pp-content        { padding-top: 24px; }
+  .pp-section        { padding: 32px 0; }
+  .pp-section__title { font-size: 19px; margin-bottom: 18px; }
+  .pp-section__body  { gap: 16px; }
+  .pp-p              { font-size: 15px; line-height: 1.75; }
+
+  /* single-column grids */
+  .pp-rights-grid  { grid-template-columns: 1fr; }
+  .pp-contact-grid { grid-template-columns: 1fr; }
+
+  /* highlight + list padding trim */
+  .pp-highlight       { padding: 14px 14px; gap: 12px; }
+  .pp-highlight__text { font-size: 14px; }
+  .pp-list            { padding: 16px 0 4px; }
+  .pp-list__item      { font-size: 14px; }
+
+  /* tables: allow horizontal scroll INSIDE the wrapper only,
+     and hint scrollability; cells stay readable, page never overflows */
+  .pp-table-wrap {
+    border-radius: var(--pp-r);
+    -webkit-overflow-scrolling: touch;
+  }
+  .pp-table    { font-size: 13px; }
+  .pp-table th { padding: 10px 12px; }
+  .pp-table td { padding: 12px 12px; }
+  /* let type cells wrap instead of forcing width via nowrap */
+  .pp-table__type { white-space: normal; }
+
+  /* cards */
+  .pp-right-card   { padding: 16px; }
+  .pp-contact-card { padding: 18px; }
+
+  /* end rule links wrap */
+  .pp-end-rule__links { flex-wrap: wrap; gap: 14px 20px; }
+}
+
+/* ── small phones ────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .pp-container      { padding: 0 14px; }
+  .pp-hero           { padding: 36px 0 28px; }
+  .pp-hero__title    { font-size: 24px; }
   .pp-section__title { font-size: 18px; }
+  .pp-eyebrow        { letter-spacing: 2px; }
+
+  /* stack the header of table on very small screens is impractical;
+     keep scroll but shrink a touch more for legibility */
+  .pp-table    { font-size: 12px; }
+  .pp-table th { padding: 9px 10px; letter-spacing: 1px; }
+  .pp-table td { padding: 10px 10px; }
+
+  .pp-meta-pill { padding: 6px 12px; }
 }
 
 /* ── reduced motion ──────────────────────────────────────────── */

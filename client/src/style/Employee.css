@@ -551,6 +551,19 @@
   color:      #ffffff;
 }
 
+.ep-role-current { font-size: 14px; color: 
+#ffb100; margin-bottom: 14px; } 
+.ep-roles-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; } 
+.ep-role-pill { background: 
+#040f1a; color: 
+#8899aa; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 6px 13px; font-size: 12.5px; cursor: pointer; transition: all .15s ease; } .ep-role-pill--on { background: 
+#ffb100; color: 
+#011626; border-color: 
+#ffb100; font-weight: 600; } .ep-role-summary { background: rgba(255,177,0,0.04); border: 1px solid rgba(255,177,0,0.18); border-radius: 10px; padding: 14px 16px; } .ep-role-summary__head { display:flex; flex-direction:column; gap:3px; margin-bottom:10px; } .ep-role-summary__tier { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; color:
+#ffb100; } .ep-role-summary__desc { font-size:12.5px; line-height:1.5; color:
+#8899aa; } .ep-role-summary__list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; } .ep-role-summary__item { display:flex; align-items:flex-start; gap:9px; font-size:13px; line-height:1.4; color:
+#dde6ee; } .ep-role-summary__check { color:
+#34d399; font-weight:700; flex-shrink:0; }
 /* ════════════════════════════════════════════════════════════════
    LOADING / ERROR
 ════════════════════════════════════════════════════════════════ */
@@ -572,7 +585,8 @@
   align-items:    center;
   gap:            18px;
 }
-
+.ep-role-locked { font-size: 11.5px; color: 
+#8899aa; margin-top: 8px; }
 /* ════════════════════════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════════════════════════ */
@@ -580,7 +594,7 @@
   .ep-grid     { grid-template-columns: 1fr; }
   .ep-identity { position: static; }
 }
-
+@media (max-width: 600px) { .ep-role-summary { padding:12px 14px; } .ep-role-summary__item { font-size:12.5px; } }
 @media (max-width: 520px) {
   .ep-field {
     grid-template-columns: 1fr;

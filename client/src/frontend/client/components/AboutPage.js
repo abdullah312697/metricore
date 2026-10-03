@@ -48,17 +48,12 @@ const useReveal = (threshold = 0.12) => {
 // };
 
 // ════════════════════════════════════════════════════════════════
-// HERO — origin statement, not a standard banner
+// HERO — mission statement, not a standard banner
 // ════════════════════════════════════════════════════════════════
 const Hero = () => (
   <section className="ab-hero">
     <div className="ab-hero__grid-bg" />
     <div className="ab-container ab-hero__inner">
-      <div className="ab-hero__founded">
-        <span className="ab-mono">FOUNDED</span>
-        <span className="ab-hero__year">2022</span>
-        <span className="ab-mono">DHAKA, BANGLADESH</span>
-      </div>
       <div className="ab-hero__copy">
         <span className="ab-eyebrow">About MetriCore</span>
         <h1 className="ab-hero__headline">
@@ -70,8 +65,8 @@ const Hero = () => (
       <p className="ab-hero__truth">
         Most businesses have a revenue number. Very few have a clear picture
         of what it cost per product, per day, to generate it. MetriCore was
-        built specifically to close that gap — not with another spreadsheet,
-        but with a system that does the work automatically.
+        built to close that gap — not with another spreadsheet, but with a
+        system that does the work automatically.
       </p>
     </div>
     <div className="ab-hero__rule" />
@@ -93,19 +88,20 @@ const ProblemSection = () => {
               The problem was hiding<br />in plain sight.
             </h2>
             <p>
-              We watched a friend run a product business for two years. She
-              celebrated her best sales month, then discovered it was her worst
-              profit month — her delivery costs had quietly doubled, her ad
-              spend had crept up, and packaging was eating margin she hadn't
-              measured since she set it.
+              MetriCore started from a simple observation: most product
+              businesses can tell you what they sold last month, but not
+              what each product actually cost them to sell — once ad spend,
+              delivery, packaging, and returns are counted.
             </p>
             <p>
-              The data existed. It sat in separate invoices, separate sheets,
-              separate dashboards — never assembled in one place, never broken
-              down per product, never updated automatically every day.
+              The data usually exists. It just sits in separate invoices,
+              separate sheets, separate dashboards — never assembled in one
+              place, never broken down per product, never updated
+              automatically every day.
             </p>
             <p className="ab-problem__punchline">
-              That experience became MetriCore's reason for existing.
+              Closing that gap — automatically, every day — is MetriCore's
+              reason for existing.
             </p>
           </div>
 
@@ -177,70 +173,6 @@ const ProblemSection = () => {
 };
 
 // ════════════════════════════════════════════════════════════════
-// TIMELINE
-// ════════════════════════════════════════════════════════════════
-const MILESTONES = [
-  {
-    year:  "2022",
-    month: "Mar",
-    title: "The spreadsheet that started it all",
-    desc:  "Our founder began manually tracking daily product costs for a small e-commerce business in Dhaka. Within three months, margins improved by 18% — purely from visibility.",
-  },
-  {
-    year:  "2023",
-    month: "Jan",
-    title: "First version built for three businesses",
-    desc:  "A working prototype shipped to three early test businesses. All three stayed. The feedback: they didn't want fewer features, they wanted more cost fields and better charts.",
-  },
-  {
-    year:  "2024",
-    month: "Feb",
-    title: "Public launch with goal-based tracking",
-    desc:  "MetriCore launched publicly with the core goal system — multiple products under one goal, daily targets, achievement tracking. 200 businesses signed up in the first month.",
-  },
-  {
-    year:  "2025",
-    month: "Jun",
-    title: "Custom fields, real-time presence, charts",
-    desc:  "The platform gained its most-requested features: custom calculated fields, real-time employee online status, and full analytics charts. The system grew into what it is today.",
-  },
-];
-
-const Timeline = () => {
-  const [ref, visible] = useReveal();
-  return (
-    <section className="ab-timeline">
-      <div className="ab-container">
-        <div className="ab-section-header">
-          <span className="ab-eyebrow">Our Journey</span>
-          <h2 className="ab-section-title">How we got here</h2>
-        </div>
-        <div className={`ab-timeline__track ${visible ? "ab-reveal" : ""}`} ref={ref}>
-          <div className="ab-timeline__line" />
-          {MILESTONES.map((m, i) => (
-            <div
-              className="ab-milestone"
-              key={m.year + m.month}
-              style={{ animationDelay: `${i * 120}ms` }}
-            >
-              <div className="ab-milestone__dot" />
-              <div className="ab-milestone__date">
-                <span className="ab-milestone__month">{m.month}</span>
-                <span className="ab-milestone__year">{m.year}</span>
-              </div>
-              <div className="ab-milestone__content">
-                <h3 className="ab-milestone__title">{m.title}</h3>
-                <p  className="ab-milestone__desc">{m.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ════════════════════════════════════════════════════════════════
 // VALUES — concrete behaviors, not buzzwords
 // ════════════════════════════════════════════════════════════════
 const VALUES = [
@@ -296,80 +228,6 @@ const ValuesSection = () => {
 };
 
 // ════════════════════════════════════════════════════════════════
-// TEAM
-// ════════════════════════════════════════════════════════════════
-const TEAM = [
-  { initials: "RK", name: "Rashid K.",  role: "Founder & CEO",       bio: "Former operations consultant. Spent 6 years watching product businesses lose margin to invisible costs." },
-  { initials: "AN", name: "Ayesha N.", role: "Head of Product",      bio: "Previously built analytics tools at two fintech startups. Obsessed with making complex data feel obvious." },
-  { initials: "TM", name: "Tanvir M.", role: "Lead Engineer",        bio: "Full-stack engineer with a background in real-time systems. Architect of MetriCore's aggregation pipeline." },
-  { initials: "PS", name: "Priya S.",  role: "Customer Success",     bio: "Runs onboarding for every new business. Has personally helped 300+ operators set up their first goal." },
-];
-
-const TeamSection = () => {
-  const [ref, visible] = useReveal();
-  return (
-    <section className="ab-team">
-      <div className="ab-container">
-        <div className="ab-section-header">
-          <span className="ab-eyebrow">The People</span>
-          <h2 className="ab-section-title">Small team. Clear focus.</h2>
-          <p className="ab-section-sub">
-            We are a small, remote team. Every person here has used MetriCore
-            for their own side business or helped someone who has.
-          </p>
-        </div>
-        <div className={`ab-team__grid ${visible ? "ab-reveal" : ""}`} ref={ref}>
-          {TEAM.map((member, i) => (
-            <div
-              className="ab-team-card"
-              key={member.name}
-              style={{ animationDelay: `${i * 90}ms` }}
-            >
-              <div className="ab-team-card__avatar">{member.initials}</div>
-              <h3 className="ab-team-card__name">{member.name}</h3>
-              <div className="ab-team-card__role ab-mono">{member.role}</div>
-              <p className="ab-team-card__bio">{member.bio}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ════════════════════════════════════════════════════════════════
-// BY THE NUMBERS
-// ════════════════════════════════════════════════════════════════
-const NUMBERS = [
-  { value: "2022",   label: "Year founded"            },
-  { value: "2,800+", label: "Goals tracked"           },
-  { value: "14",     label: "Countries active in"     },
-  { value: "98%",    label: "Annual retention rate"   },
-];
-
-const ByTheNumbers = () => {
-  const [ref, visible] = useReveal(0.3);
-  return (
-    <section className="ab-numbers" ref={ref}>
-      <div className="ab-container">
-        <div className="ab-section-header">
-          <span className="ab-eyebrow">By the Numbers</span>
-          <h2 className="ab-section-title">Small but growing — deliberately.</h2>
-        </div>
-        <div className={`ab-numbers__grid ${visible ? "ab-reveal" : ""}`}>
-          {NUMBERS.map((n, i) => (
-            <div className="ab-number-item" key={n.label} style={{ animationDelay: `${i * 100}ms` }}>
-              <div className="ab-number-item__val">{n.value}</div>
-              <div className="ab-number-item__label">{n.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ════════════════════════════════════════════════════════════════
 // CLOSING CTA
 // ════════════════════════════════════════════════════════════════
 const ClosingCTA = () => {
@@ -387,7 +245,7 @@ const ClosingCTA = () => {
           Free for 14 days. No card. No spreadsheet required.
         </p>
         <div className="ab-cta__actions">
-          <Link to="/signup" className="ab-btn ab-btn--lg">
+          <Link to="/register" className="ab-btn ab-btn--lg">
             Start Free Trial
           </Link>
           <Link to="/#features" className="ab-btn ab-btn--ghost ab-btn--lg">
@@ -409,10 +267,7 @@ export default function AboutPage() {
       <main>
         <Hero />
         <ProblemSection />
-        <Timeline />
         <ValuesSection />
-        <TeamSection />
-        <ByTheNumbers />
         <ClosingCTA />
       </main>
     </div>

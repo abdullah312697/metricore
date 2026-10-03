@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { Altaxios } from "../../Altaxios";
 import Calendar from "../../deshbord/components/calender/Calendar";
+import { can } from "../../../utils/permissions";
+import { useAuth } from "../../../context/AuthContext";
 
 const METRICS = [
   { key: "SoldAmount",   label: "Revenue",  color: "#f59e0b", unit: "$" },
@@ -83,6 +85,7 @@ export default function RevenueChart() {
   const [isOpenCalanderOne, setIsOpenCalanderOne] = useState(false);
   const [isOpenCalanderTwo, setIsOpenCalanderTwo] = useState(false);
   const calendarWrapperRef = useRef(null);
+  const {user} = useAuth();
 
 function ddmmyyyyToISOString(dateStr) {
   if (!dateStr || typeof dateStr !== "string") {
@@ -115,6 +118,7 @@ function ddmmyyyyToISOString(dateStr) {
 
   // ── Fetch whenever period or metric changes ───────────────────
   useEffect(() => {
+    if (!can(user?.employeeRoal, "viewFinancials")) return;
     if (period === "custom" && (!startDateView || !endDateView)) return;
     const fetchData = async () => {
       setLoading(true);
@@ -138,7 +142,7 @@ function ddmmyyyyToISOString(dateStr) {
     };
 
     fetchData();
-  }, [period,endDateView,startDateView]);
+  }, [period, endDateView, startDateView, user]);
 
   // ── Build nivo data ───────────────────────────────────────────
 // In RevenueChart.js — guard against empty/null data

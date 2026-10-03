@@ -6,11 +6,13 @@ import DeleteIcon    from "@mui/icons-material/Delete";
 import ConfirmDialog from "./ConfirmDialog";
 import { Altaxios }  from "../../Altaxios";
 import "../../../style/ViewProduct.css";
+import { can } from "../../../utils/permissions";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function ViewProduct() {
   const { productId,companyName } = useParams();
   const navigate = useNavigate();
-
+    const {user} = useAuth();
   const [product,   setProduct]   = useState(null);
   const [goals,     setGoals]     = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -97,6 +99,7 @@ export default function ViewProduct() {
                 <div className="vp-image vp-image--empty">📦</div>
               )}
             </div>
+        {can(user.employeeRoal, "manageProducts") && (
 
             <div className="vp-actions">
               <Link to={`/company/${companyName}/editproduct/${productId}`} className="vp-btn vp-btn--edit">
@@ -109,6 +112,7 @@ export default function ViewProduct() {
                 <DeleteIcon style={{ fontSize: 17 }} /> Delete
               </button>
             </div>
+        )}
           </aside>
 
           {/* ══ RIGHT — details ════════════════════════════════ */}

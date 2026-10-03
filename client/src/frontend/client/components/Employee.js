@@ -14,10 +14,7 @@ import { useAuth }          from "../../../context/AuthContext";
 import "../../../style/Employee.css";
 import EmailComposer from "./EmailComposer";
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
-
-
-const MANAGER_ROLES = ["Owner", "Admin"];
-
+import { can, describeRole, roleTierInfo, assignableRolesFor } from "../../../utils/permissions";
 // Which draft fields each mode may edit
 const EDITABLE_BY_MODE = {
   manager: [
@@ -45,7 +42,6 @@ const SECTIONS = [
     visibleTo: ["manager", "self", "peer"],
     fields: [
       { key: "employeePosition", label: "Position",  type: "text", visibleTo: ["manager", "self", "peer"] },
-      { key: "EmplyeeRoal",      label: "Role",      type: "text", visibleTo: ["manager", "self", "peer"] },
       { key: "EmplyeeJoinDate",  label: "Join date", type: "date", visibleTo: ["manager", "self", "peer"] },
     ],
   },
@@ -80,14 +76,13 @@ export default function Employee() {
   const { employeeId, companyName } = useParams();
   const navigate = useNavigate();
   const { user, updateEmployee, updateProfile } = useAuth();
-
+  const [targetIsOwner, setTargetIsOwner] = useState(false);
   // ── Viewer identity → mode ──────────────────────────────────────
   const viewerId   = user?.employeeId || user?._id;          // 👈 adjust to your AuthContext key
-  const viewerRole = user?.EmplyeeRoal || user?.role || "";  // 👈 adjust to your AuthContext key
+  const viewerRole = user?.employeeRoal || "";   // ✅ matches AccessData (lowercase 'e')
   const isSelf     = String(viewerId || "") === String(employeeId);
-  const isManager  = MANAGER_ROLES.includes(viewerRole);
+  const isManager  = can(viewerRole, "manageTeam");   // 👈 tier-based, matches backend
   const mode       = isManager ? "manager" : isSelf ? "self" : "peer";
-
   const editableKeys = EDITABLE_BY_MODE[mode];
   const canEditData  = editableKeys.length > 0;
   const canChangePhoto = mode === "manager" || mode === "self";
@@ -130,7 +125,7 @@ export default function Employee() {
     setter({ text, ok });
     setTimeout(() => setter(null), 3000);
   };
-
+const allowedRoles = assignableRolesFor(viewerRole);
   // ── Fetch employee ──────────────────────────────────────────────
   useEffect(() => {
     if (!employeeId) return;
@@ -144,6 +139,7 @@ export default function Employee() {
         );
         const emp = res.data?.employee;
         setEmployeeData(emp);
+        setTargetIsOwner(Boolean(res.data?.isOwner));
         setSelectedStatus(emp?.EmployeeProfileStatus || "Active");
       } catch (err) {
         if (ac.signal.aborted) return;
@@ -501,7 +497,56 @@ if (mode === "self") body.currentPassword = currentPass;
                 </section>
               );
             })}
+            {/* ── Role & permissions ─────────────────────────────────── */}
+            <section className="ep-card">
+              <h2 className="ep-card__heading">Role &amp; permissions</h2>
 
+              {/* Managers can change the role while editing; everyone else sees it read-only.
+                  The actual owner's role is protected — it can't be changed here. */}
+              {editing && editableKeys.includes("EmplyeeRoal") ? (
+                <>
+                  <div className="ep-roles-pick">
+                    {allowedRoles.map((r) => (
+                      <button
+                        type="button"
+                        key={r}
+                        className={`ep-role-pill ${ (draft.EmplyeeRoal ?? employeeData.EmplyeeRoal) === r ? "ep-role-pill--on" : "" }`}
+                        onClick={() => setDraft((p) => ({ ...p, EmplyeeRoal: r }))}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="ep-role-current ep-mono">{employeeData.EmplyeeRoal || "—"}</div>
+              )}
+
+              {/* Live permission summary for the selected (or current) role */}
+              {(() => {
+                const shownRole = editing
+                  ? (draft.EmplyeeRoal ?? employeeData.EmplyeeRoal)
+                  : employeeData.EmplyeeRoal;
+                const tier   = roleTierInfo(shownRole);
+                const grants = describeRole(shownRole);
+                return (
+                  <div className="ep-role-summary">
+                    <div className="ep-role-summary__head">
+                      <span className="ep-role-summary__tier">{tier.label}</span>
+                      <span className="ep-role-summary__desc">{tier.description}</span>
+                    </div>
+                    <ul className="ep-role-summary__list">
+                      {grants.map((g) => (
+                        <li key={g} className="ep-role-summary__item">
+                          <span className="ep-role-summary__check">✓</span>{g}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
+              {targetIsOwner && ( <p className="ep-role-locked ep-mono"> Owner role is permanent and can't be changed. </p> )}
+            </section>
             {/* ── Self: change own password ──────────────────────── */}
             {mode === "self" && (
               <section className="ep-card">

@@ -44,6 +44,7 @@ import adminAnnouncementRoutes from "./routes/adminAnnouncementRoutes.js";
 import { stripeWebhookHandler } from "./routes/stripeWebhook.js";
 import stripeRoutes, { requireActiveSubscription } from "./routes/stripeRoutes.js";
 import adminBillingRoutes from "./routes/adminBillingRoutes.js";
+import exportRoutes from "./routes/exportRoutes.js";
 // =========================
 // ✅ App Initialization
 // =========================
@@ -83,10 +84,9 @@ const allowedOrigins = [
   "https://metricore.app",
   "https://www.metricore.app",
   "https://motricore.netlify.app",
-  "http://10.243.52.23:3000",
-  "https://10.243.52.23:3000"
+  "http://10.88.231.23:3000",
+  "https://10.88.231.23:3000"
 ];
-
 
 const useCors =   cors({
     origin: function (origin, callback) {
@@ -126,6 +126,7 @@ app.use("/api/goalTarget", TargetAmountRoute);
 app.use("/api/chart", ChartData);
 app.use("/api/v1", apiV1Limiter, ingestRoutes); 
 app.use("/api/apikeys", apiKeyRoutes);  
+app.use("/api/export", exportRoutes);  
 
 // admin dashbord 
 app.use("/api/admin", adminAuthRoutes);
@@ -136,7 +137,6 @@ app.use("/api/admin",    adminFeedbackRoutes);   // admin side
 app.use("/api/admin",         adminAnnouncementRoutes);  
 app.use("/api/admin", adminBillingRoutes);
 app.use("/api/announcements", announcementRoutes);        // company feed
-
 // payment
 app.use("/api/stripe", stripeRoutes);
 

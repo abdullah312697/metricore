@@ -1,0 +1,228 @@
+/* ExportDataButton.css
+   Brand  : #011626 navy · #ffb100 amber · #071e30 card · #8899aa slate
+   Type   : Space Grotesk (buttons) · Inter (body) · IBM Plex Mono (numbers/hints)
+   Prefix : ed- (export data) — zero collision with other stylesheets.
+   Scoped under .ed-root so it can be dropped into any header/toolbar. */
+
+.ed-root {
+  --ed-navy:       #011626;
+  --ed-card:       #071e30;
+  --ed-amber:      #ffb100;
+  --ed-amber-dim:  rgba(255, 177, 0, 0.10);
+  --ed-amber-line: rgba(255, 177, 0, 0.28);
+  --ed-white:      #ffffff;
+  --ed-slate:      #8899aa;
+  --ed-slate-dim:  #4d6070;
+  --ed-border:     rgba(255, 255, 255, 0.08);
+  --ed-red:        #ef4444;
+  --ed-red-dim:    rgba(239, 68, 68, 0.10);
+  --ed-red-line:   rgba(239, 68, 68, 0.30);
+
+  --ed-display: 'Space Grotesk', sans-serif;
+  --ed-body:    'Inter', sans-serif;
+  --ed-mono:    'IBM Plex Mono', monospace;
+
+  position: relative;
+  display:  inline-block;
+}
+
+.ed-mono { font-family: var(--ed-mono); }
+
+/* ── trigger button ──────────────────────────────────────────── */
+.ed-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:              7px;
+  padding:          9px 16px;
+  border-radius:    9px;
+  border:           1px solid var(--ed-amber-line);
+  background:       var(--ed-amber-dim);
+  color:            var(--ed-amber);
+  font-family:      var(--ed-display);
+  font-size:        13px;
+  font-weight:      600;
+  cursor:           pointer;
+  transition:       border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  white-space:      nowrap;
+}
+.ed-btn:hover {
+  border-color: var(--ed-amber);
+  background:   rgba(255, 177, 0, 0.16);
+}
+.ed-btn:disabled { cursor: default; }
+
+.ed-btn--loading {
+  opacity: 0.55;
+  border-color: var(--ed-border);
+  background:   transparent;
+  color:        var(--ed-slate);
+}
+
+.ed-btn--locked {
+  border-color: var(--ed-border);
+  background:   transparent;
+  color:        var(--ed-slate);
+}
+.ed-btn--locked:hover {
+  border-color: var(--ed-slate-dim);
+  color:        var(--ed-white);
+}
+
+/* ── popover ──────────────────────────────────────────────────── */
+.ed-pop {
+  position:      absolute;
+  top:           calc(100% + 8px);
+  right:         0;
+  z-index:       40;
+  width:         260px;
+  background:    var(--ed-card);
+  border:        1px solid var(--ed-border);
+  border-radius: 14px;
+  padding:       14px;
+  box-shadow:    0 12px 32px rgba(0, 0, 0, 0.45);
+  color:         var(--ed-white);
+  font-family:   var(--ed-body);
+  animation:     ed-pop-in 0.14s ease;
+}
+
+@keyframes ed-pop-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ed-pop__head {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  font-family:     var(--ed-display);
+  font-size:       13px;
+  font-weight:     600;
+  margin-bottom:   10px;
+}
+
+.ed-pop__close {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           22px;
+  height:          22px;
+  border-radius:   6px;
+  border:          none;
+  background:      transparent;
+  color:           var(--ed-slate);
+  cursor:          pointer;
+}
+.ed-pop__close:hover { background: rgba(255, 255, 255, 0.06); color: var(--ed-white); }
+
+/* ── quick presets ────────────────────────────────────────────── */
+.ed-presets {
+  display:       flex;
+  gap:           6px;
+  margin-bottom: 12px;
+}
+.ed-chip {
+  flex:          1;
+  padding:       6px 4px;
+  border-radius: 7px;
+  border:        1px solid var(--ed-border);
+  background:    transparent;
+  color:         var(--ed-slate);
+  font-family:   var(--ed-mono);
+  font-size:     11px;
+  cursor:        pointer;
+  transition:    border-color 0.15s ease, color 0.15s ease;
+}
+.ed-chip:hover { border-color: var(--ed-amber-line); color: var(--ed-amber); }
+
+/* ── date fields ──────────────────────────────────────────────── */
+.ed-field {
+  display:       flex;
+  flex-direction: column;
+  gap:           4px;
+  margin-bottom: 10px;
+}
+.ed-field label {
+  font-size:      11px;
+  color:          var(--ed-slate);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.ed-field input[type="date"] {
+  background:    var(--ed-navy);
+  border:        1px solid var(--ed-border);
+  border-radius: 8px;
+  padding:       8px 10px;
+  color:         var(--ed-white);
+  font-family:   var(--ed-mono);
+  font-size:     12px;
+  color-scheme:  dark;
+}
+.ed-field input[type="date"]:focus {
+  outline: none;
+  border-color: var(--ed-amber-line);
+}
+
+/* ── hint / error ─────────────────────────────────────────────── */
+.ed-hint {
+  font-size:     10.5px;
+  color:         var(--ed-slate-dim);
+  line-height:   1.5;
+  margin:        0 0 12px;
+}
+
+.ed-error {
+  font-size:     11.5px;
+  color:         var(--ed-red);
+  background:    var(--ed-red-dim);
+  border:        1px solid var(--ed-red-line);
+  border-radius: 7px;
+  padding:       7px 9px;
+  margin:        0 0 10px;
+}
+
+/* ── download action ──────────────────────────────────────────── */
+.ed-download {
+  width:         100%;
+  padding:       10px;
+  border-radius: 8px;
+  border:        none;
+  background:    var(--ed-amber);
+  color:         var(--ed-navy);
+  font-family:   var(--ed-display);
+  font-size:     12.5px;
+  font-weight:   700;
+  cursor:        pointer;
+  transition:    opacity 0.15s ease;
+}
+.ed-download:hover { opacity: 0.9; }
+.ed-download:disabled { opacity: 0.5; cursor: default; }
+
+/* ── upsell variant ───────────────────────────────────────────── */
+.ed-pop--upsell { width: 240px; }
+
+.ed-upsell__title {
+  font-family:   var(--ed-display);
+  font-size:     13px;
+  font-weight:   600;
+  margin:        0 0 6px;
+  padding-right: 20px;
+}
+.ed-upsell__body {
+  font-size:     12px;
+  color:         var(--ed-slate);
+  line-height:   1.5;
+  margin:        0 0 12px;
+}
+.ed-upsell__cta {
+  display:         block;
+  text-align:      center;
+  padding:         9px;
+  border-radius:   8px;
+  background:      var(--ed-amber);
+  color:           var(--ed-navy);
+  font-family:     var(--ed-display);
+  font-size:       12.5px;
+  font-weight:     700;
+  text-decoration: none;
+}
+.ed-upsell__cta:hover { opacity: 0.9; }

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import "../../../style/ProductList.css";
+import { can } from "../../../utils/permissions";
+import { useAuth } from "../../../context/AuthContext";
 
 /* ═══════════════════════════════════════════════════════════════
    ProductList — product table for the main dashboard.
@@ -17,6 +19,8 @@ import "../../../style/ProductList.css";
      companyName : user?.companyName || companyName
 ═══════════════════════════════════════════════════════════════ */
 export default function ProductList({ products = [], companyName }) {
+    const {user} = useAuth();
+
   return (
     <div className="pl-root">
 
@@ -28,7 +32,7 @@ export default function ProductList({ products = [], companyName }) {
             <span className="pl-count pl-mono">{products.length}</span>
           )}
         </div>
-
+        {can(user.employeeRoal, "manageProducts") && (
         <Link
           to={`/company/${companyName}/addproduct`}
           className="pl-btn pl-btn--add"
@@ -36,6 +40,7 @@ export default function ProductList({ products = [], companyName }) {
           <AddIcon style={{ fontSize: 16 }} />
           Add
         </Link>
+        )}
       </div>
 
       {products.length > 0 ? (

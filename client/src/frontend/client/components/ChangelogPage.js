@@ -13,121 +13,37 @@ const TAGS = {
 };
 
 // ── Changelog entries ─────────────────────────────────────────────
-// Newest first. Based on the real MetriCore build history.
+// Newest first. Public releases only — MetriCore went live in Aug 2026.
+// Add a new entry here each time you ship something to users.
 const RELEASES = [
   {
-    version:  "2.1.0",
-    date:     "June 1, 2025",
-    label:    "Extra Fields & Formula Builder",
-    summary:  "The most-requested feature since launch. Define your own cost fields with formulas that calculate against any existing metric.",
+    version:  "1.1.0",
+    date:     "October 2026",
+    label:    "Data Export",
+    summary:  "Export your numbers to CSV, plus refinements to plan limits and team permissions.",
     changes: [
-      { tag: "new",      text: "Custom extra fields per goal — add Tax, Commission, VAT or any cost you track." },
-      { tag: "new",      text: "Formula builder: chain operations (plus, minus, multiply, divide, percentage, percentof) against any existing field." },
-      { tag: "new",      text: "Extra fields automatically pushed to all existing ProductsCost records when a new field is created." },
-      { tag: "new",      text: "Percentage (%) and percentage-of (p%) display suffix on calculated fields." },
-      { tag: "improved", text: "Goal sparklines now show green (on track) or red (behind) based on expected vs actual revenue at today's date." },
-      { tag: "improved", text: "Chart tick density reduced — month view now shows 6 evenly spaced labels instead of 30 overlapping dates." },
-      { tag: "fixed",    text: "DelibaryCostPersale field resetting to 0 on blur due to being treated as derived instead of raw." },
-      { tag: "fixed",    text: "ExtraField configId undefined error causing BSONError on update when using fallback zero records." },
-      { tag: "fixed",    text: "resolveExtraFields now preserves configId through the calculation chain so DB updates fire correctly." },
-    ],
-  },
-  {
-    version:  "2.0.0",
-    date:     "April 15, 2025",
-    label:    "Goal Architecture Rebuild",
-    summary:  "A foundational rework of how goals, products, and cost records relate. Cleaner schema, faster queries, and lazy record creation.",
-    changes: [
-      { tag: "new",         text: "ExtraFieldConfig now stored as one document per company+goal — one config, all products." },
-      { tag: "new",         text: "Lazy upsert system: ProductsCost records created automatically on first page visit each day." },
-      { tag: "new",         text: "Previous day values carried forward on new record creation (DelibaryCostPersale, TargetSaleAmount, extraFields)." },
-      { tag: "new",         text: "Field visibility manager — hide any default field per goal without affecting calculations." },
-      { tag: "new",         text: "Real-time employee online/offline status via Socket.io presence tracking." },
-      { tag: "improved",    text: "MongoDB aggregation now uses $setOnInsert — zero overwrites on existing daily records." },
-      { tag: "improved",    text: "Merged product and cost data into a single mergedSummary response — one API call, one state." },
-      { tag: "performance", text: "ExtraField aggregation replaced with fieldDefsByProduct lookup — removed a full aggregate pipeline per request." },
-      { tag: "fixed",       text: "GoalIdentifire type mismatch: string vs ObjectId causing products to not appear under goals." },
-      { tag: "security",    text: "All mongoose.Types.ObjectId constructors migrated to createFromHexString to remove deprecated number overload." },
-    ],
-  },
-  {
-    version:  "1.9.0",
-    date:     "February 28, 2025",
-    label:    "Analytics & Charts",
-    summary:  "Revenue, profit, and quantity charts across any date range. Includes a company-wide overview chart and per-goal sparklines.",
-    changes: [
-      { tag: "new",         text: "Revenue chart with period selector: Today (hourly), Week, Month, Year, Full target, Custom range." },
-      { tag: "new",         text: "Metric selector: switch between Revenue, Quantity, and Profit on the same chart." },
-      { tag: "new",         text: "Daily summary route: total units sold, total revenue, and estimated profit per day across all products." },
-      { tag: "new",         text: "Goal sparklines on the goals list page — each goal shows a mini trend line coloured by achievement." },
-      { tag: "new",         text: "Stats row above chart: Total, Average, Peak, and data point count for the selected period." },
-      { tag: "improved",    text: "Chart date labels shortened — year removed from day-view ticks (06 May not 06 May 2026)." },
-      { tag: "improved",    text: "Chart tick values adaptive — month view skips to every 5th day automatically." },
-      { tag: "fixed",       text: "$dateToString timezone field causing 500 error on older MongoDB versions — removed, UTC used instead." },
-      { tag: "performance", text: "Company chart data route uses $lookup inline — no separate product price query per document." },
-    ],
-  },
-  {
-    version:  "1.8.0",
-    date:     "January 10, 2025",
-    label:    "Daily Cost Tracking System",
-    summary:  "Per-product, per-day cost tracking with automatic calculations. The core of what MetriCore does.",
-    changes: [
-      { tag: "new",      text: "ProductsCost schema: daily record per product with SoldQuentity, Return, AdCost, OtherCost, Packaging, Buying, Shipping fields." },
-      { tag: "new",      text: "All derived fields calculated in frontend via useProductMetrics hook — zero redundant DB reads." },
-      { tag: "new",      text: "useTotalMetrics hook: sums all products across all days to produce a single total row." },
-      { tag: "new",      text: "Target lock/unlock system — lock daily targets to prevent accidental edits." },
-      { tag: "new",      text: "onBlur update system: inputs save to DB when user leaves the field, not on every keystroke." },
-      { tag: "new",      text: "editValues local state — input shows typing value while focused, calculated value when blurred." },
-      { tag: "improved", text: "Math.round applied at end of calculateMetrics — clean integers displayed throughout." },
-      { tag: "improved", text: "Separate PATCH route for extraField values vs main fields — prevents overwriting wrong document field." },
-      { tag: "fixed",    text: "DelibaryCost now derived as DelibaryCostPersale × SoldQuentity — total delivery cost correct across date ranges." },
-    ],
-  },
-  {
-    version:  "1.5.0",
-    date:     "November 20, 2024",
-    label:    "Goal & Product Management",
-    summary:  "Set revenue targets, track multiple products per goal, and see real-time achievement against daily targets.",
-    changes: [
-      { tag: "new",      text: "Goal creation with start date, end date, and total revenue target." },
-      { tag: "new",      text: "Products assigned to goals via GoalIdentifire array — one product can belong to multiple goals." },
-      { tag: "new",      text: "Target calculation: daily, weekly, monthly and yearly targets derived from total goal amount." },
-      { tag: "new",      text: "Progress bar showing current achievement percentage against calculated target for selected date range." },
-      { tag: "new",      text: "Custom date range filter with calendar picker for start and end date." },
-      { tag: "new",      text: "Product image upload to Cloudinary with automatic public ID storage for deletion." },
-      { tag: "improved", text: "Goal list page shows sparkline trend and achievement percentage per goal." },
-      { tag: "fixed",    text: "Date parsing for dd/MM/yyyy format — JS native Date misread as MM/DD/YYYY causing wrong expected revenue." },
-    ],
-  },
-  {
-    version:  "1.2.0",
-    date:     "September 5, 2024",
-    label:    "Team & Authentication",
-    summary:  "Multi-employee accounts with role-based access and encrypted session management.",
-    changes: [
-      { tag: "new",      text: "Employee accounts under a company — invite team members with their own login." },
-      { tag: "new",      text: "Cookie-based authentication with AES encrypted employeeId and companyId." },
-      { tag: "new",      text: "Socket.io integration for real-time features — presence tracking groundwork." },
-      { tag: "new",      text: "Companies schema with companyId linking all data — full multi-tenant isolation." },
-      { tag: "security", text: "All cookies encrypted with AES before storage — raw IDs never exposed to client." },
-      { tag: "security", text: "Backend field whitelist on PATCH routes — arbitrary field updates blocked at route level." },
-      { tag: "fixed",    text: "Socket middleware setting user online before connection established — moved to connection handler." },
+      { tag: "new",      text: "CSV export of cost and sales data — Growth exports the last 6 months, Scale exports full history (up to 6 months per file)." },
+      { tag: "improved", text: "Plan limits for goals, products, and team members are now enforced consistently across every entry point." },
+      { tag: "improved", text: "Role-based access refined so the right people see financials, manage data, or view only." },
     ],
   },
   {
     version:  "1.0.0",
-    date:     "June 14, 2024",
-    label:    "Initial Launch",
-    summary:  "The first public version of MetriCore. Core product tracking, daily costs, and a dashboard to see it all.",
+    date:     "August 2026",
+    label:    "MetriCore 1.0 — Launch",
+    summary:  "The first public release. Per-product, per-day cost and margin tracking, goal-based targets, analytics, and a multi-tenant team workspace — built over 2024–2026 and now live.",
     changes: [
-      { tag: "new", text: "MetriCore platform launched publicly." },
-      { tag: "new", text: "Product management with name, price, stock, and image." },
-      { tag: "new", text: "Daily cost entry: ad spend, delivery, packaging, buying cost, shipping." },
-      { tag: "new", text: "Goal creation and product assignment." },
-      { tag: "new", text: "Dashboard overview with total revenue, profit, and cost breakdown." },
-      { tag: "new", text: "Multi-tenant architecture — each company sees only its own data." },
-      { tag: "new", text: "Responsive design supporting desktop, tablet, and mobile." },
+      { tag: "new",      text: "Goal-based tracking — group multiple products under a goal with daily, weekly, monthly, and yearly targets and live achievement tracking." },
+      { tag: "new",      text: "Per-product, per-day cost tracking: ad spend, delivery, packaging, buying cost, shipping, and returns." },
+      { tag: "new",      text: "Real-time profit and margin calculation per product and across the whole goal." },
+      { tag: "new",      text: "Analytics — revenue, profit, and units-sold charts across day, month, and custom ranges, plus a mini trend sparkline on every goal." },
+      { tag: "new",      text: "Custom extra fields with a formula builder — add Tax, VAT, commission, or any cost and calculate it against existing metrics." },
+      { tag: "new",      text: "Target lock — lock a daily target to prevent accidental edits, unlock only when you need to adjust." },
+      { tag: "new",      text: "Team accounts with role-based access and real-time online presence via Socket.io." },
+      { tag: "new",      text: "Product image uploads with automatic cloud storage (Cloudinary)." },
+      { tag: "new",      text: "Multi-tenant architecture — every company sees only its own data." },
+      { tag: "security", text: "AES-encrypted session cookies and backend field whitelisting on update routes." },
+      { tag: "new",      text: "Responsive design across desktop, tablet, and mobile." },
     ],
   },
 ];
@@ -266,16 +182,16 @@ export default function ChangelogPage() {
             </div>
           </div>
 
-          {/* Subscribe pill */}
+          {/* Feedback pill */}
           <div className="cl-hero__subscribe">
-            <span className="cl-hero__subscribe-icon">🔔</span>
+            <span className="cl-hero__subscribe-icon">✉️</span>
             <div>
-              <p className="cl-hero__subscribe-title">Get update emails</p>
+              <p className="cl-hero__subscribe-title">Have feedback?</p>
               <p className="cl-hero__subscribe-sub">
-                We email subscribers when significant changes ship.
+                Tell us what to build next — we read every message.
               </p>
             </div>
-            <a href="/signup" className="cl-btn">Subscribe</a>
+            <a href="mailto:support@metricore.app" className="cl-btn">Email us</a>
           </div>
         </div>
       </div>
@@ -347,7 +263,7 @@ export default function ChangelogPage() {
             Have a feature request or found a bug?
           </p>
           <div className="cl-bottom__links">
-            <a href="mailto:hello@metricore.io" className="cl-btn cl-btn--ghost">
+            <a href="mailto:support@metricore.app" className="cl-btn cl-btn--ghost">
               Email us
             </a>
             <Link to="/privacy" className="cl-text-link">Privacy</Link>

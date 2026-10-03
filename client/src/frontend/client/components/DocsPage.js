@@ -26,7 +26,7 @@ const DOCS = [
         q: "What is MetriCore?",
         body: [
           { type: "p", text: "MetriCore is a cost-tracking platform for product businesses. You set revenue goals, add your products, and record daily costs — MetriCore calculates where each product and goal actually stands." },
-          { type: "p", text: "Replace this placeholder with a short, plain-language description of what your product does and who it's for." },
+          { type: "p", text: "It's built for product-based businesses — e-commerce sellers, small manufacturers, and anyone selling physical goods who needs to know their true margin after ad spend, delivery, packaging, and returns, not just their revenue." },
         ],
       },
       {
@@ -65,7 +65,8 @@ const DOCS = [
         id: "goal-progress",
         q: "Reading goal progress",
         body: [
-          { type: "p", text: "Each goal shows a sparkline and a completion percentage. Replace this with an explanation of how your progress math works so customers trust the numbers." },
+          { type: "p", text: "Each goal shows a sparkline of revenue over its date range and a completion percentage. The percentage is your total revenue so far divided by the goal's target amount." },
+          { type: "p", text: "The colour tells you whether you're on pace. MetriCore spreads your target evenly across the goal's days to work out where you should be today, then compares that to your actual revenue: green means you're at or ahead of pace, red means you're behind. A goal that hasn't started yet shows as upcoming." },
         ],
       },
     ],
@@ -94,7 +95,9 @@ const DOCS = [
         id: "daily-costs",
         q: "Recording daily costs",
         body: [
-          { type: "p", text: "Explain how a user records daily figures and what each field means. Keep it concrete — name the fields exactly as they appear in your UI." },
+          { type: "p", text: "Open a goal to see a daily table for each product. Each day a fresh record is created automatically, carrying your delivery cost and target forward from the day before, so you only enter what changed." },
+          { type: "p", text: "You fill in the editable fields: Sold Quantity, Return, Ad Cost, Other Cost, Delivery Cost Per Sale, Packaging Cost, Product Buying Cost, Shipping Cost, and Current Target Sale Amount. Each value saves automatically when you click out of the field." },
+          { type: "note", text: "Everything else — Sold Amount, Profit, the per-sale costs, and all the totals — is calculated for you from those inputs and the product's price. You can hide any field you don't use from the Fields menu." },
         ],
       },
     ],
@@ -108,13 +111,14 @@ const DOCS = [
         id: "api-access",
         q: "Getting API access",
         body: [
-          { type: "p", text: "The ingest API lets you push product and sales data into MetriCore automatically. API access is available on the Scale plan." },
+          { type: "p", text: "The ingest API lets your own server push daily sales and cost data into MetriCore automatically, so your dashboard stays up to date without anyone typing it in. It's available on every plan." },
           { type: "steps", items: [
-            "Open your API settings and generate a key.",
+            "In Company Settings → API access, generate a key (Owner or Admin only). Copy it immediately — it's shown only once.",
             "Send a ping request to confirm the key works.",
-            "Push your products, then your daily data.",
+            "List your products to get their ids or SKUs, then push your daily totals.",
           ] },
-          { type: "code", text: "curl -X POST https://api.yourdomain.com/ingest/ping \\\n  -H \"Authorization: Bearer YOUR_API_KEY\"" },
+          { type: "code", text: "curl https://metricore.app/api/v1/ingest/ping \\\n  -H \"Authorization: Bearer mc_live_your_key_here\"" },
+          { type: "note", text: "The key is server-side only — never put it in browser or frontend code. The full reference, payload format, and code examples are in the Developer Guide." },
         ],
       },
     ],
@@ -128,7 +132,17 @@ const DOCS = [
         id: "invite-team",
         q: "Adding team members",
         body: [
-          { type: "p", text: "Describe how the owner adds employees and what each role can and can't do. List the roles and their permissions clearly." },
+          { type: "p", text: "From the Employees page, the owner or a manager adds a team member and assigns them a role. Each person gets their own login and sees only what their role allows." },
+          { type: "p", text: "Roles decide what each person can see and do:" },
+          { type: "steps", items: [
+            "Owner — the account creator. Full control, including billing, company settings, and deleting the company.",
+            "Admin / CEO — full day-to-day access across the company.",
+            "Manager / Supervisor / HR — see financials and manage products, goals, and the team. No billing or company settings.",
+            "Finance / Accountant — see financials, manage products, and manage billing. Cannot manage the team.",
+            "Sales / Marketing / Support and other staff — team chat only. They cannot see company financials.",
+            "Guest — minimal, view-only access.",
+          ] },
+          { type: "note", text: "A person can only assign roles at or below their own level, so a manager can't create an Admin or Owner." },
         ],
       },
     ],

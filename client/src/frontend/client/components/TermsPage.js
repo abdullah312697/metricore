@@ -1,10 +1,17 @@
+// ⚠️ BEFORE LAUNCH: (1) fill every [bracketed] placeholder once your US LLC is
+//    registered — legal name, address, and the governing-law state (e.g. Delaware
+//    or Wyoming), and (2) have this reviewed by a lawyer. This draft is written to
+//    be TRUTHFUL and internally consistent with how MetriCore actually works and
+//    with the Privacy Policy — it is NOT legal advice and is not a substitute for a
+//    lawyer drafting or reviewing your Terms before you rely on them.
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../../style/TermsPage.css";
 
-const LAST_UPDATED = "June 1, 2025";
-const VERSION      = "2.0";
-const EFFECTIVE    = "June 15, 2025";
+const LAST_UPDATED = "October 2026";   // set to the real date when you publish
+const VERSION      = "1.0";
+const EFFECTIVE    = "October 2026";   // set to the real effective date when you publish
 
 const SECTIONS = [
   { id: "acceptance",     label: "Acceptance of Terms"         },
@@ -239,10 +246,11 @@ export default function TermsPage() {
             </Notice>
             <P>
               These Terms of Service ("Terms") constitute a legally binding
-              agreement between you ("User", "you", or "your") and MetriCore
-              Ltd ("MetriCore", "we", "us", or "our"). They govern your use
-              of the MetriCore platform, website, API, and all related services
-              (collectively, the "Service").
+              agreement between you ("User", "you", or "your") and{" "}
+              [Your LLC legal name], LLC, operating as MetriCore ("MetriCore",
+              "we", "us", or "our"). They govern your use of the MetriCore
+              platform, website, API, and all related services (collectively,
+              the "Service").
             </P>
             <P>
               If you are accepting these Terms on behalf of a company or
@@ -286,7 +294,7 @@ export default function TermsPage() {
               items={[
                 "You must provide accurate and complete information when creating your account and keep it current.",
                 "You are responsible for choosing a strong password and keeping it confidential.",
-                "You must notify us immediately at security@metricore.io if you suspect unauthorised access to your account.",
+                "You must notify us immediately at support@metricore.app if you suspect unauthorised access to your account.",
                 "You may not share your account credentials with people outside your organisation.",
                 "You may not create more than one account per individual without our written consent.",
                 "You are responsible for all activity that occurs under your account, including actions taken by employees you add.",
@@ -304,12 +312,11 @@ export default function TermsPage() {
           {/* 04 */}
           <Section id="service" title="04. The Service">
             <P>
-              MetriCore provides a business analytics and cost tracking
-              platform for product-based businesses. Subject to your
-              compliance with these Terms and payment of applicable fees,
-              we grant you a limited, non-exclusive, non-transferable,
-              revocable licence to use the Service for your internal
-              business purposes.
+              MetriCore provides a cost-tracking and analytics platform for
+              product-based businesses. Subject to your compliance with these
+              Terms and payment of applicable fees, we grant you a limited,
+              non-exclusive, non-transferable, revocable licence to use the
+              Service for your internal business purposes.
             </P>
             <P>
               The Service includes, but is not limited to:
@@ -319,10 +326,10 @@ export default function TermsPage() {
                 "Goal-based product tracking and target management",
                 "Daily cost entry and automatic aggregation",
                 "Revenue, profit, and cost analytics and charts",
-                "Employee access management and real-time presence",
+                "Employee access management with role-based access and real-time presence",
                 "Custom field configuration and calculation",
-                "Data export in CSV format",
-                "API access (where included in your plan)",
+                "CSV data export (on the Growth and Scale plans)",
+                "API access for pushing your data automatically",
               ]}
             />
             <Notice type="info" icon="⚙️">
@@ -338,7 +345,8 @@ export default function TermsPage() {
             <P>
               Access to paid features of MetriCore requires a valid
               subscription. All payments are processed by Stripe and
-              are subject to Stripe's terms of service.
+              are subject to Stripe's terms of service. We do not store
+              your card details.
             </P>
             <PlanTable
               rows={[
@@ -348,22 +356,23 @@ export default function TermsPage() {
               ]}
             />
             <P>Annual plans are billed upfront and carry a 20% discount
-              compared to the monthly equivalent.</P>
+              compared to the monthly equivalent. Every plan includes a
+              14-day free trial, and no card is required to start.</P>
             <BulletList
               items={[
                 "Subscriptions begin on the date your payment is successfully processed.",
                 "Subscriptions renew automatically at the end of each billing period unless you cancel.",
                 "You can cancel at any time from your account settings. Cancellation takes effect at the end of the current billing period — you retain access until then.",
                 "We do not offer refunds for partial billing periods or unused time on a plan.",
-                "If your payment fails, we will retry three times over seven days before suspending your account.",
+                "If a payment fails, Stripe will attempt to recover it. If it continues to fail, access to paid features is suspended until your billing details are updated.",
                 "We will notify you by email at least 7 days before any price increase takes effect.",
                 "Prices are listed in US Dollars and exclude any applicable local taxes.",
               ]}
             />
             <Notice type="warn" icon="⚠️">
-              Downgrading your plan may result in loss of access to features
-              or data that exceeds the limits of your new plan. Review plan
-              limits carefully before downgrading.
+              Downgrading your plan may reduce access to features or capacity
+              that exceed the limits of your new plan. Review plan limits
+              carefully before downgrading.
             </Notice>
           </Section>
 
@@ -434,7 +443,7 @@ export default function TermsPage() {
                 "You may not copy, reproduce, or create derivative works of the MetriCore platform.",
                 "You may not use MetriCore's name, logo, or trademarks without written permission.",
                 "Feedback or suggestions you provide about the Service may be used by MetriCore without obligation to you.",
-                "If you believe any content on the Service infringes your intellectual property, contact legal@metricore.io.",
+                "If you believe any content on the Service infringes your intellectual property, contact support@metricore.app.",
               ]}
             />
           </Section>
@@ -454,8 +463,8 @@ export default function TermsPage() {
                 "We will not access your Business Data except to provide the Service, resolve support requests, or as required by law.",
                 "We will not use your Business Data for any purpose other than operating the Service for your account.",
                 "We will not sell, transfer, or share your Business Data with any third party except as described in our Privacy Policy.",
-                "You may export all your Business Data at any time in CSV format.",
-                "Following account termination, your data is retained for 60 days then permanently deleted.",
+                "You may export your Business Data in CSV format where your plan includes export (the Growth and Scale plans).",
+                "We retain your Business Data while your account is active. It is not automatically deleted when your subscription ends; you may request deletion at any time and we will action it within 30 days, as described in our Privacy Policy.",
               ]}
             />
             <P>
@@ -469,30 +478,22 @@ export default function TermsPage() {
           {/* 10 */}
           <Section id="availability" title="10. Service Availability">
             <P>
-              We aim for 99.9% uptime measured monthly, excluding
-              scheduled maintenance. Our historical uptime is available
-              at status.metricore.io.
+              We work to keep MetriCore available and reliable, but we do
+              not guarantee that the Service will be uninterrupted or
+              available at all times.
             </P>
             <P>
-              We will carry out scheduled maintenance during low-traffic
-              periods and will provide at least 24 hours' notice for
-              any maintenance window lasting longer than 30 minutes.
-              Emergency maintenance may be carried out without notice
-              to protect the security or integrity of the Service.
+              We may carry out maintenance from time to time and will try
+              to do so during low-traffic periods. Where planned maintenance
+              is likely to cause significant disruption, we will give advance
+              notice where practical. Emergency maintenance may be carried out
+              without notice to protect the security or integrity of the Service.
             </P>
             <Notice type="info" icon="📡">
-              MetriCore does not guarantee that the Service will be
-              available at all times. We are not liable for any loss
-              caused by temporary unavailability, provided we act
-              reasonably to restore service.
+              The Service is provided on an "as available" basis. We are not
+              liable for loss caused by temporary unavailability, provided we
+              act reasonably to restore service.
             </Notice>
-            <P>
-              In the event of significant outages (more than 4 cumulative
-              hours in a calendar month), you may request a pro-rated
-              service credit by contacting support@metricore.io within
-              14 days. Credits are applied to your next billing cycle
-              and are your sole remedy for service unavailability.
-            </P>
           </Section>
 
           {/* 11 */}
@@ -520,10 +521,13 @@ export default function TermsPage() {
               ]}
             />
             <P>
-              On termination for any reason, your licence to use the
-              Service ends. Your data remains accessible for export for
-              60 days following termination, after which it is permanently
-              deleted.
+              On termination, your licence to use the Service ends. Because
+              CSV export requires an active plan, export any data you need
+              before your subscription ends. Afterwards, you can request a
+              copy or deletion of your data by contacting support@metricore.app;
+              see our{" "}
+              <Link to="/privacy" className="tp-link">Privacy Policy</Link>{" "}
+              for how long data is retained.
             </P>
           </Section>
 
@@ -566,14 +570,15 @@ export default function TermsPage() {
             <P>
               We would like to resolve any dispute before it becomes a
               formal legal matter. If you have a concern, please contact
-              us first at legal@metricore.io and give us 30 days to
+              us first at support@metricore.app and give us 30 days to
               respond.
             </P>
             <P>
-              These Terms are governed by the laws of Bangladesh, without
-              regard to conflict of law provisions. Any dispute that cannot
-              be resolved informally shall be submitted to the exclusive
-              jurisdiction of the courts of Dhaka, Bangladesh.
+              These Terms are governed by the laws of the State of [State],
+              United States, without regard to its conflict-of-law provisions.
+              Any dispute that cannot be resolved informally shall be submitted
+              to the exclusive jurisdiction of the state and federal courts
+              located in [State], United States.
             </P>
             <BulletList
               items={[
@@ -611,8 +616,8 @@ export default function TermsPage() {
             </P>
             <P>
               If you disagree with a change to these Terms, you may cancel
-              your subscription before the new Terms take effect and receive
-              a pro-rated refund for unused days in your current billing period.
+              your subscription before the new Terms take effect; cancellation
+              takes effect at the end of your current billing period.
               Continued use after the effective date constitutes acceptance.
             </P>
           </Section>
@@ -626,32 +631,26 @@ export default function TermsPage() {
             <div className="tp-contact-grid">
               <div className="tp-contact-card">
                 <span className="tp-contact-card__icon">📧</span>
-                <h4 className="tp-contact-card__title">General enquiries</h4>
-                <a href="mailto:hello@metricore.io" className="tp-link tp-mono">
-                  hello@metricore.io
-                </a>
-              </div>
-              <div className="tp-contact-card">
-                <span className="tp-contact-card__icon">⚖️</span>
-                <h4 className="tp-contact-card__title">Legal matters</h4>
-                <a href="mailto:legal@metricore.io" className="tp-link tp-mono">
-                  legal@metricore.io
+                <h4 className="tp-contact-card__title">General & legal enquiries</h4>
+                <a href="mailto:support@metricore.app" className="tp-link tp-mono">
+                  support@metricore.app
                 </a>
               </div>
               <div className="tp-contact-card">
                 <span className="tp-contact-card__icon">🔒</span>
                 <h4 className="tp-contact-card__title">Security & abuse</h4>
-                <a href="mailto:security@metricore.io" className="tp-link tp-mono">
-                  security@metricore.io
+                <a href="mailto:support@metricore.app" className="tp-link tp-mono">
+                  support@metricore.app
                 </a>
               </div>
               <div className="tp-contact-card">
                 <span className="tp-contact-card__icon">🏢</span>
                 <h4 className="tp-contact-card__title">Postal</h4>
                 <address className="tp-contact-card__addr">
-                  MetriCore Ltd<br />
-                  123 Business Road<br />
-                  Dhaka 1212, Bangladesh
+                  {/* ⚠️ Fill once your LLC is registered */}
+                  [Your LLC legal name], LLC<br />
+                  [Registered street address]<br />
+                  [City, State ZIP], United States
                 </address>
               </div>
             </div>

@@ -16,6 +16,7 @@ import { FieldVisibilityManager }  from "./FieldVisibilityManager";
 import { DEFAULT_FIELDS }          from "./fieldConfig";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import ExportDataButton from './ExportDataButton';
 
 function ViewGoal() {
   const { goalId } = useParams();
@@ -471,6 +472,7 @@ const handleDeleteExtraField = async () => {
           <button onClick={() => setShowManager(true)}>
             ⚙ Manage Fields ({visibleFields.size})
           </button>
+                <ExportDataButton/>
         </div>
     {
       <div className="deleteConfirmOverlay" style={{display: `${isOpneDelete ? 'flex' : 'none'}`}}>

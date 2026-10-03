@@ -9,6 +9,7 @@ import GroupChats from './GroupChats';
 import { useOnlineUsers } from "../../../hooks/useOnlineUsers";
 import EmployeeList from "./EmployeeList";
 import ProductList from "./ProductList";
+import { can } from "../../../utils/permissions";
 
 const Main = () => {
   const [currentEmployee,setCurrentEmployee] = useState([]);
@@ -21,9 +22,6 @@ const Main = () => {
   const { isOnline } = useOnlineUsers();
   const {companyName} = useParams();
  const [currentProducs,setCurrentProducts] = useState([]);
-
-
-
         useEffect(()=>{
             const getAllProducts = async () => {
             try{
@@ -64,13 +62,20 @@ const Main = () => {
 
   useEffect(() => {
     const fetchDailySummary = async () => {
-    const res = await Altaxios.get("/chart/dailySummary");
+      try{
+      const res = await Altaxios.get("/chart/dailySummary");
       setTodayOverView(res.data.data);
+      }catch(err){
+        if (err.response?.status === 403) {
+          setTodayOverView(null);
+        } else {
+          console.error(err);
+        }
+      }
     };
     fetchDailySummary();
   },[]);
 //preview photos  start
-
 
   return (
     <div className='MainContainer'>
@@ -78,6 +83,7 @@ const Main = () => {
         <div className='live_message_main'>
           <GroupChats/>
         </div>
+  {can(user.employeeRoal, "viewFinancials") && (
         <div className='live_salse_main'>
           <div className='live_salse_header'>Today’s Overview</div>
           <div className='live_sales_innerContainer'>
@@ -96,11 +102,14 @@ const Main = () => {
           </div>
 
         </div>
+        )}
       </div>
       <div className='MainContianerInner'>
+        {can(user.employeeRoal, "viewFinancials") && (
         <div className='MainContainerChunk'>
           <RevenueChart/>
         </div>
+          )}
         <div className='MainContainerChunk'>
           <EmployeeList
             employees={currentEmployee}

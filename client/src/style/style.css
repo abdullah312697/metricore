@@ -4880,7 +4880,6 @@ border-color: #85858563;
     color:#00ffa1 !important;
 }
 .liveChatAciveSigne{
-    background: #48ff00;
     width: 7px;
     height: 7px;
     border-radius: 50%;
@@ -4889,6 +4888,9 @@ border-color: #85858563;
     right: -0px;
     z-index: 1;
 }
+.liveActiveSigne{background: #48ff00;}
+.liveInActiveSigne{background: #707e89;}
+
 .liveChatFirstPopup{
     position: absolute;
     top: -17px;
@@ -4942,11 +4944,12 @@ border-color: #85858563;
     cursor: pointer;
   }
 
-.liveChatsInnerPart{
+.liveChatsInnerPart {
     position: fixed;
-    bottom: 0px;
-    left: 510px;
-    width: 320px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(320px, calc(100vw - 20px));
     height: 400px;
     background: #011626;
     border-radius: 8px;
@@ -4956,9 +4959,8 @@ border-color: #85858563;
     overflow: hidden;
     pointer-events: all;
     border: 1px solid #ffffff14;
-    transition: bottom 150ms ease;
 }
-.liveChats_dbhInner{
+    .liveChats_dbhInner{
     position: fixed;
     bottom: 0px;
     right: 10px;
@@ -5019,7 +5021,6 @@ border-color: #85858563;
 }
 .liveChatHeaderLive{
     position: absolute;
-    background: #00ff0a;
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -5707,6 +5708,7 @@ border-color: #85858563;
     border-color: #ccc9;
 }
 .rc-stats{
+    width: 200px;
     margin-top: -22px;
     position: relative;
 }
@@ -5757,6 +5759,16 @@ border-color: #85858563;
     position: absolute;
     top: 7px;
     left: 22px;
+}
+
+.emojiPickerGroup{
+    position: absolute;
+    bottom: 40px;
+    right: 130px;
+    z-index: 1000;
+    height: 280px;
+    width: 245px;
+    overflow: hidden;
 }
 /* RevieueChart.js  */
 
@@ -6418,6 +6430,14 @@ border-color: #85858563;
 .rc-stats{
     margin-top: -28px;
 }
+.liveChatsInnerPart {
+        width: 100dvw;
+        height: var(--chat-height);
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 0;
+    }
 }
 /* media max width 600px end </> */
 
@@ -6595,6 +6615,12 @@ border-color: #85858563;
     }
     .productColorSelection>h2 {
         font-size: 20px;
+    }
+    .rc-stats {
+        width: 160px;
+    }
+    .emojiPickerGroup{
+        right: 10px;
     }
 }
 /*  media max width 494px end </> */
@@ -7004,6 +7030,9 @@ border-color: #85858563;
   .group_Notifican_toggleBtns>svg {
         font-size: 19px !important;
     }
+    .rc-stats {
+        width: 120px;
+    }
 }
 
 /* media max width 355px start <> */
@@ -7042,10 +7071,17 @@ border-color: #85858563;
     .phoneNumberINput{
         width: 84% !important;
     }    
+.rc-stats {
+        width: 110px;
+    }
+
 }
 /* media max width 355px end </> */
 @media only screen and (max-width:285px){
     .mainContainer{
         width: -webkit-fill-available;
+    }
+    .rc-stats {
+        width: 90px;
     }
 }

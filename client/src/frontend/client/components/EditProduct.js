@@ -11,8 +11,8 @@ const sameSet = (a, b) =>
   a.length === b.length && a.every((x) => b.includes(x));
 
 export default function EditProduct() {
-  const { productId, companyName } = useParams();
 
+  const { productId, companyName } = useParams();
   const [original, setOriginal] = useState(null); // server copy
   const [form, setForm] = useState({
     ProductName: "", sku: "", ProductPrice: "", InStockQuentity: "",

@@ -1,4 +1,4 @@
-.vr-modal {
+/* .vr-modal {
   position: absolute;
   bottom: 45px;
   width: 310px;
@@ -8,10 +8,22 @@
   transform: translateY(20px);
   opacity: 0;
   transition: all 0.25s ease;
+} */
+.vr-modal {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    width: 310px;
+    background: #1a2f3f;
+    border-radius: 12px;
+    padding: 10px;
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    transition: all 0.25s ease;
 }
 
 .animate-in {
-  transform: translateY(0);
+  transform: translate(-50%, 0px);
   opacity: 1;
 }
 

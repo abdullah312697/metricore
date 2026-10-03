@@ -52,11 +52,11 @@ const showPopupForCancel = () => {
         isPopupOpen.current = false;
     }
 };
+
 const cencelPopupTwo = () => {
     const getpr = document.querySelector(".preDeletePopup_incancel");
     getpr.style = `display:none`;
 }
-
 const CancelConfirmPopup = () => {
     const showPopup = document.querySelector(".preDeletePopup_incancel");
     showPopup.style = `display:block`;

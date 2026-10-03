@@ -164,10 +164,18 @@
   margin:      0;
   white-space: pre-wrap;
 }
+@media (max-width: 555px) {
+  .wn-panel { width: 300px; right: -90px; }
+}
 
 /* ── responsive ───────────────────────────────────────────────── */
-@media (max-width: 420px) {
-  .wn-panel { width: calc(100vw - 32px); right: -8px; }
+@media (max-width: 425px) {
+  .wn-panel {right: -150px; }
+  
+}
+
+@media (max-width: 355px) {
+  .wn-panel {width:260px; right: -157px; }
 }
 
 /* ── reduced motion / focus ───────────────────────────────────── */

@@ -1,21 +1,30 @@
 import express from 'express';
 const router = express.Router();
 import ProductsCost from '../models/ProductCost.js';
-import{decryptUserData} from '../verifyuser.js';
 import ClientProduct from "../models/ClientProduct.js";
 import mongoose from 'mongoose';
 import ExtraFieldConfig from '../models/ExtraFieldConfig.js';
-import { limitFor } from "../config/plans.js";   // + Companies import if not present
+import { limitFor } from "../config/plans.js";
+import Companies from '../models/Companies.js';   // 👈 was used but not imported (addEverydayData)
 
+// unified auth/permission system (utils/auth.js)
+// getRequester → validated { requester, requesterId, companyId, role, tier, can() }
+import { getRequester } from "../utils/auth.js";
+
+/* ═══════════════════════════════════════════════════════════════
+   POST /createInitialCost — set up a product's cost fields
+   Writes cost data → manageProducts
+═══════════════════════════════════════════════════════════════ */
 router.post("/createInitialCost", async (req, res) => {
   try {
-    const { employeeId, companyId } = req.cookies;
-    const newemplyeeId = decryptUserData(employeeId);
-    const newcompanyId = decryptUserData(companyId);
- 
-    if (!newemplyeeId || !newcompanyId)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
- 
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to edit cost data." });
+
+    const newcompanyId = ctx.companyId;
+
     const {
       productId,
       goalId,
@@ -101,21 +110,17 @@ router.post("/createInitialCost", async (req, res) => {
   }
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   POST /addEverydayData — create a daily cost/sales record
+   Writes cost data → manageProducts
+═══════════════════════════════════════════════════════════════ */
 router.post("/addEverydayData", async (req, res) => {
   try {
-    const { employeeId, companyId } = req.cookies;
-    const newemplyeeId = decryptUserData(employeeId);
-    const newcompanyId = decryptUserData(companyId);
- 
-    if (!newemplyeeId || !newcompanyId)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
-
-    const billing = await Companies.findById(newcompanyId).select("planId subscriptionStatus trialEndsAt").lean();
-    const max = limitFor(billing, "products");
-    if (max !== Infinity) {
-      const n = await ClientProduct.countDocuments({ companyId: newcompanyId });
-      if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} Data. Upgrade to add more.` });
-    }
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to add cost data." });
     const todayData = req.body;
 
     // Validate required fields
@@ -138,16 +143,22 @@ router.post("/addEverydayData", async (req, res) => {
   }
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   GET /productGoalandData/:goalId — full cost/financial summary per
+   product for a goal. Exposes sensitive cost breakdowns → viewFinancials.
+   (Also lazily upserts today's records; the caller therefore needs
+   the financial permission to reach this data.)
+═══════════════════════════════════════════════════════════════ */
 router.get("/productGoalandData/:goalId", async (req, res) => {
-  const { employeeId, companyId } = req.cookies;
+  const ctx = await getRequester(req);
+  if (!ctx)
+    return res.status(401).json({ message: "Login/Register please!" });
+  if (!ctx.can("viewFinancials"))
+    return res.status(403).json({ message: "You don't have permission to view financial data." });
+
+  const newcompanyId = ctx.companyId;
   const { goalId }                = req.params;
   const { start, end }            = req.query;
-
-  const newemplyeeId = decryptUserData(employeeId);
-  const newcompanyId = decryptUserData(companyId);
-
-  if (!newemplyeeId || !newcompanyId)
-    return res.status(400).json({ message: "Login/Register please!" });
 
   const sameGoalProduct = await ClientProduct.find({
     companyId:      newcompanyId,
@@ -330,14 +341,19 @@ router.get("/productGoalandData/:goalId", async (req, res) => {
   return res.status(200).json({ message: "ok", mergedSummary });
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   PATCH /updateExtraFieldValue/:costId — edit a custom cost field
+   Writes cost data → manageProducts
+═══════════════════════════════════════════════════════════════ */
 router.patch("/updateExtraFieldValue/:costId", async (req, res) => {
   try {
-    const { employeeId, companyId } = req.cookies;
-    const newemplyeeId = decryptUserData(employeeId);
-    const newcompanyId = decryptUserData(companyId);
-
-    if (!newemplyeeId || !newcompanyId)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to edit cost data." });
+
+    const newcompanyId = ctx.companyId;
 
     const { costId }          = req.params;
     const { configId, value } = req.body;
@@ -366,14 +382,19 @@ router.patch("/updateExtraFieldValue/:costId", async (req, res) => {
   }
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   PATCH /updateProductCost/:costId — edit a cost/sales field
+   Writes cost data → manageProducts
+═══════════════════════════════════════════════════════════════ */
 router.patch("/updateProductCost/:costId", async (req, res) => {
   try {
-    const { employeeId, companyId } = req.cookies;
-      const newemplyeeId = decryptUserData(employeeId);
-      const newcompanyId = decryptUserData(companyId);
-
-    if (!newemplyeeId || !newcompanyId)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to edit cost data." });
+
+    const newcompanyId = ctx.companyId;
 
     const { costId } = req.params;
     const { field, value } = req.body;

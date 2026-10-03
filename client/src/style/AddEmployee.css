@@ -477,6 +477,12 @@
 .ae-empty__icon { font-size: 30px; opacity: 0.5; }
 .ae-empty p { font-size: 13px; color: var(--ae-slate-dim); line-height: 1.6; }
 
+
+.ae-role-summary { margin-top: 14px; background: rgba(255, 177, 0, 0.04); border: 1px solid rgba(255, 177, 0, 0.18); border-radius: 10px; padding: 14px 16px; } .ae-role-summary__head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; } .ae-role-summary__tier { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; color: 
+#ffb100; } .ae-role-summary__desc { font-size: 12.5px; line-height: 1.5; color: 
+#8899aa; } .ae-role-summary__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; } .ae-role-summary__item { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; line-height: 1.4; color: 
+#dde6ee; } .ae-role-summary__check { color: 
+#34d399; font-weight: 700; flex-shrink: 0; }
 /* ════════════════════════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════════════════════════ */
@@ -485,7 +491,7 @@
   .ae-list-card { position: static; max-height: none; }
   .ae-list      { max-height: 380px; }
 }
-
+@media (max-width: 600px) { .ae-role-summary { padding: 12px 14px; } .ae-role-summary__item { font-size: 12.5px; } }
 @media (max-width: 520px) {
   .ae-row       { grid-template-columns: 1fr; }
   .ae-form-card { padding: 20px; }

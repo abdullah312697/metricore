@@ -4,6 +4,8 @@ import AddIcon         from "@mui/icons-material/Add";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import EmailComposer   from "./EmailComposer";
 import "../../../style/EmployeeList.css";
+import { can } from "../../../utils/permissions";
+import { useAuth } from "../../../context/AuthContext";
 
 /* ═══════════════════════════════════════════════════════════════
    EmployeeList — team table with multi-select + group email.
@@ -33,6 +35,7 @@ export default function EmployeeList({
 }) {
   const [selected,     setSelected]     = useState([]);
   const [composerOpen, setComposerOpen] = useState(false);
+  const {user} = useAuth();
 
   const team = useMemo(
     () => employees.filter((e) => e._id !== currentUserId),
@@ -66,7 +69,7 @@ export default function EmployeeList({
           <h2 className="el-title">Team</h2>
           {team.length > 0 && <span className="el-count el-mono">{team.length}</span>}
         </div>
-
+        {can(user.employeeRoal, "manageTeam") && (
         <div className="el-topbar__actions">
           {selected.length > 0 && (
             <button className="el-btn el-btn--email" onClick={() => setComposerOpen(true)}>
@@ -79,12 +82,14 @@ export default function EmployeeList({
             Add
           </Link>
         </div>
+          )}
       </div>
 
       {team.length > 0 ? (
         <>
           {/* ══ FIXED: column header ═════════════════════════ */}
           <div className="el-head">
+          {can(user.employeeRoal, "manageTeam") && (
             <label className="el-check" onClick={(e) => e.stopPropagation()}>
               <input
                 type="checkbox"
@@ -94,6 +99,7 @@ export default function EmployeeList({
               />
               <span className="el-check__box" />
             </label>
+                    )}
             <span className="el-col-profile">Profile</span>
             <span className="el-col-name">Name</span>
             <span className="el-col-role">Role</span>
@@ -113,6 +119,7 @@ export default function EmployeeList({
                   className={`el-row ${isChecked ? "el-row--selected" : ""}`}
                   onClick={() => toggle(emp._id)}
                 >
+                {can(user.employeeRoal, "manageTeam") && (
                   <label className="el-check" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
@@ -122,7 +129,7 @@ export default function EmployeeList({
                     />
                     <span className="el-check__box" />
                   </label>
-
+                  )}
                   <span className="el-col-profile">
                     <img
                       src={emp.EmplyeeProfile || avatar}
@@ -143,11 +150,12 @@ export default function EmployeeList({
                       {online ? "Online" : "Offline"}
                     </span>
                   </span>
+                {can(user.employeeRoal, "manageTeam") && (
 
                   <span className="el-col-salary el-mono">
                     {emp.EmplyeeSellary != null ? emp.EmplyeeSellary : "—"}
                   </span>
-
+                )}
                   <span className="el-col-action" onClick={(e) => e.stopPropagation()}>
                     <Link
                       to={`/company/${companyName}/theemployee/${emp._id}`}
@@ -164,19 +172,22 @@ export default function EmployeeList({
       ) : (
         /* ══ empty state (fills remaining height) ═══════════ */
         <div className="el-scroll el-scroll--empty">
+          {can(user?.employeeRoal, "manageTeam") && (
           <Link to={`/company/${companyName}/addemployee`} className="el-empty">
             <AddIcon style={{ fontSize: 28, color: "#ffb100" }} />
             <h4>Add your first employee</h4>
           </Link>
+          )}
         </div>
       )}
 
       {/* ── Group / single email composer ───────────────────── */}
-      <EmailComposer
+     {can(user?.employeeRoal, "manageTeam") && ( <EmailComposer
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
         recipients={recipients}
       />
+     )}
     </div>
   );
 }

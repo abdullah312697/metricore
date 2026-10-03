@@ -2,13 +2,19 @@ import express from 'express';
 import mongoose from "mongoose";
 const router = express.Router();
 import MyTargetGoles from '../models/MyTarget.js';
-import { decryptUserData } from '../verifyuser.js';
 import ClientProduct from '../models/ClientProduct.js';
 import ProductsCost from '../models/ProductCost.js';
 import { parse, isValid, differenceInDays } from "date-fns";
 import ExtraFieldConfig     from "../models/ExtraFieldConfig.js";
 import { limitFor } from "../config/plans.js";
 import Companies from '../models/Companies.js'
+
+// unified auth/permission system (utils/auth.js)
+// getRequester → validated { requester, requesterId, companyId, role, tier, can() }
+// NOTE: getRequester returns companyId as a STRING. Where the queries below
+// need an ObjectId (the old getAuth exposed companyObjId), we build it with
+// mongoose.Types.ObjectId.createFromHexString(ctx.companyId).
+import { getRequester } from "../utils/auth.js";
 
 const parseGoalDate = (raw) => {
   if (!raw) return null;
@@ -61,29 +67,6 @@ const ensureRenderable = (points, startMs, endMs) => {
   return valid;
 };
 
-
-const getAuth = (req) => {
-  try {
-    const { employeeId, companyId } = req.cookies;
-    if (!employeeId || !companyId) return null;
- 
-    const newEmployeeId = decryptUserData(employeeId);
-    const newCompanyId  = decryptUserData(companyId);
- 
-    if (!newEmployeeId || !newCompanyId)                  return null;
-    if (!mongoose.Types.ObjectId.isValid(newEmployeeId))  return null;
-    if (!mongoose.Types.ObjectId.isValid(newCompanyId))   return null;
- 
-    return {
-      employeeId:   newEmployeeId,
-      companyId:    newCompanyId,
-      companyObjId: mongoose.Types.ObjectId.createFromHexString(newCompanyId),
-    };
-  } catch {
-    return null;
-  }
-};
-  
 // ── Number: positive finite check ───────────────────────────────
 const isPositiveNumber = (v) => {
   const n = Number(v);
@@ -101,20 +84,23 @@ const ALLOWED_UPDATE_FIELDS = [
  
 /* ═══════════════════════════════════════════════════════════════
    CREATE — POST /addNewGoles  (alias: POST /createGoal)
-   Old bug: never set companyId — since your schema now has
-   companyId required:true, every create was FAILING validation.
+   Creating a goal is a management action → manageProducts
 ═══════════════════════════════════════════════════════════════ */
 const createGoalHandler = async (req, res) => {
   try {
-    const auth = getAuth(req);
-    if (!auth)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to create goals." });
 
-    const billing = await Companies.findById(auth.companyObjId).select("planId subscriptionStatus trialEndsAt").lean();
-    const max = limitFor(billing, "products");
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(ctx.companyId);
+
+    const billing = await Companies.findById(companyObjId).select("planId subscriptionStatus trialEndsAt").lean();
+    const max = limitFor(billing, "goals");
     if (max !== Infinity) {
-      const n = await ClientProduct.countDocuments({ companyId: auth.companyObjId });
-      if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} Goal. Upgrade to add more.` });
+      const n = await MyTargetGoles.countDocuments({ companyId: companyObjId });
+      if (n >= max) return res.status(403).json({ message: `Your plan allows up to ${max} goals. Upgrade to add more.` });
     }
 
     const { targetName, targetStartDate, targetEndDate, targetAmount } = req.body;
@@ -143,7 +129,7 @@ const createGoalHandler = async (req, res) => {
       targetStartDate: targetStartDate.trim(),
       targetEndDate:   targetEndDate.trim(),
       targetAmount:    Number(targetAmount),
-      companyId:       auth.companyObjId,        // 👈 the missing piece
+      companyId:       companyObjId,             // 👈 the missing piece
     });
  
     await newGoal.save();
@@ -161,21 +147,27 @@ const createGoalHandler = async (req, res) => {
 };
  
 router.post("/addNewGoles", createGoalHandler);
- 
+router.post("/createGoal",  createGoalHandler);  // onboarding wizard alias — OnboardingPage.jsx
+                                                 // calls POST /setgole/createGoal. This route used to
+                                                 // live in the now-deleted GoalRoutes.js; without it
+                                                 // onboarding's goal step 404s. Same guarded handler,
+                                                 // so onboarding respects the goal limit too.
+
 /* ═══════════════════════════════════════════════════════════════
    READ ALL — GET /getGoleData
-   Old bug: find({}) returned EVERY company's goals — the single
-   worst leak in the file. Now scoped to the caller's company.
-   ⚠️ Response stays a RAW ARRAY — View.js does setAllDatas(res.data)
+   Any logged-in employee may see the company's goals/targets.
+   Tenant-scoped. ⚠️ Response stays a RAW ARRAY (View.js relies on it).
 ═══════════════════════════════════════════════════════════════ */
 router.get("/getGoleData", async (req, res) => {
   try {
-    const auth = getAuth(req);
-    if (!auth)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(ctx.companyId);
  
     const goals = await MyTargetGoles
-      .find({ companyId: auth.companyObjId })   // 👈 tenant isolation
+      .find({ companyId: companyObjId })        // 👈 tenant isolation
       .sort({ createdAt: -1 });                 // newest first
  
     // Empty list is a valid state (pre-onboarding), not an error
@@ -189,15 +181,16 @@ router.get("/getGoleData", async (req, res) => {
  
 /* ═══════════════════════════════════════════════════════════════
    READ ONE — GET /getOneGoal/:goalId
-   Old bug: findById with no company check — any logged-out visitor
-   could read any company's goal by guessing/leaking an id.
+   Any logged-in employee, tenant-scoped.
    ⚠️ Response stays the RAW GOAL OBJECT for frontend compatibility.
 ═══════════════════════════════════════════════════════════════ */
 router.get("/getOneGoal/:goalId", async (req, res) => {
   try {
-    const auth = getAuth(req);
-    if (!auth)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(ctx.companyId);
  
     const { goalId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(goalId))
@@ -205,7 +198,7 @@ router.get("/getOneGoal/:goalId", async (req, res) => {
  
     const goal = await MyTargetGoles.findOne({
       _id:       mongoose.Types.ObjectId.createFromHexString(goalId),
-      companyId: auth.companyObjId,             // 👈 tenant isolation
+      companyId: companyObjId,                  // 👈 tenant isolation
     });
  
     if (!goal)
@@ -221,15 +214,17 @@ router.get("/getOneGoal/:goalId", async (req, res) => {
  
 /* ═══════════════════════════════════════════════════════════════
    UPDATE — PUT /updateGoles/:goalId
-   Old bugs: $set:req.body (client could overwrite companyId or
-   inject any field) · upsert:true (typo'd id silently created a
-   ghost goal) · no ownership check.
+   Editing a goal is a management action → manageProducts
 ═══════════════════════════════════════════════════════════════ */
 router.put("/updateGoles/:goalId", async (req, res) => {
   try {
-    const auth = getAuth(req);
-    if (!auth)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to edit goals." });
+
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(ctx.companyId);
  
     const { goalId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(goalId))
@@ -240,7 +235,7 @@ router.put("/updateGoles/:goalId", async (req, res) => {
     // ── Fetch existing (also proves ownership) ──────────────────
     const existing = await MyTargetGoles.findOne({
       _id:       goalObjId,
-      companyId: auth.companyObjId,
+      companyId: companyObjId,
     });
  
     if (!existing)
@@ -283,7 +278,7 @@ router.put("/updateGoles/:goalId", async (req, res) => {
  
     // ── Apply — filter includes companyId, NO upsert ─────────────
     const updatedGoal = await MyTargetGoles.findOneAndUpdate(
-      { _id: goalObjId, companyId: auth.companyObjId },
+      { _id: goalObjId, companyId: companyObjId },
       { $set: updates },
       { new: true, runValidators: true }
     );
@@ -302,15 +297,17 @@ router.put("/updateGoles/:goalId", async (req, res) => {
  
 /* ═══════════════════════════════════════════════════════════════
    DELETE — DELETE /deleteGoal/:deleteId
-   Old bug: findByIdAndDelete with no ownership check — any company
-   could delete another company's goals.
-   New: cascade cleanup so no orphaned references remain.
+   Deleting a goal (with cascade cleanup) → manageProducts
 ═══════════════════════════════════════════════════════════════ */
 router.delete("/deleteGoal/:deleteId", async (req, res) => {
   try {
-    const auth = getAuth(req);
-    if (!auth)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
+    if (!ctx.can("manageProducts"))
+      return res.status(403).json({ message: "You don't have permission to delete goals." });
+
+    const companyObjId = mongoose.Types.ObjectId.createFromHexString(ctx.companyId);
  
     const { deleteId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(deleteId))
@@ -321,7 +318,7 @@ router.delete("/deleteGoal/:deleteId", async (req, res) => {
     // ── Delete with tenant isolation ────────────────────────────
     const deletedGoal = await MyTargetGoles.findOneAndDelete({
       _id:       goalObjId,
-      companyId: auth.companyObjId,
+      companyId: companyObjId,
     });
  
     if (!deletedGoal)
@@ -332,13 +329,13 @@ router.delete("/deleteGoal/:deleteId", async (req, res) => {
     //    GoalIdentifire array (products can live in other goals,
     //    so we never delete the products themselves).
     await ClientProduct.updateMany(
-      { companyId: auth.companyObjId, GoalIdentifire: deleteId },
+      { companyId: companyObjId, GoalIdentifire: deleteId },
       { $pull: { GoalIdentifire: deleteId } }
     );
  
     // 2) Remove this goal's extra-field configuration doc.
     await ExtraFieldConfig.deleteOne({
-      companyId: auth.companyObjId,
+      companyId: companyObjId,
       GoalId:    goalObjId,
     });
  
@@ -356,18 +353,19 @@ router.delete("/deleteGoal/:deleteId", async (req, res) => {
   }
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   GET /goalSparklineData — per-goal revenue / achievement / expected
+   revenue. Exposes sensitive financial performance → viewFinancials.
+═══════════════════════════════════════════════════════════════ */
 router.get("/goalSparklineData", async (req, res) => {
   try {
-    const { employeeId, companyId } = req.cookies;
-    const newemplyeeId = decryptUserData(employeeId);
-    const newcompanyId = decryptUserData(companyId);
- 
-    if (!newemplyeeId || !newcompanyId)
+    const ctx = await getRequester(req);
+    if (!ctx)
       return res.status(401).json({ message: "Login/Register please!" });
- 
-    if (!mongoose.Types.ObjectId.isValid(newcompanyId))
-      return res.status(400).json({ message: "Invalid companyId" });
- 
+    if (!ctx.can("viewFinancials"))
+      return res.status(403).json({ message: "You don't have permission to view financial data." });
+
+    const newcompanyId = ctx.companyId;
     const companyObjId = mongoose.Types.ObjectId.createFromHexString(newcompanyId);
  
     // ── 1. Fetch all goals for this company ──────────────────────
