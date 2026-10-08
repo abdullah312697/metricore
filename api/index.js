@@ -61,7 +61,6 @@ mongoose.set("bufferCommands", false);
 // app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
 app.post("/api/paddle/webhook", express.raw({ type: "application/json" }), paddleWebhookHandler);
 app.use(json());
-app.use("/api/paddle", paddleRoutes);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -132,6 +131,7 @@ app.use("/api/chart", ChartData);
 app.use("/api/v1", apiV1Limiter, ingestRoutes); 
 app.use("/api/apikeys", apiKeyRoutes);  
 app.use("/api/export", exportRoutes);  
+app.use("/api/paddle", paddleRoutes);
 
 // admin dashbord 
 app.use("/api/admin", adminAuthRoutes);
