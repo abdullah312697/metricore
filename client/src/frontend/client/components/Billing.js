@@ -76,9 +76,10 @@ export default function Billing() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+  load();
   initializePaddle({
-    environment: process.env.REACT_APP_PADDLE_ENV,                         // "production" at go-live
+    environment: process.env.REACT_APP_PADDLE_ENV,
     token: process.env.REACT_APP_PADDLE_CLIENT_TOKEN,
     eventCallback: (ev) => {
       if (ev.name === "checkout.closed")    setBusyPlan(null);
@@ -86,7 +87,6 @@ export default function Billing() {
     },
   }).then(setPaddle);
 }, [load]);
-
 
 const choose = (planId) => {
   if (!paddle) return;
