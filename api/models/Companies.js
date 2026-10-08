@@ -23,6 +23,8 @@ const CompanySchema = new Schema(
         billingInterval:    { type: String, default: null },
         currentPeriodEnd:   { type: Date },
         trialEndsAt:        { type: Date },
+        paddleCustomerId:     { type: String },
+        paddleSubscriptionId: { type: String },
     },
 
     {timestamps:true},

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import { Altaxios } from "../../Altaxios";   // 👈 adjust to your folder depth
 import "../../../style/Billing.css";
-
+import { initializePaddle } from "@paddle/paddle-js";
 /* ═══════════════════════════════════════════════════════════════
    Billing — company-side plan page (/company/:name/billing).
    Trial/active/expired banner + the three plan cards with a
@@ -12,6 +12,12 @@ import "../../../style/Billing.css";
    These feature lists also appear on LandingPage — keep them in sync.
 ═══════════════════════════════════════════════════════════════ */
 
+// plan + interval  →  Paddle Price ID (sandbox).  Swap for LIVE ids at go-live.
+const PADDLE_PRICES = {
+  starter: { month: "pri_01m497v870ahen9jexgcx78pzy", year: "pri_01m4980dswk10p4kn0159bqte0" },
+  growth:  { month: "pri_01m49851nn0y73kjwfz3gw1wv0", year: "pri_01m498730xsphfrdak4s82cytf" },
+  scale:   { month: "pri_01m4989rbbx3mnsgmq4954bhjc", year: "pri_01m498b2xpcrqap73vcspe4jpa" },
+};
 const PLANS_UI = [
   {
     id: "starter",
@@ -61,33 +67,44 @@ export default function Billing() {
   const [busyPlan, setBusyPlan] = useState(null);   // planId being checked out
   const [busyPortal, setBusyPortal] = useState(false);
   const [error,    setError]    = useState("");
+  const [paddle, setPaddle] = useState(null);
 
-  const load = useCallback(() => {
-    Altaxios.get("/stripe/subscription")
+    const load = useCallback(() => {
+    Altaxios.get("/paddle/subscription")
       .then((res) => setSub(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+  initializePaddle({
+    environment: process.env.REACT_APP_PADDLE_ENV,                         // "production" at go-live
+    token: process.env.REACT_APP_PADDLE_CLIENT_TOKEN,
+    eventCallback: (ev) => {
+      if (ev.name === "checkout.closed")    setBusyPlan(null);
+      if (ev.name === "checkout.completed") { setBusyPlan(null); setTimeout(load, 2500); }
+    },
+  }).then(setPaddle);
+}, [load]);
 
-  const choose = async (planId) => {
-    setBusyPlan(planId);
-    setError("");
-    try {
-      const res = await Altaxios.post("/stripe/create-checkout-session", { planId, interval });
-      window.location.href = res.data.url;          // off to Stripe Checkout
-    } catch (err) {
-      setError(err.response?.data?.message || "Could not start checkout.");
-      setBusyPlan(null);
-    }
-  };
+
+const choose = (planId) => {
+  if (!paddle) return;
+  const priceId = PADDLE_PRICES[planId]?.[interval];   // from GET /paddle/prices
+  if (!priceId) { setError("That plan isn't set up yet."); return; }
+  setBusyPlan(planId); setError("");
+  paddle.Checkout.open({
+    items: [{ priceId, quantity: 1 }],
+    customData: { companyId: sub.companyId, planId },
+    customer: sub.email ? { email: sub.email } : undefined,
+  });
+};
 
   const openPortal = async () => {
     setBusyPortal(true);
     setError("");
     try {
-      const res = await Altaxios.post("/stripe/create-portal-session");
+      const res = await Altaxios.post("/paddle/create-portal-session");
       window.location.href = res.data.url;
     } catch (err) {
       setError(err.response?.data?.message || "Could not open the billing portal.");
@@ -200,7 +217,7 @@ export default function Billing() {
                   onClick={() => choose(p.id)}
                   disabled={current || Boolean(busyPlan)}
                 >
-                  {current ? "Current plan" : isBusy ? "Redirecting…" : isActive ? "Switch to this plan" : "Choose plan"}
+                  {current ? "Current plan" : isBusy ? "Opening…" : isActive ? "Switch to this plan" : "Choose plan"}
                 </button>
               </div>
             );

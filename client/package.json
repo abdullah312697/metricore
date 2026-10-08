@@ -11,6 +11,7 @@
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@nivo/line": "^0.88.0",
+    "@paddle/paddle-js": "^1.6.5",
     "@paypal/react-paypal-js": "^8.5.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

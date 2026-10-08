@@ -135,3 +135,30 @@ export const earliestExportDate = (company) => {
   d.setUTCMonth(d.getUTCMonth() - historyMonths);
   return d;
 };
+
+// ════════════════════════════════════════════════════════════════
+//  ADD THESE EXPORTS TO YOUR EXISTING api/config/plans.js
+//  (don't replace the file — just paste these in alongside getPlan,
+//   priceIdFor, inTrial, effectivePlanId, TRIAL_DAYS, planFromPriceId).
+//  You can delete the old Stripe priceIdFor / planFromPriceId once Paddle
+//  is fully live and Stripe is gone.
+// ════════════════════════════════════════════════════════════════
+
+// Paddle price IDs, read from env so sandbox↔live is just an env swap.
+// Never hardcode/commit the ids. Fill the env vars from your Paddle catalog
+// (Part 2): the 6 pri_... ids you created for Starter/Growth/Scale × month/year.
+export const PADDLE_PRICES = {
+  starter: { month: process.env.PADDLE_PRICE_STARTER_M, year: process.env.PADDLE_PRICE_STARTER_Y },
+  growth:  { month: process.env.PADDLE_PRICE_GROWTH_M,  year: process.env.PADDLE_PRICE_GROWTH_Y  },
+  scale:   { month: process.env.PADDLE_PRICE_SCALE_M,   year: process.env.PADDLE_PRICE_SCALE_Y   },
+};
+
+// Paddle price id (pri_...) → { planId, interval }. Mirrors your Stripe
+// planFromPriceId — the webhook uses it to set the company's plan.
+export const planFromPaddlePriceId = (priceId) => {
+  for (const [planId, ivals] of Object.entries(PADDLE_PRICES)) {
+    if (ivals.month === priceId) return { planId, interval: "month" };
+    if (ivals.year  === priceId) return { planId, interval: "year"  };
+  }
+  return null;
+};

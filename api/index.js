@@ -33,6 +33,9 @@ import ChartData from "./routes/ChartData.js";
 import ingestRoutes  from "./routes/ingestRoutes.js";
 import apiKeyRoutes  from "./routes/apiKeyRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
+import { paddleWebhookHandler } from "./routes/paddleWebhook.js";
+import paddleRoutes from "./routes/paddleRoutes.js";
+import { requireActiveSubscription } from "./middleware/requireActiveSubscription.js";
 
 //=================admin=====================//
 import adminStatsRoutes from "./routes/adminStatsRoutes.js";
@@ -41,8 +44,8 @@ import adminCompanyRoutes from "./routes/adminCompanyRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import adminFeedbackRoutes from "./routes/adminFeedbackRoutes.js";
 import adminAnnouncementRoutes from "./routes/adminAnnouncementRoutes.js";
-import { stripeWebhookHandler } from "./routes/stripeWebhook.js";
-import stripeRoutes, { requireActiveSubscription } from "./routes/stripeRoutes.js";
+// import { stripeWebhookHandler } from "./routes/stripeWebhook.js";
+// import stripeRoutes, { requireActiveSubscription } from "./routes/stripeRoutes.js";
 import adminBillingRoutes from "./routes/adminBillingRoutes.js";
 import exportRoutes from "./routes/exportRoutes.js";
 // =========================
@@ -55,8 +58,10 @@ mongoose.set("bufferCommands", false);
 // =========================
 // ✅ Middleware Setup
 // =========================
-app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
+// app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
+app.post("/api/paddle/webhook", express.raw({ type: "application/json" }), paddleWebhookHandler);
 app.use(json());
+app.use("/api/paddle", paddleRoutes);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -138,7 +143,7 @@ app.use("/api/admin",         adminAnnouncementRoutes);
 app.use("/api/admin", adminBillingRoutes);
 app.use("/api/announcements", announcementRoutes);        // company feed
 // payment
-app.use("/api/stripe", stripeRoutes);
+// app.use("/api/stripe", stripeRoutes);
 
 // =========================
 // ✅ HTTP & Socket.IO Setup
