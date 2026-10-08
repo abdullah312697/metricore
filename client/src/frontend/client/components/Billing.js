@@ -153,12 +153,20 @@ const choose = (planId) => {
             </button>
           </div>
         )}
-        {!isActive && !sub?.trialActive && sub?.status !== "past_due" && (
-          <div className="bl-banner bl-banner--danger">
-            <strong>Your free trial has ended.</strong>&nbsp;Choose a plan below to continue.
-          </div>
-        )}
+      {/* canceled paid subscription */}
+      {!isActive && !sub?.trialActive && sub?.status === "canceled" && (
+        <div className="bl-banner bl-banner--danger">
+          <strong>Your subscription has been canceled.</strong>&nbsp;Choose a plan below to continue.
+        </div>
+      )}
 
+      {/* trial ended, never subscribed */}
+      {!isActive && !sub?.trialActive && sub?.status !== "past_due" && sub?.status !== "canceled" && (
+        <div className="bl-banner bl-banner--danger">
+          <strong>Your free trial has ended.</strong>&nbsp;Choose a plan below to continue.
+        </div>
+      )}
+      
         {/* ── interval toggle ────────────────────────────────── */}
         <div className="bl-toggle">
           <button

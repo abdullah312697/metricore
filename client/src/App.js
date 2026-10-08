@@ -26,6 +26,8 @@ const ChangelogPage = lazy(() => import("./frontend/client/components/ChangelogP
 const ContactPage   = lazy(() => import("./frontend/client/components/ContactPage"));
 const DeveloperGuide = lazy(() => import("./frontend/client/components/DeveloperGuide"));
 const DocsPage = lazy(() => import("./frontend/client/components/DocsPage"));
+const RefundPolicyPage = lazy(() => import("./frontend/client/components/Refundpolicypage"));
+
 // ── Auth pages (standalone — full-screen, no marketing chrome) ───
 const Register    = lazy(() => import("./frontend/client/components/Register"));
 const EmailVerify = lazy(() => import("./frontend/client/components/EmailVerify"));
@@ -118,6 +120,7 @@ function App() {
               <Route path="contact"   element={<ContactPage />}   />
               <Route path="developers" element={<DeveloperGuide />} />
               <Route path="docs" element={<DocsPage />} />
+              <Route path="refund-policy" element={<RefundPolicyPage />} />
             </Route>
 
             {/* ══ AUTH — standalone, no layout (focused screens) ══

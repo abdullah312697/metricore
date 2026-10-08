@@ -344,9 +344,10 @@ export default function TermsPage() {
           <Section id="payment" title="05. Payment & Billing">
             <P>
               Access to paid features of MetriCore requires a valid
-              subscription. All payments are processed by Stripe and
-              are subject to Stripe's terms of service. We do not store
-              your card details.
+              subscription. All payments are processed by Paddle, our Merchant of Record.
+               Paddle is the seller of record for your subscription,
+                calculates and handles any applicable taxes, and is subject to Paddle's Buyer Terms.
+                 We do not store your card details.
             </P>
             <PlanTable
               rows={[
@@ -364,7 +365,7 @@ export default function TermsPage() {
                 "Subscriptions renew automatically at the end of each billing period unless you cancel.",
                 "You can cancel at any time from your account settings. Cancellation takes effect at the end of the current billing period — you retain access until then.",
                 "We do not offer refunds for partial billing periods or unused time on a plan.",
-                "If a payment fails, Stripe will attempt to recover it. If it continues to fail, access to paid features is suspended until your billing details are updated.",
+                "If a payment fails, Paddle will attempt to recover it. If it continues to fail, access to paid features is suspended until your billing details are updated.",
                 "We will notify you by email at least 7 days before any price increase takes effect.",
                 "Prices are listed in US Dollars and exclude any applicable local taxes.",
               ]}

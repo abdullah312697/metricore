@@ -71,7 +71,7 @@ const PublicLayout = () => {
             {[
               { heading: "Product",  links: [["Features","/#features"],["Pricing","/#pricing"],["Changelog","/changelog"]] },
               { heading: "Company",  links: [["About","/about"],["Contact","/contact"],["Docs","/docs"]]                  },
-              { heading: "Legal",    links: [["Privacy","/privacy"],["Terms","/terms"],["Developer-Guide","/developers"]]              },
+              { heading: "Legal",    links: [["Privacy","/privacy"],["Refund-Policy","/refund-policy"],["Terms","/terms"],["Developer-Guide","/developers"]]              },
             ].map((col) => (
               <div key={col.heading} className="pl-footer__col">
                 <h4>{col.heading}</h4>

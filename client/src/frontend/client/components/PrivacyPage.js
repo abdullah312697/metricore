@@ -282,9 +282,8 @@ export default function PrivacyPage() {
               ]}
             />
             <P>
-              We do not collect or store payment card numbers. All payments are
-              processed by Stripe, and your card details are handled entirely by
-              Stripe under their own privacy policy.
+              We do not collect or store payment card numbers. All payments are processed by Paddle, our Merchant of Record, 
+              and your card details are handled entirely by Paddle under their own privacy policy.
             </P>
           </Section>
 
@@ -354,8 +353,8 @@ export default function PrivacyPage() {
               rows={[
                 {
                   type:     "Payment processing",
-                  includes: "Stripe",
-                  reason:   "To process subscription payments securely",
+                  includes: "Paddle (Merchant of Record)",
+                  reason:   "To process subscription payments and handle sales tax",
                 },
                 {
                   type:     "Database hosting",
