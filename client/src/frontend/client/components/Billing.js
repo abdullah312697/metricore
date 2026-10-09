@@ -23,7 +23,7 @@ const PLANS_UI = [
     id: "starter",
     name: "Starter",
     monthly: 19,
-    annual: 182,
+    annual: 180,
     tagline: "Perfect for solo operators and small product lines.",
     features: [
       "3 active goals", "Up to 10 products", "5 team members, role-based access",
@@ -35,7 +35,7 @@ const PLANS_UI = [
     id: "growth",
     name: "Growth",
     monthly: 49,
-    annual: 470,
+    annual: 468,
     popular: true,
     tagline: "The most popular plan for growing businesses.",
     features: [
@@ -47,7 +47,7 @@ const PLANS_UI = [
     id: "scale",
     name: "Scale",
     monthly: 99,
-    annual: 950,
+    annual: 948,
     tagline: "For established businesses with multiple teams.",
     features: [
       "Everything in Growth", "Unlimited goals", "Unlimited products",

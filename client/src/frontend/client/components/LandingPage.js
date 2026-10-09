@@ -467,6 +467,17 @@ const Pricing = () => {
                   </span>
                   <span className="lp-plan__period">/ {plan.period}</span>
                 </div>
+
+                {/* When annual, show the full yearly price below the monthly rate */}
+                {annual && (
+                  <span
+                    className="lp-plan__billed"
+                    style={{ display: "block", fontSize: "0.85rem", opacity: 0.65, marginTop: "6px" }}
+                  >
+                    billed ${Math.round(plan.price * 0.8) * 12}/year
+                  </span>
+                )}
+
                 <p className="lp-plan__desc">{plan.desc}</p>
               </div>
               <ul className="lp-plan__features">

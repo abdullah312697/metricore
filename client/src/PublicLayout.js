@@ -33,7 +33,7 @@ const PublicLayout = () => {
         </Link>
           <nav className="pl-nav">
             <a href="/#features">Features</a>
-            <a href="/#pricing">Pricing</a>
+            <a href="/pricing">Pricing</a>
             <Link to="/about">About</Link>
             <Link to="/contact">Contact</Link>
           </nav>
@@ -69,7 +69,7 @@ const PublicLayout = () => {
 
           <div className="pl-footer__cols">
             {[
-              { heading: "Product",  links: [["Features","/#features"],["Pricing","/#pricing"],["Changelog","/changelog"]] },
+              { heading: "Product",  links: [["Features","/#features"],["Pricing","/pricing"],["Changelog","/changelog"]] },
               { heading: "Company",  links: [["About","/about"],["Contact","/contact"],["Docs","/docs"]]                  },
               { heading: "Legal",    links: [["Privacy","/privacy"],["Refund-Policy","/refund-policy"],["Terms","/terms"],["Developer-Guide","/developers"]]              },
             ].map((col) => (
