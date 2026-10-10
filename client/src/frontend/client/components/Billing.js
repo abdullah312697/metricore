@@ -88,6 +88,16 @@ useEffect(() => {
   }).then(setPaddle);
 }, [load]);
 
+useEffect(() => {
+  const onPageShow = (e) => {
+    setBusyPortal(false);
+    setBusyPlan(null);
+    if (e.persisted) load();
+  };
+  window.addEventListener("pageshow", onPageShow);
+  return () => window.removeEventListener("pageshow", onPageShow);
+}, [load]);
+
 const choose = (planId) => {
   if (!paddle) return;
   const priceId = PADDLE_PRICES[planId]?.[interval];   // from GET /paddle/prices

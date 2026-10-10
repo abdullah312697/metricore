@@ -298,7 +298,7 @@ export default function RefundPolicyPage() {
             </P>
             <Notice type="info" icon="🧾">
               On your statement, the charge will usually appear as "Paddle" or
-              "paddle.com" rather than "MetriCore" — this is still your MetriCore
+              "paddle.net" rather than "MetriCore" — this is still your MetriCore
               subscription.
             </Notice>
             <P>
