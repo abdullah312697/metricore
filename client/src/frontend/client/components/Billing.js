@@ -14,9 +14,9 @@ import { initializePaddle } from "@paddle/paddle-js";
 
 // plan + interval  →  Paddle Price ID (sandbox).  Swap for LIVE ids at go-live.
 const PADDLE_PRICES = {
-  starter: { month: "pri_01m497v870ahen9jexgcx78pzy", year: "pri_01m4980dswk10p4kn0159bqte0" },
-  growth:  { month: "pri_01m49851nn0y73kjwfz3gw1wv0", year: "pri_01m498730xsphfrdak4s82cytf" },
-  scale:   { month: "pri_01m4989rbbx3mnsgmq4954bhjc", year: "pri_01m498b2xpcrqap73vcspe4jpa" },
+  starter: { month: "pri_01m4jats4bm1r2mv76n0qen4xd", year: "pri_01m4jax43fxqpxcrk0e88558zm" },
+  growth:  { month: "pri_01m4jb1j6aktfh0dwcmpcmhy51", year: "pri_01m4jb3nbezhprbqxrp5cak11r" },
+  scale:   { month: "pri_01m4jbaafj15cvmfqx4a1e0ybr", year: "pri_01m4jbc4cvv2mhsy4y6c9tath1" },
 };
 const PLANS_UI = [
   {
